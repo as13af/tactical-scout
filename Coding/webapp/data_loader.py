@@ -2,6 +2,18 @@ import os
 import json
 import re
 from pathlib import Path
+from functools import lru_cache
+
+# ── Simple module-level result cache (key → value) ────────────────────────────
+# Populated on first call, reused for all subsequent requests in the same process.
+_cache: dict = {}
+
+
+def _cached(key, fn):
+    """Return cached result for *key*, or call *fn()* and cache the result."""
+    if key not in _cache:
+        _cache[key] = fn()
+    return _cache[key]
 
 
 def _load_json(path):
@@ -57,6 +69,10 @@ def _parse_player_row(json_path, country, competition, club_name):
 # ── Home dashboard stats ──────────────────────────────────────────────────────
 def get_home_stats(output_dir):
     """Return aggregate counts and top-rated players for the home page."""
+    return _cached(f'home_stats:{output_dir}', lambda: _get_home_stats(output_dir))
+
+
+def _get_home_stats(output_dir):
     base = Path(output_dir)
     if not base.exists():
         return {'competitions': 0, 'clubs': 0, 'players': 0, 'top_players': []}
@@ -118,6 +134,10 @@ def get_home_stats(output_dir):
 # ── Competition / League overview ─────────────────────────────────────────────
 def get_all_competitions(output_dir):
     """Walk output/ and return list of {country, competition, clubs, standings_path}."""
+    return _cached(f'all_competitions:{output_dir}', lambda: _get_all_competitions(output_dir))
+
+
+def _get_all_competitions(output_dir):
     result = []
     base   = Path(output_dir)
     if not base.exists():
