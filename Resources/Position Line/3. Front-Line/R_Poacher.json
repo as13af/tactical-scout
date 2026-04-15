@@ -1,0 +1,106 @@
+{
+  "provider": "Sofascore",
+  "position": "Poacher",
+  "core_10_model": {
+    "weight_distribution": {
+      "box_presence": 0.30,
+      "shot_volume": 0.25,
+      "finishing_efficiency": 0.25,
+      "off_ball_movement": 0.10,
+      "pressing_output": 0.10
+    },
+    "metrics": [
+      {
+        "name": "Shots per 90",
+        "sofascore_key": "totalShots",
+        "computation": "totalShots / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total shots attempted per 90 minutes (primary box presence indicator)",
+        "category": "box_presence"
+      },
+      {
+        "name": "Shots on target per 90",
+        "sofascore_key": "shotsOnTarget",
+        "computation": "shotsOnTarget / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Shots on target per 90 minutes (proxy for dangerous box touches)",
+        "category": "box_presence"
+      },
+      {
+        "name": "Was fouled per 90",
+        "sofascore_key": "wasFouled",
+        "computation": "wasFouled / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Times fouled per 90 minutes (proxy for box movement drawing fouls)",
+        "category": "box_presence"
+      },
+      {
+        "name": "Shots on target, %",
+        "sofascore_key": ["shotsOnTarget", "totalShots"],
+        "computation": "shotsOnTarget / totalShots * 100",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots on target",
+        "category": "shot_volume"
+      },
+      {
+        "name": "Blocked shots per 90",
+        "sofascore_key": "blockedShots",
+        "computation": "blockedShots / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Shots that were blocked per 90 minutes (reflects persistent shooting volume)",
+        "category": "shot_volume"
+      },
+      {
+        "name": "Goals per 90",
+        "sofascore_key": "goals",
+        "computation": "goals / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Goals scored per 90 minutes",
+        "category": "finishing_efficiency"
+      },
+      {
+        "name": "Shots on target, %",
+        "sofascore_key": ["shotsOnTarget", "totalShots"],
+        "computation": "shotsOnTarget / totalShots * 100",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots on target",
+        "category": "finishing_efficiency"
+      },
+      {
+        "name": "Goal conversion, %",
+        "sofascore_key": "goalConversionPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots converted into goals",
+        "category": "finishing_efficiency"
+      },
+      {
+        "name": "Successful dribbles per 90",
+        "sofascore_key": "successfulDribbles",
+        "computation": "successfulDribbles / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Successful dribbles per 90 minutes (proxy for off-ball movement and progressive runs into box)",
+        "category": "off_ball_movement"
+      },
+      {
+        "name": "Total duels per 90",
+        "sofascore_key": ["totalDuelsWon", "duelLost"],
+        "computation": "(totalDuelsWon + duelLost) / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total duels engaged per 90 minutes (proxy for pressing engagement)",
+        "category": "pressing_output"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

@@ -1,0 +1,855 @@
+{
+    "standings": [
+        {
+            "type": "total",
+            "descriptions": [],
+            "tieBreakingRule": {
+                "text": "In the event that two (or more) teams have an equal number of points, the following rules break the tie:\n1. Number of matches played\n2. Goal difference \n3. Goals scored",
+                "id": 14600
+            },
+            "rows": [
+                {
+                    "team": {
+                        "name": "ADO Den Haag",
+                        "slug": "ado-den-haag",
+                        "shortName": "ADO",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 33081,
+                        "nameCode": "ADO",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2966,
+                        "teamColors": {
+                            "primary": "#339900",
+                            "secondary": "#ffff00",
+                            "text": "#ffff00"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion",
+                        "id": 11
+                    },
+                    "position": 1,
+                    "matches": 29,
+                    "wins": 22,
+                    "scoresFor": 70,
+                    "scoresAgainst": 30,
+                    "id": 1650603,
+                    "losses": 5,
+                    "draws": 2,
+                    "points": 68,
+                    "scoreDiffFormatted": "+40",
+                    "team_id": 2966
+                },
+                {
+                    "team": {
+                        "name": "SC Cambuur",
+                        "slug": "sc-cambuur",
+                        "shortName": "Cambuur",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 28899,
+                        "nameCode": "CAM",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2970,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#0099ff",
+                            "text": "#0099ff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion",
+                        "id": 11
+                    },
+                    "position": 2,
+                    "matches": 28,
+                    "wins": 19,
+                    "scoresFor": 60,
+                    "scoresAgainst": 32,
+                    "id": 1650618,
+                    "losses": 3,
+                    "draws": 6,
+                    "points": 63,
+                    "scoreDiffFormatted": "+28",
+                    "team_id": 2970
+                },
+                {
+                    "team": {
+                        "name": "De Graafschap",
+                        "slug": "de-graafschap",
+                        "shortName": "De Graafschap",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 16659,
+                        "nameCode": "GRA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2949,
+                        "teamColors": {
+                            "primary": "#ffffff",
+                            "secondary": "#0066ff",
+                            "text": "#0066ff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 3,
+                    "matches": 29,
+                    "wins": 14,
+                    "scoresFor": 55,
+                    "scoresAgainst": 44,
+                    "id": 1650605,
+                    "losses": 8,
+                    "draws": 7,
+                    "points": 49,
+                    "scoreDiffFormatted": "+11",
+                    "team_id": 2949
+                },
+                {
+                    "team": {
+                        "name": "Jong PSV Eindhoven",
+                        "slug": "jong-psv-eindhoven",
+                        "shortName": "Jong PSV",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 19991,
+                        "nameCode": "PSV",
+                        "disabled": false,
+                        "national": false,
+                        "parentTeam": {
+                            "name": "PSV Eindhoven",
+                            "slug": "psv-eindhoven",
+                            "shortName": "PSV",
+                            "gender": "M",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "userCount": 479453,
+                            "nameCode": "PSV",
+                            "disabled": false,
+                            "national": false,
+                            "type": 0,
+                            "id": 2952,
+                            "teamColors": {
+                                "primary": "#ff0000",
+                                "secondary": "#ffffff",
+                                "text": "#ffffff"
+                            }
+                        },
+                        "type": 0,
+                        "id": 46168,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 4,
+                    "matches": 29,
+                    "wins": 14,
+                    "scoresFor": 59,
+                    "scoresAgainst": 53,
+                    "id": 1650614,
+                    "losses": 10,
+                    "draws": 5,
+                    "points": 47,
+                    "scoreDiffFormatted": "+6",
+                    "team_id": 46168
+                },
+                {
+                    "team": {
+                        "name": "Roda JC Kerkrade",
+                        "slug": "roda-jc-kerkrade",
+                        "shortName": "Roda",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 17601,
+                        "nameCode": "ROD",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2954,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#ffff00",
+                            "text": "#ffff00"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 5,
+                    "matches": 29,
+                    "wins": 12,
+                    "scoresFor": 49,
+                    "scoresAgainst": 43,
+                    "id": 1650617,
+                    "losses": 7,
+                    "draws": 10,
+                    "points": 46,
+                    "scoreDiffFormatted": "+6",
+                    "team_id": 2954
+                },
+                {
+                    "team": {
+                        "name": "Willem II Tilburg",
+                        "slug": "willem-ii-tilburg",
+                        "shortName": "Willem II",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 24208,
+                        "nameCode": "WIL",
+                        "national": false,
+                        "type": 0,
+                        "id": 2961,
+                        "teamColors": {
+                            "primary": "#ffffff",
+                            "secondary": "#0000ff",
+                            "text": "#0000ff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 6,
+                    "matches": 29,
+                    "wins": 13,
+                    "scoresFor": 41,
+                    "scoresAgainst": 36,
+                    "id": 1650622,
+                    "losses": 9,
+                    "draws": 7,
+                    "points": 46,
+                    "scoreDiffFormatted": "+5",
+                    "team_id": 2961
+                },
+                {
+                    "team": {
+                        "name": "Almere City FC",
+                        "slug": "almere-city-fc",
+                        "shortName": "Almere",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 24147,
+                        "nameCode": "ALM",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2990,
+                        "teamColors": {
+                            "primary": "#620709",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 7,
+                    "matches": 29,
+                    "wins": 13,
+                    "scoresFor": 60,
+                    "scoresAgainst": 50,
+                    "id": 1650604,
+                    "losses": 13,
+                    "draws": 3,
+                    "points": 42,
+                    "scoreDiffFormatted": "+10",
+                    "team_id": 2990
+                },
+                {
+                    "team": {
+                        "name": "RKC Waalwijk",
+                        "slug": "rkc-waalwijk",
+                        "shortName": "Waalwijk",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 19101,
+                        "nameCode": "WAA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2956,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#000066",
+                            "text": "#000066"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 8,
+                    "matches": 29,
+                    "wins": 11,
+                    "scoresFor": 47,
+                    "scoresAgainst": 44,
+                    "id": 1650616,
+                    "losses": 10,
+                    "draws": 8,
+                    "points": 41,
+                    "scoreDiffFormatted": "+3",
+                    "team_id": 2956
+                },
+                {
+                    "team": {
+                        "name": "FC Dordrecht",
+                        "slug": "fc-dordrecht",
+                        "shortName": "Dordrecht",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 14370,
+                        "nameCode": "DOR",
+                        "national": false,
+                        "type": 0,
+                        "id": 2973,
+                        "teamColors": {
+                            "primary": "#00cc66",
+                            "secondary": "#00cc66",
+                            "text": "#00cc66"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 9,
+                    "matches": 29,
+                    "wins": 11,
+                    "scoresFor": 39,
+                    "scoresAgainst": 38,
+                    "id": 1650607,
+                    "losses": 10,
+                    "draws": 8,
+                    "points": 41,
+                    "scoreDiffFormatted": "+1",
+                    "team_id": 2973
+                },
+                {
+                    "team": {
+                        "name": "FC Den Bosch",
+                        "slug": "fc-den-bosch",
+                        "shortName": "Den Bosch",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 16182,
+                        "nameCode": "DBO",
+                        "national": false,
+                        "type": 0,
+                        "id": 2963,
+                        "teamColors": {
+                            "primary": "#0000cc",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 10,
+                    "matches": 29,
+                    "wins": 11,
+                    "scoresFor": 51,
+                    "scoresAgainst": 53,
+                    "id": 1650606,
+                    "losses": 12,
+                    "draws": 6,
+                    "points": 39,
+                    "scoreDiffFormatted": "-2",
+                    "team_id": 2963
+                },
+                {
+                    "team": {
+                        "name": "VVV-Venlo",
+                        "slug": "vvv-venlo",
+                        "shortName": "VVV-Venlo",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 11890,
+                        "nameCode": "VEN",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2980,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 11,
+                    "matches": 29,
+                    "wins": 11,
+                    "scoresFor": 38,
+                    "scoresAgainst": 43,
+                    "id": 1650621,
+                    "losses": 14,
+                    "draws": 4,
+                    "points": 37,
+                    "scoreDiffFormatted": "-5",
+                    "team_id": 2980
+                },
+                {
+                    "team": {
+                        "name": "FC Eindhoven",
+                        "slug": "fc-eindhoven",
+                        "shortName": "Eindhoven",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12235,
+                        "nameCode": "EIN",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2994,
+                        "teamColors": {
+                            "primary": "#24528e",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 12,
+                    "matches": 29,
+                    "wins": 10,
+                    "scoresFor": 41,
+                    "scoresAgainst": 53,
+                    "id": 1650608,
+                    "losses": 15,
+                    "draws": 4,
+                    "points": 34,
+                    "scoreDiffFormatted": "-12",
+                    "team_id": 2994
+                },
+                {
+                    "team": {
+                        "name": "Jong FC Utrecht",
+                        "slug": "jong-fc-utrecht",
+                        "shortName": "Jong FC Utrecht",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12819,
+                        "nameCode": "UTR",
+                        "national": false,
+                        "type": 0,
+                        "id": 53067,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 13,
+                    "matches": 29,
+                    "wins": 8,
+                    "scoresFor": 47,
+                    "scoresAgainst": 52,
+                    "id": 1650613,
+                    "losses": 12,
+                    "draws": 9,
+                    "points": 33,
+                    "scoreDiffFormatted": "-5",
+                    "team_id": 53067
+                },
+                {
+                    "team": {
+                        "name": "FC Emmen",
+                        "slug": "fc-emmen",
+                        "shortName": "Emmen",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 16176,
+                        "nameCode": "EMM",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2965,
+                        "teamColors": {
+                            "primary": "#e8ecf8",
+                            "secondary": "#d13a3a",
+                            "text": "#d13a3a"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 14,
+                    "matches": 28,
+                    "wins": 9,
+                    "scoresFor": 43,
+                    "scoresAgainst": 51,
+                    "id": 1650609,
+                    "losses": 13,
+                    "draws": 6,
+                    "points": 33,
+                    "scoreDiffFormatted": "-8",
+                    "team_id": 2965
+                },
+                {
+                    "team": {
+                        "name": "Helmond Sport",
+                        "slug": "helmond-sport",
+                        "shortName": "Helmond Sport",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 9506,
+                        "nameCode": "HEL",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2974,
+                        "teamColors": {
+                            "primary": "#b30a29",
+                            "secondary": "#b30a29",
+                            "text": "#b30a29"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 15,
+                    "matches": 29,
+                    "wins": 9,
+                    "scoresFor": 36,
+                    "scoresAgainst": 53,
+                    "id": 1650610,
+                    "losses": 15,
+                    "draws": 5,
+                    "points": 32,
+                    "scoreDiffFormatted": "-17",
+                    "team_id": 2974
+                },
+                {
+                    "team": {
+                        "name": "MVV Maastricht",
+                        "slug": "mvv-maastricht",
+                        "shortName": "MVV",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 9715,
+                        "nameCode": "MAA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2976,
+                        "teamColors": {
+                            "primary": "#d31100",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 16,
+                    "matches": 29,
+                    "wins": 8,
+                    "scoresFor": 35,
+                    "scoresAgainst": 58,
+                    "id": 1650615,
+                    "losses": 14,
+                    "draws": 7,
+                    "points": 31,
+                    "scoreDiffFormatted": "-23",
+                    "team_id": 2976
+                },
+                {
+                    "team": {
+                        "name": "Jong AZ Alkmaar",
+                        "slug": "jong-az-alkmaar",
+                        "shortName": "Jong AZ",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 14209,
+                        "nameCode": "AZ",
+                        "national": false,
+                        "type": 0,
+                        "id": 46161,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 17,
+                    "matches": 29,
+                    "wins": 9,
+                    "scoresFor": 49,
+                    "scoresAgainst": 57,
+                    "id": 1650612,
+                    "losses": 17,
+                    "draws": 3,
+                    "points": 30,
+                    "scoreDiffFormatted": "-8",
+                    "team_id": 46161
+                },
+                {
+                    "team": {
+                        "name": "Vitesse",
+                        "slug": "vitesse",
+                        "shortName": "Vitesse",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 22890,
+                        "nameCode": "VIT",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2958,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [
+                        {
+                            "text": "12 points deducted due to decision by the Federation",
+                            "id": 70
+                        }
+                    ],
+                    "position": 18,
+                    "matches": 29,
+                    "wins": 10,
+                    "scoresFor": 43,
+                    "scoresAgainst": 45,
+                    "id": 1882429,
+                    "losses": 10,
+                    "draws": 9,
+                    "points": 27,
+                    "scoreDiffFormatted": "-2",
+                    "team_id": 2958
+                },
+                {
+                    "team": {
+                        "name": "TOP Oss",
+                        "slug": "top-oss",
+                        "shortName": "TOP Oss",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 10228,
+                        "nameCode": "OSS",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 2978,
+                        "teamColors": {
+                            "primary": "#91110e",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 19,
+                    "matches": 29,
+                    "wins": 6,
+                    "scoresFor": 35,
+                    "scoresAgainst": 50,
+                    "id": 1650619,
+                    "losses": 14,
+                    "draws": 9,
+                    "points": 27,
+                    "scoreDiffFormatted": "-15",
+                    "team_id": 2978
+                },
+                {
+                    "team": {
+                        "name": "Jong Ajax",
+                        "slug": "jong-ajax",
+                        "shortName": "Jong Ajax",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 22045,
+                        "nameCode": "AJA",
+                        "disabled": false,
+                        "national": false,
+                        "parentTeam": {
+                            "name": "AFC Ajax",
+                            "slug": "ajax",
+                            "shortName": "Ajax",
+                            "gender": "M",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "userCount": 493459,
+                            "nameCode": "AJA",
+                            "disabled": false,
+                            "national": false,
+                            "type": 0,
+                            "id": 2953,
+                            "teamColors": {
+                                "primary": "#bb002b",
+                                "secondary": "#ffffff",
+                                "text": "#ffffff"
+                            }
+                        },
+                        "type": 0,
+                        "id": 46160,
+                        "teamColors": {
+                            "primary": "#bb002b",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 20,
+                    "matches": 29,
+                    "wins": 6,
+                    "scoresFor": 40,
+                    "scoresAgainst": 53,
+                    "id": 1650611,
+                    "losses": 15,
+                    "draws": 8,
+                    "points": 26,
+                    "scoreDiffFormatted": "-13",
+                    "team_id": 46160
+                }
+            ],
+            "id": 179467,
+            "tournament": {
+                "name": "Eerste Divisie",
+                "slug": "eerste-divisie",
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL"
+                },
+                "uniqueTournament": {
+                    "name": "Eerste Divisie",
+                    "slug": "eerste-divisie",
+                    "primaryColorHex": "#b0192e",
+                    "secondaryColorHex": "#a3a3a3",
+                    "category": {
+                        "name": "Netherlands",
+                        "slug": "netherlands",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "id": 35,
+                        "flag": "netherlands",
+                        "alpha2": "NL"
+                    },
+                    "userCount": 23858,
+                    "hasPerformanceGraphFeature": true,
+                    "id": 131,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 323,
+                "isGroup": false,
+                "isLive": false,
+                "id": 40
+            },
+            "name": "Eerste Divisie 25/26",
+            "updatedAtTimestamp": 1772571180
+        }
+    ]
+}

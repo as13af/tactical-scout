@@ -1,0 +1,601 @@
+{% extends "base.html" %}
+{% block title %}Tactical Compatibility — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Tactical Compatibility</h1>
+  <div class="sub">Score a player against any of the 18 role profiles from the Position Line model.</div>
+</div>
+
+<!-- ── Setup card ─────────────────────────────────────────────────────────── -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-title" style="margin-bottom:16px;">Select Player &amp; Role</div>
+
+  <div class="compat-setup-grid">
+    <!-- Player search (autocomplete) -->
+    <div class="compat-field">
+      <label class="compat-label">Player</label>
+      <div class="ac-wrap" style="position:relative;">
+        <input type="text" id="player-input" class="compat-input" placeholder="Search player name…" autocomplete="off"
+               oninput="triggerPlayerSearch()" onkeydown="onPlayerKeyDown(event)">
+        <button class="search-clear-btn" id="player-clear" onclick="clearPlayer()" style="display:none;">×</button>
+        <div class="autocomplete-list" id="player-dropdown" style="display:none;"></div>
+        <input type="hidden" id="player-path">
+      </div>
+      <div id="player-badge" class="compat-badge" style="display:none;"></div>
+    </div>
+
+    <!-- Role selector -->
+    <div class="compat-field">
+      <label class="compat-label">Role Profile</label>
+      <select id="role-select" class="compat-input">
+        <optgroup label="Back Line">
+          <option value="1. Back-Line/A_Central_Defend.json">Central Defender</option>
+          <option value="1. Back-Line/B_Ball_Playing_Defend.json">Ball Playing Defender</option>
+          <option value="1. Back-Line/C_Wing_Back.json">Wing Back</option>
+          <option value="1. Back-Line/D_Full_Back.json">Full Back</option>
+          <option value="1. Back-Line/E_Inverted_Wing_Back.json">Inverted Wing Back</option>
+          <option value="1. Back-Line/F_Inverted_Full_Back.json">Inverted Full Back</option>
+        </optgroup>
+        <optgroup label="Mid Line">
+          <option value="2. Mid-Line/G_Defensive_Midfielder.json">Defensive Midfielder</option>
+          <option value="2. Mid-Line/H_Deep_Lying_Playmaker.json">Deep Lying Playmaker</option>
+          <option value="2. Mid-Line/I_Central_Midfielder.json">Central Midfielder</option>
+          <option value="2. Mid-Line/J_Box_to_Box_Midfielder.json">Box-to-Box Midfielder</option>
+          <option value="2. Mid-Line/K_Advanced_Playmaker.json">Advanced Playmaker</option>
+          <option value="2. Mid-Line/L_Attacking_Midfielder.json">Attacking Midfielder</option>
+        </optgroup>
+        <optgroup label="Front Line">
+          <option value="3. Front-Line/M_Winger.json">Winger</option>
+          <option value="3. Front-Line/N_Inside_Forward.json">Inside Forward</option>
+          <option value="3. Front-Line/O_Advanced_Forward.json">Advanced Forward</option>
+          <option value="3. Front-Line/P_Target_Forward.json">Target Forward</option>
+          <option value="3. Front-Line/Q_False_Nine.json">False Nine</option>
+          <option value="3. Front-Line/R_Poacher.json">Poacher</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <button class="compat-btn" id="analyse-btn" onclick="runAnalysis()" disabled>Analyse</button>
+  <div id="error-msg" class="compat-error" style="display:none;"></div>
+</div>
+
+<!-- ── Results ─────────────────────────────────────────────────────────────── -->
+<div id="results" style="display:none;">
+
+  <!-- Score header -->
+  <div class="card compat-result-header" style="margin-bottom:16px;">
+    <div class="score-ring" id="score-ring" style="--pct:0">
+      <span id="overall-score-val">--</span>
+    </div>
+    <div class="compat-result-meta">
+      <div class="compat-result-name" id="res-player-name">—</div>
+      <div class="compat-result-role" id="res-role-name">—</div>
+      <div class="compat-result-detail" id="res-detail">—</div>
+      <div id="avg-score-line" style="display:none; font-size:12px; color:var(--text3); margin-top:4px;"></div>
+    </div>
+    <div class="compat-verdict" id="verdict-block"></div>
+  </div>
+
+  <!-- How it works panel -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title" style="margin-bottom:0; display:flex; align-items:center; justify-content:space-between; cursor:pointer;"
+         onclick="toggleExplain()">
+      <span>How is this score calculated?</span>
+      <span id="explain-chevron" style="font-size:18px; color:var(--text2); transition:transform 0.25s;">▸</span>
+    </div>
+    <div id="explain-body" style="display:none; margin-top:16px;">
+
+      <!-- Step 1 -->
+      <div class="explain-step">
+        <div class="explain-step-num">1</div>
+        <div class="explain-step-body">
+          <div class="explain-step-title">Raw stat → formula → one number per metric</div>
+          <div class="explain-step-text">
+            Each metric in the role profile has a <strong>computation formula</strong> applied to the player's raw SofaScore stats.
+            There are three formula types:
+          </div>
+          <div class="explain-formula-grid" id="explain-formulas"></div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="explain-step">
+        <div class="explain-step-num">2</div>
+        <div class="explain-step-body">
+          <div class="explain-step-title">Raw value → 0–100 metric score</div>
+          <div class="explain-step-text">
+            Two scoring paths depending on the formula:
+          </div>
+          <div class="explain-score-paths">
+            <div class="explain-score-path">
+              <div class="explain-path-label" style="color:var(--amber);">Percentage / rate output</div>
+              <div class="explain-path-formula"><code>score = raw value (already 0–100)</code></div>
+              <div class="explain-path-note">e.g. "Pass accuracy %" — 73.2% → score 73.2</div>
+            </div>
+            <div class="explain-score-path">
+              <div class="explain-path-label" style="color:var(--green);">Per-90 counting stat</div>
+              <div class="explain-path-formula"><code>score = (raw / ref_max) × 100, clamped to 100</code></div>
+              <div class="explain-path-note">Each stat has an elite benchmark as <code>ref_max</code> (e.g. goals/90 ref_max = 1.2, key passes/90 = 4.0). A player at the benchmark scores 100.</div>
+            </div>
+          </div>
+          <div class="explain-step-text" style="margin-top:10px;">
+            For metrics where <strong>lower is better</strong> (e.g. fouls/90), the score is inverted: <code>score = 100 − raw_score</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="explain-step">
+        <div class="explain-step-num">3</div>
+        <div class="explain-step-body">
+          <div class="explain-step-title">Category score = average of its metric scores</div>
+          <div class="explain-step-text">Metrics are grouped into <strong id="explain-cat-count">—</strong> categories for this role. Each category score is the mean of all metric scores inside it:</div>
+          <div id="explain-cats" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="explain-step" style="border-bottom:none; padding-bottom:0;">
+        <div class="explain-step-num">4</div>
+        <div class="explain-step-body">
+          <div class="explain-step-title">Role Fitness = weighted sum of category scores</div>
+          <div class="explain-step-text">Each category has a <strong>weight</strong> defined in the role profile. The final score is:</div>
+          <div class="explain-formula-box" id="explain-formula-box">—</div>
+          <div class="explain-step-text" style="margin-top:8px;" id="explain-live-calc"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Category bars -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title" style="margin-bottom:14px;">Category Breakdown</div>
+    <div id="cat-bars"></div>
+  </div>
+
+  <!-- Metric detail table -->
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px;">Metric Details</div>
+    <div class="metric-table-wrap">
+      <table class="metric-table" id="metric-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Category</th>
+            <th style="text-align:right;">Raw Value</th>
+            <th style="width:140px;">Score</th>
+            <th style="text-align:right;">/ 100</th>
+            <th style="text-align:right; color:var(--text3);" title="League positional average">Avg Raw</th>
+            <th style="text-align:right; color:var(--text3);" title="League positional average">Avg Score</th>
+          </tr>
+        </thead>
+        <tbody id="metric-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /results -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let selectedPath   = '';
+let selectedName   = '';
+let dropdownItems  = [];
+let highlightIndex = -1;
+let searchTimer    = null;
+let avgData        = null;
+// ── Score ring animation ───────────────────────────────────────────────────
+function animateRingVal(ringEl, labelEl, target, showDecimal) {
+  ringEl.style.setProperty('--pct', '0');
+  const start = performance.now();
+  requestAnimationFrame(function frame(now) {
+    const t     = Math.min((now - start) / 800, 1);
+    const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const cur   = target * eased;
+    ringEl.style.setProperty('--pct', cur.toFixed(2));
+    labelEl.textContent = showDecimal ? cur.toFixed(1) : Math.round(cur).toString();
+    if (t < 1) requestAnimationFrame(frame);
+    else labelEl.textContent = showDecimal ? target.toFixed(1) : Math.round(target).toString();
+  });
+}
+// ── Player autocomplete ───────────────────────────────────────────────────────
+function triggerPlayerSearch() {
+  clearTimeout(searchTimer);
+  const q = document.getElementById('player-input').value.trim();
+  if (q.length < 2) { closeDropdown(); return; }
+  searchTimer = setTimeout(() => fetchSuggestions(q), 220);
+}
+
+function fetchSuggestions(q) {
+  fetch('/api/player_search?q=' + encodeURIComponent(q))
+    .then(r => r.json()).then(data => buildDropdown(data));
+}
+
+function buildDropdown(data) {
+  const dd = document.getElementById('player-dropdown');
+  dd.innerHTML = '';
+  dropdownItems = data;
+  highlightIndex = -1;
+
+  if (!data.length) {
+    const el = document.createElement('div');
+    el.className = 'autocomplete-item ac-empty';
+    el.textContent = 'No players found';
+    dd.appendChild(el);
+    dd.style.display = 'block';
+    return;
+  }
+
+  data.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'autocomplete-item';
+    const nameEl = document.createElement('span');
+    nameEl.textContent = item.name;
+    const teamEl = document.createElement('span');
+    teamEl.className = 'ac-team';
+    teamEl.textContent = item.team + ' · ' + (item.competition || '');
+    el.appendChild(nameEl);
+    el.appendChild(teamEl);
+    el.addEventListener('mousedown', e => { e.preventDefault(); selectPlayer(item); });
+    dd.appendChild(el);
+  });
+  dd.style.display = 'block';
+}
+
+function onPlayerKeyDown(e) {
+  const dd = document.getElementById('player-dropdown');
+  const items = dd.querySelectorAll('.autocomplete-item:not(.ac-empty)');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    highlightIndex = Math.min(highlightIndex + 1, items.length - 1);
+    updateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    highlightIndex = Math.max(highlightIndex - 1, 0);
+    updateHighlight(items);
+  } else if (e.key === 'Enter' && highlightIndex >= 0) {
+    e.preventDefault();
+    selectPlayer(dropdownItems[highlightIndex]);
+  } else if (e.key === 'Escape') {
+    closeDropdown();
+  }
+}
+
+function updateHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('focused', i === highlightIndex));
+  if (highlightIndex >= 0) items[highlightIndex].scrollIntoView({ block: 'nearest' });
+}
+
+function selectPlayer(item) {
+  selectedPath = item.path;
+  selectedName = item.name;
+  const inp = document.getElementById('player-input');
+  inp.value = item.name;
+  inp.classList.add('selected');
+  inp.readOnly = true;
+  document.getElementById('player-clear').style.display = 'flex';
+  document.getElementById('player-path').value = item.path;
+
+  // Mini badge
+  const badge = document.getElementById('player-badge');
+  badge.textContent = (item.team || '') + (item.competition ? ' · ' + item.competition : '');
+  badge.style.display = 'block';
+
+  closeDropdown();
+  checkReady();
+}
+
+function clearPlayer() {
+  selectedPath = ''; selectedName = ''; avgData = null;
+  const inp = document.getElementById('player-input');
+  inp.value = ''; inp.readOnly = false; inp.classList.remove('selected');
+  inp.focus();
+  document.getElementById('player-clear').style.display = 'none';
+  document.getElementById('player-path').value = '';
+  document.getElementById('player-badge').style.display = 'none';
+  const asl = document.getElementById('avg-score-line');
+  if (asl) asl.style.display = 'none';
+  closeDropdown();
+  checkReady();
+}
+
+function closeDropdown() {
+  document.getElementById('player-dropdown').style.display = 'none';
+  highlightIndex = -1;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ac-wrap')) closeDropdown();
+});
+
+// ── Analyse ───────────────────────────────────────────────────────────────────
+function checkReady() {
+  document.getElementById('analyse-btn').disabled = !selectedPath;
+}
+
+function runAnalysis() {
+  const role = document.getElementById('role-select').value;
+  if (!selectedPath || !role) return;
+
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  const btn = document.getElementById('analyse-btn');
+  btn.disabled = true;
+  btn.textContent = 'Analysing…';
+
+  avgData = null;
+  fetch('/api/compatibility?player=' + encodeURIComponent(selectedPath)
+      + '&role=' + encodeURIComponent(role))
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false; btn.textContent = 'Analyse';
+      if (data.error) { showError(data.error); return; }
+      renderResults(data);
+      fetchLeagueAvg(selectedPath, role);
+    })
+    .catch(() => {
+      btn.disabled = false; btn.textContent = 'Analyse';
+      showError('Network error. Is the server running?');
+    });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderResults(d) {
+  const score = d.overall_score;
+
+  // Score ring
+  const ring = document.getElementById('score-ring');
+  const colour = score >= 70 ? 'var(--green)' : score >= 45 ? 'var(--amber)' : 'var(--red)';
+  ring.style.setProperty('--ring-colour', colour);
+  ring.style.setProperty('--ring-glow-opacity', (Math.min(0.30, 0.08 + score / 100 * 0.22)).toFixed(2));
+  animateRingVal(ring, document.getElementById('overall-score-val'), score, true);
+
+  // Verdict text
+  let verdict = '', vcls = '';
+  if (score >= 75) { verdict = 'Excellent Fit'; vcls = 'verdict-good'; }
+  else if (score >= 60) { verdict = 'Good Fit'; vcls = 'verdict-good'; }
+  else if (score >= 45) { verdict = 'Moderate Fit'; vcls = 'verdict-mid'; }
+  else if (score >= 30) { verdict = 'Below Average'; vcls = 'verdict-low'; }
+  else { verdict = 'Poor Fit'; vcls = 'verdict-low'; }
+  const vb = document.getElementById('verdict-block');
+  vb.innerHTML = '';
+  const vs = document.createElement('span');
+  vs.className = 'verdict-badge ' + vcls;
+  vs.textContent = verdict;
+  vb.appendChild(vs);
+
+  // Meta
+  document.getElementById('res-player-name').textContent = d.player_name;
+  document.getElementById('res-role-name').textContent   = d.role_name;
+  document.getElementById('res-detail').textContent      =
+    'Age ' + d.player_age + ' · ' + d.player_positions.join(', ')
+    + ' · League intensity ' + (d.league_intensity * 100).toFixed(1) + '%';
+
+  // Category bars
+  const catWrap = document.getElementById('cat-bars');
+  catWrap.innerHTML = '';
+  const weights = d.weights;
+  const cats    = Object.keys(weights).sort((a, b) => weights[b] - weights[a]);
+  cats.forEach(cat => {
+    const score_c = d.category_scores[cat] || 0;
+    const weight  = (weights[cat] * 100).toFixed(0);
+    const barColour = score_c >= 70 ? 'linear-gradient(90deg,#2a7aaf 0%,#3a8dbf 100%)' : score_c >= 45 ? 'linear-gradient(90deg,#6ba3c8 0%,#87bde0 100%)' : 'linear-gradient(90deg,#c04040 0%,#e05c5c 100%)';
+    const row = document.createElement('div');
+    row.className = 'cat-bar-row';
+    row.innerHTML = `
+      <div class="cat-bar-header">
+        <span class="cat-bar-name">${formatCatName(cat)}</span>
+        <span class="cat-bar-meta">weight ${weight}% &nbsp;·&nbsp; <strong>${score_c.toFixed(1)}</strong>/100<span class="cat-avg-label" id="cat-avg-${cat}"></span></span>
+      </div>
+      <div class="cat-bar-track">
+        <div class="cat-bar-fill" style="width:${score_c}%; background:${barColour};"></div>
+      </div>`;
+    catWrap.appendChild(row);
+  });
+
+  // Metric table
+  const tbody = document.getElementById('metric-tbody');
+  tbody.innerHTML = '';
+  d.metric_details.forEach(m => {
+    const fillColour = m.score >= 70 ? 'linear-gradient(90deg,#2a7aaf 0%,#3a8dbf 100%)' : m.score >= 45 ? 'linear-gradient(90deg,#6ba3c8 0%,#87bde0 100%)' : 'linear-gradient(90deg,#c04040 0%,#e05c5c 100%)';
+    const arrowClr   = m.higher_is_better ? 'color:var(--green)' : 'color:var(--red)';
+    const arrowChar  = m.higher_is_better ? '↑' : '↓';
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-metric', m.name);
+    tr.innerHTML = `
+      <td class="metric-name">${m.name} <span style="${arrowClr}; font-size:11px;">${arrowChar}</span></td>
+      <td><span class="tag tag-sm">${formatCatName(m.category)}</span></td>
+      <td class="metric-raw" style="text-align:right;">${formatRaw(m.raw_value)}</td>
+      <td class="metric-bar-cell">
+        <div class="metric-bar-track">
+          <div class="metric-bar-fill" style="width:${m.score}%; background:${fillColour};"></div>
+        </div>
+      </td>
+      <td style="text-align:right; font-variant-numeric:tabular-nums;">${m.score.toFixed(1)}</td>
+      <td class="metric-avg-raw" style="text-align:right; color:var(--text3);">—</td>
+      <td class="metric-avg-score" style="text-align:right; color:var(--text3);">—</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  buildExplanation(d);
+}
+
+function formatCatName(k) {
+  return k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatRaw(v) {
+  if (v === null || v === undefined) return '—';
+  // If it looks like a whole number show 0dp, otherwise 2dp
+  return (v % 1 === 0) ? v.toFixed(0) : v.toFixed(2);
+}
+
+// ── League average overlay ───────────────────────────────────────────────────
+function fetchLeagueAvg(playerPath, role) {
+  fetch('/api/compatibility_avg?player=' + encodeURIComponent(playerPath)
+      + '&role=' + encodeURIComponent(role))
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) return;
+      avgData = data;
+      applyAvgOverlay(data);
+    })
+    .catch(() => {});
+}
+
+function applyAvgOverlay(avg) {
+  // ── Score ring secondary line ────────────────────────────────────────────────
+  const scoreLine = document.getElementById('avg-score-line');
+  if (scoreLine) {
+    if (avg.avg_pool_size === 0) {
+      scoreLine.innerHTML = 'No comparable players found in this league for this position group.';
+    } else {
+      let txt = 'League avg for this role: <strong>' + avg.overall_score.toFixed(1) + '</strong>';
+      if (avg.avg_pool_size < 5) {
+        txt += ' <span style="color:var(--text3); font-size:11px;">(small sample — '
+            + avg.avg_pool_size + ' player' + (avg.avg_pool_size !== 1 ? 's' : '') + ')</span>';
+      } else {
+        txt += ' <span style="color:var(--text3); font-size:11px;">(' + avg.avg_pool_size + ' players)</span>';
+      }
+      scoreLine.innerHTML = txt;
+    }
+    scoreLine.style.display = 'block';
+  }
+
+  if (avg.avg_pool_size === 0) return;
+
+  // ── Category bars — append avg score label ───────────────────────────────────
+  const catAvgs = avg.category_scores || {};
+  Object.keys(catAvgs).forEach(cat => {
+    const el = document.getElementById('cat-avg-' + cat);
+    if (el) el.textContent = ' · avg ' + catAvgs[cat].toFixed(1);
+  });
+
+  // ── Metric table — fill Avg Raw and Avg Score columns ────────────────────────
+  const metricMap = {};
+  (avg.metric_details || []).forEach(m => { metricMap[m.name] = m; });
+  document.querySelectorAll('#metric-tbody tr[data-metric]').forEach(tr => {
+    const m       = metricMap[tr.getAttribute('data-metric')];
+    const rawEl   = tr.querySelector('.metric-avg-raw');
+    const scoreEl = tr.querySelector('.metric-avg-score');
+    if (!m || !rawEl || !scoreEl) return;
+    rawEl.textContent   = formatRaw(m.raw_value);
+    scoreEl.textContent = m.score.toFixed(1);
+  });
+}
+
+// ── Explanation panel ─────────────────────────────────────────────────────────
+function toggleExplain() {
+  const body = document.getElementById('explain-body');
+  const chevron = document.getElementById('explain-chevron');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chevron.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+function buildExplanation(d) {
+  // ── Formula types used by this profile's metrics ───────────────────────────
+  const formulaTypes = new Map();
+  d.metric_details.forEach(m => {
+    // Reconstruct formula type label from name + raw_value
+    let type, example;
+    if (m.name.includes('%') || m.name.includes('rate') || m.name.includes('accuracy') || m.name.includes('Accurate') && !m.name.includes('per 90')) {
+      type    = '% / rate — used as-is';
+      example = m.name + ': ' + formatRaw(m.raw_value) + ' → score ' + m.score.toFixed(1);
+    } else if (m.name.includes('per 90')) {
+      type    = 'Per 90 — <code>total ÷ (minutes ÷ 90)</code>';
+      example = m.name + ': ' + formatRaw(m.raw_value) + '/90 → score ' + m.score.toFixed(1);
+    } else {
+      type    = 'Direct — raw stat value';
+      example = m.name + ': ' + formatRaw(m.raw_value) + ' → score ' + m.score.toFixed(1);
+    }
+    if (!formulaTypes.has(type)) formulaTypes.set(type, example);
+  });
+
+  const fGrid = document.getElementById('explain-formulas');
+  fGrid.innerHTML = '';
+  formulaTypes.forEach((example, type) => {
+    fGrid.innerHTML += `<div class="explain-formula-row">
+      <div class="explain-formula-type">${type}</div>
+      <div class="explain-formula-ex">${example}</div>
+    </div>`;
+  });
+
+  // ── Category breakdown ─────────────────────────────────────────────────────
+  const weights = d.weights;
+  const cats    = Object.keys(weights).sort((a, b) => weights[b] - weights[a]);
+  document.getElementById('explain-cat-count').textContent = cats.length;
+
+  const catContainer = document.getElementById('explain-cats');
+  catContainer.innerHTML = '';
+  cats.forEach(cat => {
+    const metricsInCat = d.metric_details.filter(m => m.category === cat);
+    const sc  = d.category_scores[cat] || 0;
+    const wt  = (weights[cat] * 100).toFixed(0);
+    const clr = sc >= 70 ? 'var(--green)' : sc >= 45 ? 'var(--amber)' : 'var(--red)';
+    let metricsHtml = metricsInCat.map(m =>
+      `<span class="explain-metric-chip">
+         ${m.name}
+         <span style="color:var(--text3);">${formatRaw(m.raw_value)}</span>
+         <strong style="color:${m.score>=70?'var(--green)':m.score>=45?'var(--amber)':'var(--red)'};">${m.score.toFixed(0)}</strong>
+       </span>`
+    ).join('');
+    catContainer.innerHTML += `
+      <div class="explain-cat-row">
+        <div class="explain-cat-header">
+          <span class="explain-cat-name">${formatCatName(cat)}</span>
+          <span class="explain-cat-meta">weight <strong>${wt}%</strong> &nbsp;·&nbsp;
+            avg = <strong style="color:${clr};">${sc.toFixed(1)}</strong>
+          </span>
+        </div>
+        <div class="explain-chips">${metricsHtml}</div>
+      </div>`;
+  });
+
+  // ── Weighted formula ───────────────────────────────────────────────────────
+  const formulaParts = cats.map(c => `(${formatCatName(c)} × ${(weights[c]*100).toFixed(0)}%)`);
+  document.getElementById('explain-formula-box').innerHTML =
+    'Score = ' + formulaParts.join(' + ');
+
+  // ── Live calculation with this player's numbers ────────────────────────────
+  const liveParts = cats.map(c => {
+    const sc = d.category_scores[c] || 0;
+    const wt = weights[c];
+    return `${sc.toFixed(1)} × ${(wt*100).toFixed(0)}%`;
+  });
+  const liveSum = cats.reduce((s, c) => s + (d.category_scores[c]||0) * weights[c], 0);
+  document.getElementById('explain-live-calc').innerHTML =
+    `With this player's numbers: <code>${liveParts.join(' + ')} = <strong>${liveSum.toFixed(1)}</strong></code>`;
+}
+
+// ── Pre-fill from URL ?prefill= ───────────────────────────────────────────────
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const prefill = params.get('prefill');
+  if (!prefill) return;
+  fetch('/api/player_search?q=' + encodeURIComponent(prefill.split('/').slice(-1)[0].replace('.json','').replace(/_/g,' ')))
+    .then(r => r.json())
+    .then(results => {
+      // Find the one matching the exact path
+      const match = results.find(p => p.path === prefill) || results[0];
+      if (!match) return;
+      selectPlayer(match);
+    })
+    .catch(() => {});
+})();
+</script>
+{% endblock %}

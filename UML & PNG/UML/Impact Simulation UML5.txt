@@ -1,0 +1,50 @@
+@startuml
+title CONTENDER IMPACT SIMULATION
+
+start
+
+:Estimate Build-up Improvement;
+
+note right
+Build-up Improvement =
+Player Progression Index
+- Current Squad Average
+end note
+
+:Convert to xG Gain;
+
+note right
+xG Gain per Match =
+Build-up Improvement ×
+Attack Conversion Factor
+
+Season xG Gain =
+xG Gain × Total Matches
+end note
+
+:Convert xG to Goals;
+
+note right
+Using Poisson Approximation:
+Goals ≈ xG (long-term)
+end note
+
+:Convert Goals to Points;
+
+note right
+Empirical Model:
+1 Goal ≈ 0.7–1.2 Points
+(depending on league variance)
+end note
+
+:Update Title Probability;
+
+note right
+Title Probability Updated via:
+Logistic Function
+
+P = 1 / (1 + e^-(ΔPoints))
+end note
+
+stop
+@enduml

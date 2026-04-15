@@ -1,0 +1,561 @@
+{
+    "team_id": "46160",
+    "team_name": "Jong Ajax",
+    "tournament_id": "131",
+    "season_id": "77156",
+    "competition_name": "Eerste_Divisie",
+    "competition_country": "Netherlands",
+    "profile": {
+        "team": {
+            "name": "Jong Ajax",
+            "slug": "jong-ajax",
+            "shortName": "Jong Ajax",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Netherlands",
+                "slug": "netherlands",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 35,
+                "flag": "netherlands",
+                "alpha2": "NL",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Eerste Divisie",
+                "slug": "eerste-divisie",
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "Eerste Divisie",
+                    "slug": "eerste-divisie",
+                    "primaryColorHex": "#b0192e",
+                    "secondaryColorHex": "#a3a3a3",
+                    "category": {
+                        "name": "Netherlands",
+                        "slug": "netherlands",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "NL",
+                            "alpha3": "NLD",
+                            "name": "Netherlands",
+                            "slug": "netherlands"
+                        },
+                        "id": 35,
+                        "flag": "netherlands",
+                        "alpha2": "NL",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 24195,
+                    "hasPerformanceGraphFeature": true,
+                    "country": {},
+                    "id": 131,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 324,
+                "isLive": false,
+                "id": 40
+            },
+            "primaryUniqueTournament": {
+                "name": "Eerste Divisie",
+                "slug": "eerste-divisie",
+                "primaryColorHex": "#b0192e",
+                "secondaryColorHex": "#a3a3a3",
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 24195,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 131,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 22321,
+            "manager": {
+                "name": "Paul Nuijten",
+                "slug": "paul-nuijten",
+                "shortName": "P. Nuijten",
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 803852
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 52.29504,
+                    "longitude": 4.90746
+                },
+                "hidden": true,
+                "slug": "sportpark-de-toekomst",
+                "name": "Sportpark De Toekomst",
+                "capacity": 2250,
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 16736,
+                "city": {
+                    "name": "Ouder-Amstel"
+                },
+                "stadium": {
+                    "name": "Sportpark De Toekomst",
+                    "capacity": 2250
+                }
+            },
+            "nameCode": "AJA",
+            "disabled": false,
+            "national": false,
+            "parentTeam": {
+                "name": "AFC Ajax",
+                "slug": "ajax",
+                "shortName": "Ajax",
+                "gender": "M",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "tournament": {
+                    "name": "VriendenLoterij Eredivisie",
+                    "slug": "eredivisie",
+                    "category": {
+                        "name": "Netherlands",
+                        "slug": "netherlands",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "NL",
+                            "alpha3": "NLD",
+                            "name": "Netherlands",
+                            "slug": "netherlands"
+                        },
+                        "id": 35,
+                        "flag": "netherlands",
+                        "alpha2": "NL",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "uniqueTournament": {
+                        "name": "VriendenLoterij Eredivisie",
+                        "slug": "eredivisie",
+                        "primaryColorHex": "#292766",
+                        "secondaryColorHex": "#7c79c3",
+                        "category": {
+                            "name": "Netherlands",
+                            "slug": "netherlands",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "country": {
+                                "alpha2": "NL",
+                                "alpha3": "NLD",
+                                "name": "Netherlands",
+                                "slug": "netherlands"
+                            },
+                            "id": 35,
+                            "flag": "netherlands",
+                            "alpha2": "NL",
+                            "transferPeriod": [
+                                {
+                                    "activeFrom": "06-01 00:00",
+                                    "activeTo": "09-18 00:00"
+                                },
+                                {
+                                    "activeFrom": "12-30 00:00",
+                                    "activeTo": "02-16 00:00"
+                                }
+                            ]
+                        },
+                        "userCount": 150619,
+                        "hasPerformanceGraphFeature": true,
+                        "country": {},
+                        "id": 37,
+                        "displayInverseHomeAwayTeams": false
+                    },
+                    "priority": 515,
+                    "isLive": false,
+                    "id": 39
+                },
+                "primaryUniqueTournament": {
+                    "name": "VriendenLoterij Eredivisie",
+                    "slug": "eredivisie",
+                    "primaryColorHex": "#292766",
+                    "secondaryColorHex": "#7c79c3",
+                    "category": {
+                        "name": "Netherlands",
+                        "slug": "netherlands",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "NL",
+                            "alpha3": "NLD",
+                            "name": "Netherlands",
+                            "slug": "netherlands"
+                        },
+                        "id": 35,
+                        "flag": "netherlands",
+                        "alpha2": "NL",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 150619,
+                    "hasPerformanceGraphFeature": true,
+                    "country": {},
+                    "id": 37,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "userCount": 491270,
+                "manager": {
+                    "name": "Oscar Garcia",
+                    "slug": "oscar-garcia",
+                    "shortName": "O. Garcia",
+                    "country": {
+                        "alpha2": "ES",
+                        "alpha3": "ESP",
+                        "name": "Spain",
+                        "slug": "spain"
+                    },
+                    "id": 234830
+                },
+                "venue": {
+                    "venueCoordinates": {
+                        "latitude": 52.314353,
+                        "longitude": 4.942843
+                    },
+                    "hidden": false,
+                    "slug": "johan-cruijff-arena",
+                    "name": "Johan Cruijff Arena",
+                    "capacity": 55865,
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 577,
+                    "city": {
+                        "name": "Amsterdam"
+                    },
+                    "stadium": {
+                        "name": "Johan Cruijff Arena",
+                        "capacity": 55865
+                    }
+                },
+                "nameCode": "AJA",
+                "class": 4,
+                "disabled": false,
+                "national": false,
+                "type": 0,
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 2953,
+                "fullName": "AFC Ajax",
+                "teamColors": {
+                    "primary": "#bb002b",
+                    "secondary": "#ffffff",
+                    "text": "#ffffff"
+                },
+                "foundationDateTimestamp": -2202422400,
+                "timeActive": []
+            },
+            "type": 0,
+            "country": {
+                "alpha2": "NL",
+                "alpha3": "NLD",
+                "name": "Netherlands",
+                "slug": "netherlands"
+            },
+            "id": 46160,
+            "fullName": "Jong Ajax",
+            "teamColors": {
+                "primary": "#bb002b",
+                "secondary": "#ffffff",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": -2202422400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.80",
+            "position": 18,
+            "value": "32",
+            "form": [
+                "D",
+                "W",
+                "L",
+                "W",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 45,
+            "goalsConceded": 59,
+            "ownGoals": 1,
+            "assists": 34,
+            "shots": 396,
+            "penaltyGoals": 2,
+            "penaltiesTaken": 4,
+            "freeKickGoals": 0,
+            "freeKickShots": 14,
+            "goalsFromInsideTheBox": 33,
+            "goalsFromOutsideTheBox": 10,
+            "shotsFromInsideTheBox": 238,
+            "shotsFromOutsideTheBox": 158,
+            "headedGoals": 4,
+            "leftFootGoals": 10,
+            "rightFootGoals": 29,
+            "bigChances": 56,
+            "bigChancesCreated": 38,
+            "bigChancesMissed": 31,
+            "shotsOnTarget": 142,
+            "shotsOffTarget": 145,
+            "blockedScoringAttempt": 109,
+            "successfulDribbles": 306,
+            "dribbleAttempts": 640,
+            "corners": 142,
+            "hitWoodwork": 13,
+            "fastBreaks": 52,
+            "fastBreakGoals": 8,
+            "fastBreakShots": 44,
+            "averageBallPossession": 51.545454545455,
+            "totalPasses": 14566,
+            "accuratePasses": 12163,
+            "accuratePassesPercentage": 83.502677468076,
+            "totalOwnHalfPasses": 8492,
+            "accurateOwnHalfPasses": 7683,
+            "accurateOwnHalfPassesPercentage": 90.47338671691,
+            "totalOppositionHalfPasses": 6074,
+            "accurateOppositionHalfPasses": 4480,
+            "accurateOppositionHalfPassesPercentage": 73.756997036549,
+            "totalLongBalls": 1271,
+            "accurateLongBalls": 696,
+            "accurateLongBallsPercentage": 54.760031471282,
+            "totalCrosses": 383,
+            "accurateCrosses": 79,
+            "accurateCrossesPercentage": 20.626631853786,
+            "cleanSheets": 6,
+            "tackles": 523,
+            "interceptions": 271,
+            "saves": 151,
+            "errorsLeadingToGoal": 6,
+            "errorsLeadingToShot": 14,
+            "penaltiesCommited": 8,
+            "penaltyGoalsConceded": 5,
+            "clearances": 799,
+            "clearancesOffLine": 5,
+            "lastManTackles": 6,
+            "totalDuels": 3112,
+            "duelsWon": 1528,
+            "duelsWonPercentage": 49.100257069409,
+            "totalGroundDuels": 2445,
+            "groundDuelsWon": 1236,
+            "groundDuelsWonPercentage": 50.552147239264,
+            "totalAerialDuels": 667,
+            "aerialDuelsWon": 292,
+            "aerialDuelsWonPercentage": 43.778110944528,
+            "possessionLost": 4216,
+            "offsides": 49,
+            "fouls": 362,
+            "yellowCards": 60,
+            "yellowRedCards": 0,
+            "redCards": 0,
+            "avgRating": 6.796686159844,
+            "accurateFinalThirdPassesAgainst": 2771,
+            "accurateOppositionHalfPassesAgainst": 5150,
+            "accurateOwnHalfPassesAgainst": 5840,
+            "accuratePassesAgainst": 10990,
+            "bigChancesAgainst": 107,
+            "bigChancesCreatedAgainst": 79,
+            "bigChancesMissedAgainst": 72,
+            "clearancesAgainst": 624,
+            "cornersAgainst": 199,
+            "crossesSuccessfulAgainst": 170,
+            "crossesTotalAgainst": 694,
+            "dribbleAttemptsTotalAgainst": 506,
+            "dribbleAttemptsWonAgainst": 224,
+            "errorsLeadingToGoalAgainst": 2,
+            "errorsLeadingToShotAgainst": 11,
+            "hitWoodworkAgainst": 15,
+            "interceptionsAgainst": 283,
+            "keyPassesAgainst": 384,
+            "longBallsSuccessfulAgainst": 960,
+            "longBallsTotalAgainst": 1837,
+            "offsidesAgainst": 106,
+            "redCardsAgainst": 1,
+            "shotsAgainst": 523,
+            "shotsBlockedAgainst": 134,
+            "shotsFromInsideTheBoxAgainst": 359,
+            "shotsFromOutsideTheBoxAgainst": 164,
+            "shotsOffTargetAgainst": 177,
+            "shotsOnTargetAgainst": 212,
+            "blockedScoringAttemptAgainst": 134,
+            "tacklesAgainst": 645,
+            "totalFinalThirdPassesAgainst": 3967,
+            "oppositionHalfPassesTotalAgainst": 6956,
+            "ownHalfPassesTotalAgainst": 6465,
+            "totalPassesAgainst": 13421,
+            "yellowCardsAgainst": 59,
+            "throwIns": 588,
+            "goalKicks": 260,
+            "ballRecovery": 1671,
+            "freeKicks": 410,
+            "id": 47130,
+            "matches": 33,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}{{ player_name or player_id }} — Match History{% endblock %}
+
+{% block head %}
+<style>
+/* ── Header ── */
+.pmh-header {
+  background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:22px 28px; margin-bottom:24px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+}
+.pmh-title { font-size:22px; font-weight:800; color:var(--text1); margin:0 0 4px; }
+.pmh-meta  { font-size:13px; color:var(--text3); }
+.pmh-stat-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.stat-chip {
+  background:var(--bg3); border:1px solid var(--border); border-radius:20px;
+  padding:4px 12px; font-size:12px; color:var(--text2);
+}
+.stat-chip strong { color:var(--text1); }
+
+/* ── Per-90 section ── */
+.p90-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;
+}
+@media(max-width:720px){.p90-grid{grid-template-columns:1fr;}}
+.p90-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+.p90-card-title { font-size:13px; font-weight:700; color:var(--text1); margin-bottom:14px; }
+.p90-card-subtitle { font-size:11px; color:var(--text3); margin-bottom:12px; }
+.p90-table { width:100%; border-collapse:collapse; }
+.p90-table td { padding:6px 8px; font-size:12px; border-bottom:1px solid var(--border); }
+.p90-table tr:last-child td { border-bottom:none; }
+.p90-table .p90-label { color:var(--text2); }
+.p90-table .p90-val   { text-align:right; font-weight:700; color:var(--text1); }
+.p90-table .p90-raw   { text-align:right; color:var(--text3); font-size:11px; }
+.match-only-badge {
+  display:inline-block; font-size:9px; font-weight:700; letter-spacing:.06em;
+  background:#1a2744; color:#80DEEA; border-radius:4px;
+  padding:1px 5px; margin-left:6px; vertical-align:middle; text-transform:uppercase;
+}
+.derived-pct { font-size:11px; color:#B0BEC5; }
+
+/* ── Match-by-match table ── */
+.section-title { font-size:16px; font-weight:700; color:var(--text1); margin:0 0 14px; }
+.mh-table-wrap { overflow-x:auto; }
+.mh-table { border-collapse:collapse; font-size:12px; min-width:860px; width:100%; }
+.mh-table th {
+  font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text3);
+  padding:7px 10px; text-align:center; border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+.mh-table th:nth-child(2), .mh-table th:nth-child(4) { text-align:left; }
+.mh-table td { padding:8px 10px; text-align:center; border-bottom:1px solid var(--border); color:var(--text1); }
+.mh-table td.team-cell { text-align:left; font-weight:500; white-space:nowrap; }
+.mh-table tr:last-child td { border-bottom:none; }
+.mh-table tr:hover td { background:var(--bg3); }
+.mh-table tr.mh-even td { background:var(--bg3); }
+.score-txt { font-weight:700; font-family:'BasementGrotesque',sans-serif; }
+.ha-h { color:#80DEEA; font-weight:700; }
+.ha-a { color:#FF8A65; font-weight:700; }
+.sub-icon { color:var(--text3); font-size:11px; }
+.result-W { color:#66BB6A; font-weight:700; }
+.result-L { color:#EF5350; font-weight:700; }
+.result-D { color:#FFD54F; font-weight:700; }
+.result-? { color:var(--text3); }
+.rating-chip { display:inline-block; border-radius:6px; padding:2px 7px; font-size:12px; font-weight:700; }
+.r-good { background:#1b3a20; color:#66BB6A; }
+.r-mid  { background:#3a2e0a; color:#FFD54F; }
+.r-low  { background:#3a1b1b; color:#EF5350; }
+.link-cell a { color:var(--accent); text-decoration:none; font-size:11px; font-weight:600; }
+.link-cell a:hover { text-decoration:underline; }
+.back-link { font-size:13px; color:var(--text3); text-decoration:none; margin-bottom:16px; display:inline-block; }
+.back-link:hover { color:var(--text1); }
+.empty-state { text-align:center; padding:48px; color:var(--text3); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if profile_path %}
+<a href="/player/{{ profile_path }}" class="back-link">← Player Profile</a>
+{% else %}
+<a href="/matches" class="back-link">← Matches</a>
+{% endif %}
+
+<!-- ── Header ── -->
+<div class="pmh-header">
+  <div>
+    <div class="pmh-title">{{ player_name or ('Player #' ~ player_id) }}</div>
+    {% if appearances %}
+    {%- set last_team = appearances[-1].match_meta.get('home_team','') if appearances[-1].side == 'home' else appearances[-1].match_meta.get('away_team','') -%}
+    <div class="pmh-meta">ID: {{ player_id }}{% if last_team %} · {{ last_team }}{% endif %}</div>
+    {% else %}
+    <div class="pmh-meta">Player ID: {{ player_id }}</div>
+    {% endif %}
+    <div class="pmh-stat-chips">
+      <div class="stat-chip"><strong>{{ per90.appearances }}</strong> appearances</div>
+      <div class="stat-chip"><strong>{{ per90.total_minutes }}</strong> min</div>
+      {% if per90.avg_rating %}<div class="stat-chip">Avg rating <strong>{{ per90.avg_rating }}</strong></div>{% endif %}
+      <div class="stat-chip"><strong>{{ per90.totals.get('goals', 0) }}</strong> goals</div>
+      <div class="stat-chip"><strong>{{ per90.totals.get('assists', 0) }}</strong> assists</div>
+    </div>
+  </div>
+  {% if profile_path %}
+  <a href="/player/{{ profile_path }}" class="btn btn-ghost" style="font-size:12px; padding:6px 14px;">
+    View Full Profile →
+  </a>
+  {% endif %}
+</div>
+
+{% if not appearances %}
+<div class="empty-state">
+  <div style="font-size:36px;margin-bottom:12px;">📋</div>
+  <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:6px;">No match data found</div>
+  <div style="font-size:13px;">Scrape matches containing this player to see their history.</div>
+</div>
+{% else %}
+
+<!-- ══════════════════════════════════════════════════
+     Per-90 stats grid
+══════════════════════════════════════════════════════ -->
+<div class="p90-grid">
+
+  <!-- Left: stats also in overall profile →  common stats -->
+  <div class="p90-card">
+    <div class="p90-card-title">Per-90 Stats (from match data)</div>
+    <div class="p90-card-subtitle">Accumulated across {{ per90.appearances }} match(es) · {{ per90.total_minutes }} minutes</div>
+    <table class="p90-table">
+      <thead>
+        <tr>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding-bottom:6px;">Stat</td>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:right;padding-bottom:6px;">Per 90</td>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:right;padding-bottom:6px;">Total</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in stat_meta %}
+        {% if m.per90 and m.key != 'minutes_played' and not m.match_only %}
+        {% set p90v = per90.per90.get(m.key) %}
+        {% if p90v is not none and p90v != 0 %}
+        <tr>
+          <td class="p90-label">{{ m.label }}</td>
+          <td class="p90-val">{{ p90v }}</td>
+          <td class="p90-raw">{{ per90.totals.get(m.key, '') }}</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        <!-- Derived %s that are not match-only -->
+        {% for d in derived_meta %}
+        {% if not d.match_only %}
+        {% set dv = per90.derived.get(d.key) %}
+        {% if dv is not none %}
+        <tr>
+          <td class="p90-label derived-pct">{{ d.label }}</td>
+          <td class="p90-val derived-pct">{{ dv }}%</td>
+          <td class="p90-raw">—</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Right: match-only stats — new insights not in overall profile -->
+  <div class="p90-card" style="border-color:#1a2744;">
+    <div class="p90-card-title" style="display:flex;align-items:center;gap:8px;">
+      Match-Only Insights
+      <span class="match-only-badge">New</span>
+    </div>
+    <div class="p90-card-subtitle">Stats not available in the season summary — only from per-match data</div>
+    <table class="p90-table">
+      <thead>
+        <tr>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding-bottom:6px;">Stat</td>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:right;padding-bottom:6px;">Per 90</td>
+          <td style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:right;padding-bottom:6px;">Total</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in stat_meta %}
+        {% if m.per90 and m.match_only %}
+        {% set p90v = per90.per90.get(m.key) %}
+        {% if p90v is not none and p90v != 0 %}
+        <tr>
+          <td class="p90-label">{{ m.label }}</td>
+          <td class="p90-val" style="color:#80DEEA;">{{ p90v }}</td>
+          <td class="p90-raw">{{ per90.totals.get(m.key, '') }}</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        <!-- Derived %s that are match-only -->
+        {% for d in derived_meta %}
+        {% if d.get('match_only') %}
+        {% set dv = per90.derived.get(d.key) %}
+        {% if dv is not none %}
+        <tr>
+          <td class="p90-label derived-pct">{{ d.label }}</td>
+          <td class="p90-val derived-pct" style="color:#80DEEA;">{{ dv }}%</td>
+          <td class="p90-raw">—</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Match-by-match table
+══════════════════════════════════════════════════════ -->
+<div class="section-title">Match-by-Match</div>
+<div class="card" style="padding:0;overflow:hidden;">
+<div class="mh-table-wrap">
+  <table class="mh-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th style="text-align:left;">Home</th>
+        <th>Score</th>
+        <th style="text-align:left;">Away</th>
+        <th>H/A</th>
+        <th>Mins</th>
+        <th>Rating</th>
+        <th>Gls</th>
+        <th>Ast</th>
+        <th>xG</th>
+        <th>xA</th>
+        <th>KP</th>
+        <th>Shots</th>
+        <th>Pass Acc</th>
+        <th>Pass%</th>
+        <th>Duels</th>
+        <th>Tkl</th>
+        <th>Int</th>
+        <th>BR</th>
+        <th>Result</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in appearances|reverse %}
+      {% set mm  = a.match_meta %}
+      {% set s   = a.stats %}
+      {% set rat = s.get('rating', 0)|default(0)|float %}
+      {% set rc  = 'r-good' if rat >= 7.0 else ('r-mid' if rat >= 6.0 else 'r-low') %}
+      {% set ha  = 'H' if a.side == 'home' else 'A' %}
+      {% set pa  = s.get('passes_accurate', 0)|default(0)|int %}
+      {% set pt  = s.get('passes_total', 0)|default(0)|int %}
+      {% set pct = ((pa / pt * 100)|round(1))|string ~ '%' if pt > 0 else '—' %}
+      {# Determine match result from this player's perspective #}
+      {% set hs = mm.get('home_score', '') %}
+      {% set as_ = mm.get('away_score', '') %}
+      {% if hs != '' and as_ != '' %}
+        {% if a.side == 'home' %}
+          {% if hs|int > as_|int %}{% set res = 'W' %}{% elif hs|int < as_|int %}{% set res = 'L' %}{% else %}{% set res = 'D' %}{% endif %}
+        {% else %}
+          {% if as_|int > hs|int %}{% set res = 'W' %}{% elif as_|int < hs|int %}{% set res = 'L' %}{% else %}{% set res = 'D' %}{% endif %}
+        {% endif %}
+      {% else %}{% set res = '?' %}{% endif %}
+      <tr class="{{ 'mh-even' if loop.index % 2 == 0 else '' }}">
+        <td style="color:var(--text3);white-space:nowrap;font-size:11px;">{{ mm.get('date','') }}</td>
+        <td class="team-cell">{{ mm.get('home_team','') }}</td>
+        <td><span class="score-txt">{{ hs }} : {{ as_ }}</span></td>
+        <td class="team-cell">{{ mm.get('away_team','') }}</td>
+        <td><span class="{{ 'ha-h' if ha == 'H' else 'ha-a' }}">{{ ha }}</span></td>
+        <td>{{ s.get('minutes_played','') or '—' }}</td>
+        <td>{% if rat > 0 %}<span class="rating-chip {{ rc }}">{{ "%.1f"|format(rat) }}</span>{% else %}—{% endif %}</td>
+        <td>{{ s.get('goals','') or '—' }}</td>
+        <td>{{ s.get('assists','') or '—' }}</td>
+        <td>{{ "%.2f"|format(s.get('xG',0)|float) if s.get('xG') else '—' }}</td>
+        <td>{{ "%.2f"|format(s.get('xA',0)|float) if s.get('xA') else '—' }}</td>
+        <td>{{ s.get('key_passes','') or '—' }}</td>
+        <td>{{ s.get('shots_total','') or '—' }}</td>
+        <td>{{ pa or '—' }}</td>
+        <td>{{ pct }}</td>
+        <td>{{ s.get('duels_won','') or '—' }}</td>
+        <td>{{ s.get('tackles_total','') or '—' }}</td>
+        <td>{{ s.get('interceptions','') or '—' }}</td>
+        <td>{{ s.get('ball_recoveries','') or '—' }}</td>
+        <td><span class="result-{{ res }}">{{ res }}</span></td>
+        <td class="link-cell">
+          {% if a.event_id %}<a href="/match/{{ a.event_id }}">Match →</a>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+{% endif %}
+{% endblock %}

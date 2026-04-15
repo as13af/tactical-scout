@@ -1,0 +1,42 @@
+@startuml
+title EXPLANATION GENERATOR
+
+start
+
+:Input Final Compatibility Score;
+
+if (Score > 80%) then (High Fit)
+    :Generate Strong Recommendation;
+else (Moderate)
+    :Generate Conditional Recommendation;
+endif
+
+:Generate Why Club Needs Player;
+
+note right
+Reason Derived From:
+- Tactical Gap
+- Statistical Underperformance
+- Physical Deficiency
+end note
+
+:Generate Why Player Fits;
+
+note right
+Explain using:
+- Cosine Similarity %
+- Pressing Match %
+- Build-up Fit %
+end note
+
+:Generate Contender Impact;
+
+note right
+Explain:
+- Projected xG Gain
+- Projected Goals
+- Projected Points
+end note
+
+stop
+@enduml

@@ -1,0 +1,276 @@
+{
+    "team_id": "389226",
+    "team_name": "RFC Liège",
+    "tournament_id": "9",
+    "season_id": "77849",
+    "competition_name": "Challenger_Pro_League",
+    "competition_country": "Belgium",
+    "profile": {
+        "team": {
+            "name": "RFC Liège",
+            "slug": "rfc-liege",
+            "shortName": "Club Liège",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Belgium",
+                "slug": "belgium",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 33,
+                "flag": "belgium",
+                "alpha2": "BE",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "primaryUniqueTournament": {
+                "name": "Challenger Pro League",
+                "slug": "challenger-pro-league",
+                "primaryColorHex": "#0E0027",
+                "secondaryColorHex": "#a9ee17",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 6809,
+                "hasPerformanceGraphFeature": false,
+                "country": {},
+                "id": 9,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 3170,
+            "manager": {
+                "name": "Gaetan Englebert",
+                "slug": "gaetan-englebert",
+                "shortName": "G. Englebert",
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 801252
+            },
+            "venue": {
+                "hidden": true,
+                "slug": "stade-de-rocourt",
+                "name": "Stade de Rocourt",
+                "capacity": 8000,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 42976,
+                "city": {
+                    "name": "Rocourt"
+                },
+                "stadium": {
+                    "name": "Stade de Rocourt",
+                    "capacity": 8000
+                }
+            },
+            "nameCode": "LIE",
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "BE",
+                "alpha3": "BEL",
+                "name": "Belgium",
+                "slug": "belgium"
+            },
+            "id": 389226,
+            "fullName": "RFC Liège",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": -2443132800,
+            "createdByEditor": true,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.85",
+            "position": 5,
+            "value": "50",
+            "form": [
+                "D",
+                "L",
+                "L",
+                "W",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 42,
+            "goalsConceded": 38,
+            "ownGoals": 1,
+            "assists": 30,
+            "shots": 361,
+            "penaltyGoals": 1,
+            "penaltiesTaken": 2,
+            "freeKickGoals": 2,
+            "freeKickShots": 5,
+            "goalsFromInsideTheBox": 35,
+            "goalsFromOutsideTheBox": 5,
+            "shotsFromInsideTheBox": 251,
+            "shotsFromOutsideTheBox": 110,
+            "headedGoals": 6,
+            "leftFootGoals": 16,
+            "rightFootGoals": 18,
+            "bigChances": 59,
+            "bigChancesCreated": 48,
+            "bigChancesMissed": 32,
+            "shotsOnTarget": 118,
+            "shotsOffTarget": 138,
+            "blockedScoringAttempt": 105,
+            "successfulDribbles": 212,
+            "dribbleAttempts": 461,
+            "corners": 148,
+            "hitWoodwork": 2,
+            "fastBreaks": 56,
+            "fastBreakGoals": 4,
+            "fastBreakShots": 51,
+            "averageBallPossession": 45.451612903226,
+            "totalPasses": 11889,
+            "accuratePasses": 9357,
+            "accuratePassesPercentage": 78.703002775675,
+            "totalOwnHalfPasses": 6020,
+            "accurateOwnHalfPasses": 5323,
+            "accurateOwnHalfPassesPercentage": 88.421926910299,
+            "totalOppositionHalfPasses": 5869,
+            "accurateOppositionHalfPasses": 4034,
+            "accurateOppositionHalfPassesPercentage": 68.734026239564,
+            "totalLongBalls": 1349,
+            "accurateLongBalls": 647,
+            "accurateLongBallsPercentage": 47.961452928095,
+            "totalCrosses": 643,
+            "accurateCrosses": 149,
+            "accurateCrossesPercentage": 23.172628304821,
+            "cleanSheets": 10,
+            "tackles": 549,
+            "interceptions": 305,
+            "saves": 123,
+            "errorsLeadingToGoal": 2,
+            "errorsLeadingToShot": 8,
+            "penaltiesCommited": 4,
+            "penaltyGoalsConceded": 2,
+            "clearances": 830,
+            "clearancesOffLine": 2,
+            "lastManTackles": 1,
+            "totalDuels": 3253,
+            "duelsWon": 1638,
+            "duelsWonPercentage": 50.353519827851,
+            "totalGroundDuels": 2244,
+            "groundDuelsWon": 1127,
+            "groundDuelsWonPercentage": 50.222816399287,
+            "totalAerialDuels": 1009,
+            "aerialDuelsWon": 511,
+            "aerialDuelsWonPercentage": 50.644202180377,
+            "possessionLost": 4241,
+            "offsides": 96,
+            "fouls": 368,
+            "yellowCards": 53,
+            "yellowRedCards": 1,
+            "redCards": 1,
+            "avgRating": 6.8497844827586,
+            "accurateFinalThirdPassesAgainst": 3048,
+            "accurateOppositionHalfPassesAgainst": 6076,
+            "accurateOwnHalfPassesAgainst": 6132,
+            "accuratePassesAgainst": 12208,
+            "bigChancesAgainst": 63,
+            "bigChancesCreatedAgainst": 50,
+            "bigChancesMissedAgainst": 40,
+            "clearancesAgainst": 802,
+            "cornersAgainst": 158,
+            "crossesSuccessfulAgainst": 131,
+            "crossesTotalAgainst": 585,
+            "dribbleAttemptsTotalAgainst": 607,
+            "dribbleAttemptsWonAgainst": 290,
+            "errorsLeadingToGoalAgainst": 6,
+            "errorsLeadingToShotAgainst": 11,
+            "hitWoodworkAgainst": 13,
+            "interceptionsAgainst": 257,
+            "keyPassesAgainst": 359,
+            "longBallsSuccessfulAgainst": 765,
+            "longBallsTotalAgainst": 1632,
+            "offsidesAgainst": 49,
+            "redCardsAgainst": 7,
+            "shotsAgainst": 473,
+            "shotsBlockedAgainst": 132,
+            "shotsFromInsideTheBoxAgainst": 267,
+            "shotsFromOutsideTheBoxAgainst": 206,
+            "shotsOffTargetAgainst": 182,
+            "shotsOnTargetAgainst": 159,
+            "blockedScoringAttemptAgainst": 132,
+            "tacklesAgainst": 479,
+            "totalFinalThirdPassesAgainst": 4281,
+            "oppositionHalfPassesTotalAgainst": 7904,
+            "ownHalfPassesTotalAgainst": 6721,
+            "totalPassesAgainst": 14625,
+            "yellowCardsAgainst": 73,
+            "throwIns": 675,
+            "goalKicks": 285,
+            "ballRecovery": 1542,
+            "freeKicks": 371,
+            "id": 47409,
+            "matches": 31,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

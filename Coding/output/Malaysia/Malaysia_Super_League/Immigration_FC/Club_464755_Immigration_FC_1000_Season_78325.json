@@ -1,0 +1,178 @@
+{
+    "team_id": "464755",
+    "team_name": "Immigration FC",
+    "tournament_id": "1000",
+    "season_id": "78325",
+    "competition_name": "Malaysia_Super_League",
+    "competition_country": "Malaysia",
+    "profile": {
+        "team": {
+            "name": "Immigration FC",
+            "slug": "immigration-fc",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Malaysia",
+                "slug": "malaysia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 85,
+                "flag": "malaysia",
+                "alpha2": "MY",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "primaryUniqueTournament": {
+                "name": "Malaysia Super League",
+                "slug": "malaysia-super-league",
+                "primaryColorHex": "#0164bd",
+                "secondaryColorHex": "#293793",
+                "category": {
+                    "name": "Malaysia",
+                    "slug": "malaysia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "MY",
+                        "alpha3": "MYS",
+                        "name": "Malaysia",
+                        "slug": "malaysia"
+                    },
+                    "id": 85,
+                    "flag": "malaysia",
+                    "alpha2": "MY",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 5274,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1000,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 1776,
+            "manager": {
+                "name": "Yusri Che Lah",
+                "slug": "yusri-che-lah",
+                "shortName": "Y. C. Lah",
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 789962
+            },
+            "nameCode": "IMI",
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "MY",
+                "alpha3": "MYS",
+                "name": "Malaysia",
+                "slug": "malaysia"
+            },
+            "id": 464755,
+            "fullName": "Immigration FC",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1388534400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 9,
+            "value": "18",
+            "form": [
+                "W",
+                "L",
+                "W",
+                "L",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 26,
+            "goalsConceded": 40,
+            "assists": 14,
+            "shots": 198,
+            "penaltyGoals": 3,
+            "penaltiesTaken": 5,
+            "successfulDribbles": 230,
+            "dribbleAttempts": 303,
+            "corners": 67,
+            "averageBallPossession": 46.1,
+            "totalPasses": 6314,
+            "accuratePasses": 5083,
+            "accuratePassesPercentage": 80.5,
+            "totalLongBalls": 795,
+            "accurateLongBalls": 418,
+            "accurateLongBallsPercentage": 52.58,
+            "totalCrosses": 174,
+            "accurateCrosses": 50,
+            "accurateCrossesPercentage": 28.74,
+            "cleanSheets": 4,
+            "interceptions": 716,
+            "saves": 56,
+            "errorsLeadingToShot": 123,
+            "totalDuels": 3244,
+            "duelsWon": 1205,
+            "duelsWonPercentage": 37.15,
+            "totalAerialDuels": 507,
+            "aerialDuelsWon": 239,
+            "aerialDuelsWonPercentage": 47.14,
+            "offsides": 25,
+            "fouls": 201,
+            "yellowCards": 30,
+            "yellowRedCards": 3,
+            "redCards": 1,
+            "shotsAgainst": 279,
+            "goalKicks": 145,
+            "ballRecovery": 1281,
+            "freeKicks": 44,
+            "id": 47987,
+            "matches": 19,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

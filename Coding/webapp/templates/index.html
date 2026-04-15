@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block title %}Competitions — Scout{% endblock %}
+
+{% block head %}
+<style>
+/* ── Scrape-new-league collapsible card ── */
+.new-league-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.new-league-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 20px;
+  cursor: pointer;
+  color: var(--text1);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: left;
+  gap: 8px;
+}
+.new-league-toggle:hover { background: var(--bg3); }
+.new-league-toggle .toggle-label { flex: 1; }
+.new-league-toggle .toggle-icon {
+  font-size: 11px;
+  color: var(--text3);
+  transition: transform .2s;
+}
+.new-league-toggle.open .toggle-icon { transform: rotate(180deg); }
+.new-league-body {
+  display: none;
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
+}
+.new-league-body.open { display: block; }
+.url-row { margin-top: 14px; }
+.url-row label, .scrape-field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+.url-row input[type="text"], .scrape-field input[type="text"] {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text1);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 8px 11px;
+  box-sizing: border-box;
+}
+.url-row input[type="text"]:focus,
+.scrape-field input[type="text"]:focus { outline: none; border-color: var(--accent); }
+.scrape-field .field-hint { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+.scrape-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+.scrape-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.scrape-footer label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Competitions</h1>
+  <div class="sub">{{ competitions|length }} competition(s) found in output/</div>
+</div>
+
+<!-- ── Scrape New League (collapsible) ── -->
+<div class="new-league-card">
+  <button class="new-league-toggle" id="nl-toggle" onclick="toggleNewLeague()">
+    <span class="toggle-label">▶&nbsp; Scrape New League</span>
+    <span class="toggle-icon">▼</span>
+  </button>
+  <div class="new-league-body" id="nl-body">
+
+    <div class="url-row">
+      <label for="nl-url">SofaScore League URL <span style="font-weight:400;font-style:italic;">(optional — auto-fills IDs below)</span></label>
+      <input type="text" id="nl-url"
+             placeholder="https://www.sofascore.com/tournament/football/…"
+             oninput="parseLeagueUrl(this.value)">
+    </div>
+
+    <div class="scrape-form-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="scrape-field">
+        <label for="nl-uniq">Unique Tournament ID</label>
+        <input type="text" id="nl-uniq" placeholder="e.g. 9">
+        <div class="field-hint">Last number in the SofaScore league URL. Auto-filled when URL is pasted above.</div>
+      </div>
+      <div class="scrape-field">
+        <label for="nl-season">Season ID</label>
+        <input type="text" id="nl-season" placeholder="e.g. 77849">
+        <div class="field-hint">The <code>#id:</code> fragment in the URL. Auto-filled when URL is pasted above.</div>
+      </div>
+    </div>
+
+    <div class="scrape-footer">
+      <label>
+        <input type="checkbox" id="nl-skip" checked>
+        Skip already-scraped players
+      </label>
+      <button class="btn-update" id="nl-btn" onclick="startLeagueScrape()">▶&nbsp; Scrape</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Scrape progress modal (reuses global .scrape-modal CSS from style.css) -->
+<div id="scrape-modal" class="scrape-modal" style="display:none;">
+  <div class="scrape-modal-inner">
+    <div class="scrape-modal-header">
+      <span>Scraping SofaScore…</span>
+      <button id="scrape-close" class="scrape-close" disabled>✕</button>
+    </div>
+    <div class="scrape-progress-wrap">
+      <div id="scrape-bar" class="scrape-bar" style="width:0%"></div>
+    </div>
+    <div id="scrape-pct" style="font-size:11px;color:var(--text3);margin-bottom:6px;">0%</div>
+    <textarea id="scrape-log" class="scrape-log" readonly></textarea>
+    <div id="scrape-done-msg" style="display:none; margin-top:10px; font-size:13px;"></div>
+  </div>
+</div>
+
+{% if not competitions %}
+  <div class="card">
+    <div style="text-align:center; padding:48px; color:var(--text3);">
+      No data yet — use <strong>Scrape New League</strong> above to get started.
+    </div>
+  </div>
+{% else %}
+  {% set countries = competitions | map(attribute='country') | unique | list %}
+  {% for country in countries | sort %}
+    <div class="mb16">
+      <div style="font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">
+        {{ country.replace('_',' ') }}
+      </div>
+      <div class="grid-auto">
+        {% for c in competitions if c.country == country %}
+          <a href="/competition/{{ c.country }}/{{ c.competition }}" class="competition-card">
+            <div class="country">{{ c.country.replace('_',' ') }}</div>
+            <div class="name">{{ c.competition.replace('_',' ') }}</div>
+            <div class="meta">{{ c.club_count }} clubs</div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+
+  window.toggleNewLeague = function () {
+    const btn  = document.getElementById('nl-toggle');
+    const body = document.getElementById('nl-body');
+    const open = body.classList.toggle('open');
+    btn.classList.toggle('open', open);
+  };
+
+  /* Auto-parse a pasted SofaScore league URL.
+     Extracts:
+       uniq_tid  — last numeric segment of the path
+       season_id — #id:<n> fragment, or /season/<n> in the path  */
+  window.parseLeagueUrl = function (url) {
+    const pathOnly  = url.replace(/#.*$/, '');
+    const pathMatch = pathOnly.match(/\/(\d+)\/?$/);
+    if (pathMatch) {
+      document.getElementById('nl-uniq').value = pathMatch[1];
+    }
+    const seasonHash = url.match(/#id:(\d+)/);
+    if (seasonHash) {
+      document.getElementById('nl-season').value = seasonHash[1];
+      return;
+    }
+    const seasonPath = url.match(/\/season\/(\d+)/);
+    if (seasonPath) {
+      document.getElementById('nl-season').value = seasonPath[1];
+    }
+  };
+
+  window.startLeagueScrape = function () {
+    const uniqTid  = document.getElementById('nl-uniq').value.trim();
+    const seasonId = document.getElementById('nl-season').value.trim();
+    const skip     = document.getElementById('nl-skip').checked;
+
+    if (!uniqTid || !seasonId) {
+      alert('Please fill in Unique Tournament ID and Season ID.');
+      return;
+    }
+
+    const modal    = document.getElementById('scrape-modal');
+    const closeBtn = document.getElementById('scrape-close');
+    const bar      = document.getElementById('scrape-bar');
+    const pctLabel = document.getElementById('scrape-pct');
+    const logEl    = document.getElementById('scrape-log');
+    const doneMsg  = document.getElementById('scrape-done-msg');
+    const nlBtn    = document.getElementById('nl-btn');
+
+    // Reset UI
+    bar.style.width       = '0%';
+    pctLabel.textContent  = '0%';
+    logEl.value           = '';
+    doneMsg.style.display = 'none';
+    doneMsg.textContent   = '';
+    closeBtn.disabled     = true;
+    nlBtn.disabled        = true;
+    modal.style.display   = 'flex';
+
+    fetch('/api/scrape', {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      // tid is no longer a separate input — use uniq_tid for both; scraper_cli
+      // now calls unique-tournament/{uniq_tid}/… for standings so tid is unused.
+      body:    JSON.stringify({tid: uniqTid, uniq_tid: uniqTid, season_id: seasonId, skip}),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { showError(data.error); return; }
+      poll(data.job_id, 0);
+    })
+    .catch(e => showError(String(e)));
+
+    function poll(jobId, offset) {
+      fetch(`/api/scrape/${jobId}?offset=${offset}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { showError(data.error); return; }
+
+          // Append visible lines (strip PROGRESS: protocol lines from display)
+          const visible = (data.lines || []).filter(l => !l.startsWith('PROGRESS:'));
+          if (visible.length) {
+            logEl.value    += visible.join('\n') + '\n';
+            logEl.scrollTop = logEl.scrollHeight;
+          }
+
+          const pct = data.progress || 0;
+          bar.style.width      = pct + '%';
+          pctLabel.textContent = pct + '%';
+
+          if (data.done) {
+            bar.style.width      = '100%';
+            pctLabel.textContent = '100%';
+            closeBtn.disabled    = false;
+            nlBtn.disabled       = false;
+            if (data.error) {
+              doneMsg.style.color = 'var(--red, #e74c3c)';
+              doneMsg.textContent = '✗ Scrape failed — see log above.';
+            } else {
+              doneMsg.style.color = 'var(--green, #27ae60)';
+              doneMsg.textContent = '✓ Done! Reloading page…';
+              setTimeout(() => window.location.reload(), 1500);
+            }
+            doneMsg.style.display = 'block';
+          } else {
+            setTimeout(() => poll(jobId, data.total), 1500);
+          }
+        })
+        .catch(e => showError(String(e)));
+    }
+
+    function showError(msg) {
+      logEl.value          += '\nERROR: ' + msg + '\n';
+      doneMsg.style.color   = 'var(--red, #e74c3c)';
+      doneMsg.textContent   = '✗ ' + msg;
+      doneMsg.style.display = 'block';
+      closeBtn.disabled     = false;
+      nlBtn.disabled        = false;
+    }
+
+    closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+  };
+
+})();
+</script>
+{% endblock %}

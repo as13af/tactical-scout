@@ -1,0 +1,115 @@
+{
+  "provider": "Sofascore",
+  "position": "Inverted Full Back",
+  "core_10_model": {
+    "weight_distribution": {
+      "defensive_reliability": 0.35,
+      "inverted_build_up": 0.30,
+      "control_distribution": 0.15,
+      "transition_security": 0.10,
+      "discipline": 0.10
+    },
+    "metrics": [
+      {
+        "name": "Total duels per 90",
+        "sofascore_key": ["totalDuelsWon", "duelLost"],
+        "computation": "(totalDuelsWon + duelLost) / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total duels engaged per 90 minutes",
+        "category": "defensive_reliability"
+      },
+      {
+        "name": "Total duels won, %",
+        "sofascore_key": "totalDuelsWonPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of all duels successfully won",
+        "category": "defensive_reliability"
+      },
+      {
+        "name": "Ball recoveries per 90",
+        "sofascore_key": "ballRecovery",
+        "computation": "ballRecovery / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Ball recoveries per 90 minutes (proxy for interceptions)",
+        "category": "defensive_reliability"
+      },
+      {
+        "name": "Clearances per 90",
+        "sofascore_key": "clearances",
+        "computation": "clearances / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Defensive clearances per 90 minutes (proxy for successful defensive actions)",
+        "category": "defensive_reliability"
+      },
+      {
+        "name": "Passes to final third per 90",
+        "sofascore_key": "accurateFinalThirdPasses",
+        "computation": "accurateFinalThirdPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Accurate passes into the final third per 90 minutes (proxy for progressive passes)",
+        "category": "inverted_build_up"
+      },
+      {
+        "name": "Accurate long passes, %",
+        "sofascore_key": "accurateLongBallsPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Accuracy of long passes (proxy for accurate progressive distribution)",
+        "category": "inverted_build_up"
+      },
+      {
+        "name": "Key passes per 90",
+        "sofascore_key": "keyPasses",
+        "computation": "keyPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Key passes per 90 minutes reflecting central attacking contribution",
+        "category": "inverted_build_up"
+      },
+      {
+        "name": "Passes per 90",
+        "sofascore_key": "totalPasses",
+        "computation": "totalPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total passes per 90 minutes",
+        "category": "control_distribution"
+      },
+      {
+        "name": "Accurate passes, %",
+        "sofascore_key": "accuratePassesPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Pass completion percentage",
+        "category": "control_distribution"
+      },
+      {
+        "name": "Dribbled past per 90",
+        "sofascore_key": "dribbledPast",
+        "computation": "dribbledPast / (minutesPlayed / 90)",
+        "higher_is_better": false,
+        "value": null,
+        "description": "Times beaten by a dribble per 90 minutes (lower is better for transition security)",
+        "category": "transition_security"
+      },
+      {
+        "name": "Fouls per 90",
+        "sofascore_key": "fouls",
+        "computation": "fouls / (minutesPlayed / 90)",
+        "higher_is_better": false,
+        "value": null,
+        "description": "Fouls committed per 90 minutes (lower is better)",
+        "category": "discipline"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

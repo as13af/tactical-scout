@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.batch-page { max-width: 1100px; margin: 0 auto; }
+.batch-card {
+  background: var(--card-bg, #0f172a);
+  border: 1px solid var(--border, #1e293b);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.batch-page h2 { color: var(--text, #e2e8f0); font-size: 1.25rem; margin: 0 0 16px; }
+.batch-page h3 { color: var(--accent, #0ea5e9); font-size: 1rem; margin: 0 0 12px; }
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+.batch-row  { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.batch-col  { flex: 1; min-width: 220px; }
+.batch-label { font-size: 12px; color: var(--text2, #94a3b8); margin-bottom: 5px; display: block; }
+.batch-input, .batch-select {
+  width: 100%; padding: 8px 12px; background: #0d1117;
+  border: 1px solid #1e293b; border-radius: 6px;
+  color: #e2e8f0; font-size: 14px; box-sizing: border-box;
+}
+.batch-input:focus, .batch-select:focus { outline: none; border-color: #0ea5e9; }
+
+/* ── Autocomplete ─────────────────────────────────────────────────────────── */
+.ac-wrap   { position: relative; }
+.ac-list   {
+  position: absolute; z-index: 99; background: #0d1b2a;
+  border: 1px solid #1e293b; border-radius: 6px; width: 100%;
+  max-height: 220px; overflow-y: auto; display: none;
+}
+.ac-item   { padding: 8px 12px; cursor: pointer; font-size: 13px; color: #e2e8f0; }
+.ac-item:hover { background: #1e293b; }
+.ac-sub    { font-size: 11px; color: #64748b; }
+
+/* ── Player list builder ─────────────────────────────────────────────────── */
+#player-list-wrap { display: flex; flex-direction: column; gap: 8px; }
+.player-tag {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #1e293b; border-radius: 6px; padding: 7px 12px; font-size: 13px;
+}
+.player-tag-name { color: #e2e8f0; font-weight: 600; }
+.player-tag-sub  { color: #64748b; font-size: 11px; margin-left: 8px; }
+.player-tag-rm   { cursor: pointer; color: #ef4444; font-size: 16px; margin-left: auto; padding-left: 12px; }
+.batch-add-row   { display: flex; gap: 8px; align-items: flex-start; }
+#btn-add-player  { padding: 8px 18px; font-size: 13px; white-space: nowrap; }
+.player-count    { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+/* ── Action buttons ──────────────────────────────────────────────────────── */
+.batch-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+#btn-run { padding: 10px 28px; font-size: 14px; font-weight: 600; }
+#spinner  { display: none; color: #0ea5e9; font-size: 13px; }
+
+/* ── Results table ───────────────────────────────────────────────────────── */
+#results-section { display: none; }
+#results-section .meta-bar {
+  font-size: 13px; color: #94a3b8; margin-bottom: 12px;
+}
+.results-table-wrap { overflow-x: auto; }
+table.batch-tbl {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+table.batch-tbl th {
+  background: #0d1b2a; color: #e2e8f0; padding: 9px 10px;
+  text-align: center; border-bottom: 1px solid #1e293b;
+  cursor: pointer; white-space: nowrap; user-select: none;
+}
+table.batch-tbl th:hover { background: #1e293b; }
+table.batch-tbl th.sort-asc::after  { content: ' ↑'; color: #0ea5e9; }
+table.batch-tbl th.sort-desc::after { content: ' ↓'; color: #0ea5e9; }
+table.batch-tbl td {
+  padding: 8px 10px; border-bottom: 1px solid #0d1b2a;
+  color: #94a3b8; text-align: center;
+}
+table.batch-tbl tr:hover td { background: #1e293b22; }
+table.batch-tbl td.name-cell  { text-align: left; color: #e2e8f0; font-weight: 500; }
+table.batch-tbl td.score-cell { font-weight: 700; }
+.verdict-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 12px;
+  font-size: 11px; font-weight: 700; color: #0d1117;
+}
+.v-starter   { background: #22c55e; }
+.v-strong    { background: #0ea5e9; }
+.v-squad     { background: #f59e0b; }
+.v-dev       { background: #a855f7; }
+.v-below     { background: #ef4444; }
+.score-high  { color: #22c55e; }
+.score-mid   { color: #f59e0b; }
+.score-low   { color: #ef4444; }
+
+/* ── Error list ──────────────────────────────────────────────────────────── */
+#error-list { margin-top: 12px; }
+.err-item { font-size: 12px; color: #ef4444; padding: 3px 0; }
+</style>
+
+<div class="batch-page">
+  <div class="batch-card">
+    <h2>Shortlist — Batch Player Comparison</h2>
+    <p style="color:#64748b; font-size:13px; margin:0 0 18px;">
+      Score up to 30 players against a single target club and role to build a prioritised shortlist.
+    </p>
+
+    <!-- ── Club + Role ─────────────────────────────────────────────────────── -->
+    <div class="batch-row">
+      <div class="batch-col">
+        <label class="batch-label">Target Club</label>
+        <div class="ac-wrap">
+          <input id="club-input" class="batch-input" type="text"
+                 placeholder="Search club…" autocomplete="off"
+                 oninput="searchClub(this.value)" onblur="hideAcList('club-list', 200)">
+          <div id="club-list" class="ac-list"></div>
+        </div>
+        <div id="club-selected" style="font-size:11px; color:#0ea5e9; margin-top:4px; min-height:14px;"></div>
+      </div>
+      <div class="batch-col">
+        <label class="batch-label">Role Profile</label>
+        <select id="role-select" class="batch-select">
+          <option value="">— select a role —</option>
+          <optgroup label="Back Line">
+            <option value="1. Back-Line/A_Central_Defend.json">Central Defender</option>
+            <option value="1. Back-Line/B_Ball_Playing_Defend.json">Ball Playing Defender</option>
+            <option value="1. Back-Line/C_Wing_Back.json">Wing Back</option>
+            <option value="1. Back-Line/D_Full_Back.json">Full Back</option>
+            <option value="1. Back-Line/E_Inverted_Wing_Back.json">Inverted Wing Back</option>
+            <option value="1. Back-Line/F_Inverted_Full_Back.json">Inverted Full Back</option>
+          </optgroup>
+          <optgroup label="Mid Line">
+            <option value="2. Mid-Line/G_Defensive_Midfielder.json">Defensive Midfielder</option>
+            <option value="2. Mid-Line/H_Deep_Lying_Playmaker.json">Deep Lying Playmaker</option>
+            <option value="2. Mid-Line/I_Central_Midfielder.json">Central Midfielder</option>
+            <option value="2. Mid-Line/J_Box_to_Box_Midfielder.json">Box-to-Box Midfielder</option>
+            <option value="2. Mid-Line/K_Advanced_Playmaker.json">Advanced Playmaker</option>
+            <option value="2. Mid-Line/L_Attacking_Midfielder.json">Attacking Midfielder</option>
+          </optgroup>
+          <optgroup label="Front Line">
+            <option value="3. Front-Line/M_Winger.json">Winger</option>
+            <option value="3. Front-Line/N_Inside_Forward.json">Inside Forward</option>
+            <option value="3. Front-Line/O_Advanced_Forward.json">Advanced Forward</option>
+            <option value="3. Front-Line/P_Target_Forward.json">Target Forward</option>
+            <option value="3. Front-Line/Q_False_Nine.json">False Nine</option>
+            <option value="3. Front-Line/R_Poacher.json">Poacher</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- ── Player list builder ─────────────────────────────────────────────── -->
+    <h3>Players <span id="player-count-lbl" style="font-size:11px; color:#64748b;">(0 / 30)</span></h3>
+    <div class="batch-add-row">
+      <div class="ac-wrap" style="flex:1;">
+        <input id="player-input" class="batch-input" type="text"
+               placeholder="Search player to add…" autocomplete="off"
+               oninput="searchPlayer(this.value)"
+               onblur="hideAcList('player-list', 200)"
+               onkeydown="if(event.key==='Enter') addTopPlayer()">
+        <div id="player-list" class="ac-list"></div>
+      </div>
+      <button class="btn btn-primary" id="btn-add-player" onclick="addTopPlayer()">Add</button>
+    </div>
+    <div style="margin-top:12px;" id="player-list-wrap"></div>
+
+    <!-- ── Run ─────────────────────────────────────────────────────────────── -->
+    <div class="batch-actions" style="margin-top:20px;">
+      <button class="btn btn-primary" id="btn-run" onclick="runBatch()">Run Comparison</button>
+      <span id="spinner">⏳ Scoring players…</span>
+      <button class="btn btn-ghost" onclick="clearAll()" style="font-size:12px;">Clear All</button>
+    </div>
+  </div><!-- /config card -->
+
+  <!-- ── Results ──────────────────────────────────────────────────────────── -->
+  <div id="results-section">
+    <div class="batch-card">
+      <div class="meta-bar" id="results-meta"></div>
+      <div class="batch-actions" style="margin-bottom:14px;">
+        <button class="btn btn-ghost" id="btn-xlsx" onclick="exportXLSX()" style="font-size:13px;">
+          📥 Export Shortlist (XLSX)
+        </button>
+      </div>
+      <div class="results-table-wrap">
+        <table class="batch-tbl" id="results-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('rank')"           data-col="rank">Rank</th>
+              <th onclick="sortTable('name')"           data-col="name">Name</th>
+              <th onclick="sortTable('position')"       data-col="position">Pos</th>
+              <th onclick="sortTable('age')"            data-col="age">Age</th>
+              <th onclick="sortTable('team')"           data-col="team">Team</th>
+              <th onclick="sortTable('league')"         data-col="league">League</th>
+              <th onclick="sortTable('combined_score')" data-col="combined_score">Score</th>
+              <th onclick="sortTable('role_fitness')"   data-col="role_fitness">Role Fit</th>
+              <th onclick="sortTable('squad_impact_norm')" data-col="squad_impact_norm">Squad Impact</th>
+              <th onclick="sortTable('league_adaptation')" data-col="league_adaptation">Lg. Adapt</th>
+              <th data-col="verdict">Verdict</th>
+            </tr>
+          </thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+      <div id="error-list"></div>
+    </div>
+  </div>
+</div><!-- /batch-page -->
+
+{% endblock %}
+{% block scripts %}
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+const state = {
+  club:    { path: '', name: '' },
+  players: [],          // [{path, name, position, team, league}]
+  results: [],          // last successful batch results
+  lastMeta: {},
+};
+let playerAcCandidates = [];  // top search results for "add" on Enter
+let sortCol = 'rank';
+let sortAsc = true;
+
+// ── Club autocomplete ─────────────────────────────────────────────────────────
+let clubTimer = null;
+function searchClub(q) {
+  clearTimeout(clubTimer);
+  if (q.length < 1) { hideAcList('club-list', 0); return; }
+  clubTimer = setTimeout(() => {
+    fetch('/api/club_search?q=' + encodeURIComponent(q) + '&limit=15')
+      .then(r => r.json())
+      .then(data => {
+        const list = document.getElementById('club-list');
+        list.innerHTML = '';
+        data.forEach(c => {
+          const d = document.createElement('div');
+          d.className = 'ac-item';
+          d.innerHTML = `<div>${esc(c.name)}</div><div class="ac-sub">${esc(c.competition)} · ${esc(c.country)}</div>`;
+          d.onmousedown = () => selectClub(c);
+          list.appendChild(d);
+        });
+        list.style.display = data.length ? 'block' : 'none';
+      });
+  }, 280);
+}
+function selectClub(c) {
+  state.club = { path: c.path, name: c.name };
+  document.getElementById('club-input').value    = c.name;
+  document.getElementById('club-selected').textContent =
+    c.competition + ' · ' + c.country;
+  hideAcList('club-list', 0);
+}
+
+// ── Player autocomplete ───────────────────────────────────────────────────────
+let playerTimer = null;
+function searchPlayer(q) {
+  clearTimeout(playerTimer);
+  playerAcCandidates = [];
+  if (q.length < 2) { hideAcList('player-list', 0); return; }
+  playerTimer = setTimeout(() => {
+    fetch('/api/player_search?q=' + encodeURIComponent(q) + '&limit=15')
+      .then(r => r.json())
+      .then(data => {
+        playerAcCandidates = data;
+        const list = document.getElementById('player-list');
+        list.innerHTML = '';
+        data.forEach((p, i) => {
+          const d = document.createElement('div');
+          d.className = 'ac-item';
+          d.innerHTML = `<div>${esc(p.name)}</div>
+            <div class="ac-sub">${esc(p.position || '')} · ${esc(p.team || '')} · ${esc(p.competition || '')} · ${esc(p.country || '')}</div>`;
+          d.onmousedown = () => addPlayer(p);
+          list.appendChild(d);
+        });
+        list.style.display = data.length ? 'block' : 'none';
+      });
+  }, 280);
+}
+function addTopPlayer() {
+  if (playerAcCandidates.length) addPlayer(playerAcCandidates[0]);
+}
+function addPlayer(p) {
+  if (state.players.length >= 30) { alert('Maximum 30 players.'); return; }
+  if (state.players.find(x => x.path === p.path)) return;
+  state.players.push(p);
+  renderPlayerList();
+  document.getElementById('player-input').value = '';
+  playerAcCandidates = [];
+  hideAcList('player-list', 0);
+}
+function removePlayer(path) {
+  state.players = state.players.filter(p => p.path !== path);
+  renderPlayerList();
+}
+function renderPlayerList() {
+  const wrap = document.getElementById('player-list-wrap');
+  wrap.innerHTML = '';
+  state.players.forEach(p => {
+    const tag = document.createElement('div');
+    tag.className = 'player-tag';
+    tag.innerHTML = `
+      <span class="player-tag-name">${esc(p.name)}</span>
+      <span class="player-tag-sub">${esc(p.position || '')} · ${esc(p.team || '')} · ${esc(p.competition || '')}</span>
+      <span class="player-tag-rm" onclick="removePlayer('${esc(p.path)}')">✕</span>`;
+    wrap.appendChild(tag);
+  });
+  document.getElementById('player-count-lbl').textContent =
+    `(${state.players.length} / 30)`;
+}
+
+// ── Run batch ─────────────────────────────────────────────────────────────────
+async function runBatch() {
+  if (!state.club.path)           { alert('Please select a target club.'); return; }
+  if (!document.getElementById('role-select').value) { alert('Please select a role.'); return; }
+  if (state.players.length === 0) { alert('Please add at least one player.'); return; }
+
+  const btn     = document.getElementById('btn-run');
+  const spinner = document.getElementById('spinner');
+  btn.disabled  = true;
+  spinner.style.display = 'inline';
+
+  try {
+    const res = await fetch('/api/batch_compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        players: state.players.map(p => p.path),
+        role:    document.getElementById('role-select').value,
+        club:    state.club.path,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert('Error: ' + (data.error || res.statusText)); return; }
+    state.results = data.results || [];
+    state.lastMeta = data;
+    renderResults(data);
+  } catch (e) {
+    alert('Network error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }
+}
+
+// ── Render results ────────────────────────────────────────────────────────────
+function renderResults(data) {
+  document.getElementById('results-section').style.display = 'block';
+  const roleLabel = document.getElementById('role-select')
+    .options[document.getElementById('role-select').selectedIndex].text;
+  document.getElementById('results-meta').innerHTML =
+    `<strong>${esc(data.club)}</strong> · ${esc(data.competition)}, ${esc(data.country)}
+     &nbsp;|&nbsp; Role: <strong>${esc(roleLabel)}</strong>
+     &nbsp;|&nbsp; ${data.results.length} players scored
+     &nbsp;|&nbsp; Squad avg: <strong>${(data.squad_avg || 0).toFixed(1)}</strong>`;
+
+  const errors = data.errors || [];
+  const errDiv = document.getElementById('error-list');
+  errDiv.innerHTML = '';
+  errors.forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'err-item';
+    d.textContent = `⚠ ${e.player_path || ''}: ${e.error}`;
+    errDiv.appendChild(d);
+  });
+
+  sortCol = 'rank';
+  sortAsc = true;
+  renderTableBody(state.results);
+  // Reset sort indicators
+  document.querySelectorAll('table.batch-tbl th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+  });
+  const rankTh = document.querySelector('th[data-col="rank"]');
+  if (rankTh) rankTh.classList.add('sort-asc');
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderTableBody(rows) {
+  const tbody = document.getElementById('results-body');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const score   = r.combined_score || 0;
+    const sClass  = score >= 72 ? 'score-high' : score >= 44 ? 'score-mid' : 'score-low';
+    const vClass  = verdictClass(r.verdict);
+    const tr      = document.createElement('tr');
+    tr.innerHTML  = `
+      <td>${r.rank}</td>
+      <td class="name-cell">
+        <a href="/club_compatibility?prefill=${encodeURIComponent(r.player_path)}"
+           style="color:#0ea5e9; text-decoration:none;">${esc(r.name)}</a>
+      </td>
+      <td>${esc(r.position || '')}</td>
+      <td>${esc(r.age || '')}</td>
+      <td>${esc(r.team || '')}</td>
+      <td>${esc(r.league || '')}</td>
+      <td class="score-cell ${sClass}">${score.toFixed(1)}</td>
+      <td>${(r.role_fitness || 0).toFixed(1)}</td>
+      <td>${(r.squad_impact_norm || 0).toFixed(1)}</td>
+      <td>${(r.league_adaptation || 0).toFixed(1)}</td>
+      <td><span class="verdict-pill ${vClass}">${esc(r.verdict)}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Sort ──────────────────────────────────────────────────────────────────────
+function sortTable(col) {
+  if (sortCol === col) {
+    sortAsc = !sortAsc;
+  } else {
+    sortCol = col;
+    sortAsc = col === 'name' || col === 'position' || col === 'team' || col === 'league';
+  }
+  const sorted = [...state.results].sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+    else { va = va ?? 0; vb = vb ?? 0; }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+  renderTableBody(sorted);
+  document.querySelectorAll('table.batch-tbl th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === col) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+  });
+}
+
+// ── XLSX Export ───────────────────────────────────────────────────────────────
+async function exportXLSX() {
+  if (!state.results.length) { alert('Run a comparison first.'); return; }
+  const roleLabel = document.getElementById('role-select')
+    .options[document.getElementById('role-select').selectedIndex].text;
+  const btn = document.getElementById('btn-xlsx');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Exporting…';
+  try {
+    const res = await fetch('/api/export_shortlist_xlsx', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        results:   state.results,
+        club_name: state.lastMeta.club || '',
+        role_name: roleLabel,
+      }),
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); alert('Error: '+(e.error||res.statusText)); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const cd   = res.headers.get('Content-Disposition') || '';
+    const fn   = (cd.match(/filename="?([^"]+)"?/) || [])[1] || 'Shortlist.xlsx';
+    a.download = fn; a.href = url;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '📥 Export Shortlist (XLSX)';
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function clearAll() {
+  state.players = [];
+  state.results = [];
+  renderPlayerList();
+  document.getElementById('results-section').style.display = 'none';
+}
+function hideAcList(id, delay) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }, delay);
+}
+function verdictClass(v) {
+  if (!v) return '';
+  const m = { 'Starter Upgrade': 'v-starter', 'Strong Signing': 'v-strong',
+               'Squad Depth': 'v-squad', 'Development Option': 'v-dev',
+               'Below Squad Level': 'v-below' };
+  return m[v] || '';
+}
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+{% endblock %}

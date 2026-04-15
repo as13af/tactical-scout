@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+{% block title %}Player Search — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Player Search</h1>
+  <div class="sub">Filter across all scraped players</div>
+</div>
+
+<!-- Filters -->
+<div class="filters-panel">
+  <div class="filters-row" id="basic-filters">
+
+    <div class="filter-group" style="flex:1; min-width:160px;">
+      <label>Competition</label>
+      <select id="f-competition">
+        <option value="">All</option>
+        {% for c in competitions %}
+          <option value="{{ c.competition }}">{{ c.competition.replace('_',' ') }} ({{ c.country.replace('_',' ') }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Club</label>
+      <input type="text" id="f-club" placeholder="e.g. Beveren">
+    </div>
+
+    <div class="filter-group">
+      <label>Position</label>
+      <select id="f-position">
+        <option value="">All</option>
+        <option value="G">GK</option>
+        <option value="D">Defender</option>
+        <option value="M">Midfielder</option>
+        <option value="F">Forward</option>
+      </select>
+    </div>
+
+    <div class="filter-group" style="min-width:190px;">
+      <label>Position Detailed</label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <select id="f-specific-pos-select" onchange="addPosTag()">
+          <option value="">— Pick position —</option>
+          <optgroup label="Goalkeeper">
+            <option value="GK">GK – Goalkeeper</option>
+          </optgroup>
+          <optgroup label="Defender">
+            <option value="DC">DC – Centre-Back</option>
+            <option value="DL">DL – Left-Back</option>
+            <option value="DR">DR – Right-Back</option>
+          </optgroup>
+          <optgroup label="Midfielder">
+            <option value="DM">DM – Defensive Mid</option>
+            <option value="MC">MC – Central Mid</option>
+            <option value="AM">AM – Attacking Mid</option>
+            <option value="ML">ML – Left Mid</option>
+            <option value="MR">MR – Right Mid</option>
+          </optgroup>
+          <optgroup label="Forward">
+            <option value="LW">LW – Left Wing</option>
+            <option value="RW">RW – Right Wing</option>
+            <option value="ST">ST – Striker</option>
+          </optgroup>
+        </select>
+      </div>
+      <div id="pos-tags" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;"></div>
+    </div>
+
+    <div class="filter-group">
+      <label>Nationality</label>
+      <input type="text" id="f-nationality" placeholder="e.g. Belgian">
+    </div>
+
+    <div class="filter-group">
+      <label>Age Min</label>
+      <input type="number" id="f-age-min" placeholder="16" style="width:80px;">
+    </div>
+
+    <div class="filter-group">
+      <label>Age Max</label>
+      <input type="number" id="f-age-max" placeholder="40" style="width:80px;">
+    </div>
+
+    <div class="filter-group">
+      <label>Min Apps</label>
+      <input type="number" id="f-apps" placeholder="0" style="width:80px;">
+    </div>
+
+    <div class="filter-group">
+      <label>Min Rating</label>
+      <input type="number" id="f-rating" placeholder="6.0" step="0.1" style="width:90px;">
+    </div>
+
+    <div class="filter-group">
+      <label>Min Goals</label>
+      <input type="number" id="f-goals" placeholder="0" style="width:80px;">
+    </div>
+
+    <div class="filter-group">
+      <label>Min Assists</label>
+      <input type="number" id="f-assists" placeholder="0" style="width:80px;">
+    </div>
+
+    <div class="filter-group" style="justify-content:flex-end;">
+      <label>&nbsp;</label>
+      <button class="toggle-advanced" id="toggle-adv" onclick="toggleAdvanced()">+ Advanced</button>
+    </div>
+  </div>
+
+  <!-- Advanced filters -->
+  <div class="filters-advanced" id="adv-filters">
+    <div class="filters-row" style="margin-top:0;">
+      <div class="filter-group">
+        <label>Pass Acc % Min</label>
+        <input type="number" id="f-pass-acc" placeholder="0" step="1" style="width:110px;">
+      </div>
+      <div class="filter-group">
+        <label>Duels Won Min</label>
+        <input type="number" id="f-duels" placeholder="0" style="width:100px;">
+      </div>
+      <div class="filter-group">
+        <label>Aerial Won Min</label>
+        <input type="number" id="f-aerial" placeholder="0" style="width:100px;">
+      </div>
+      <div class="filter-group">
+        <label>Dribbles Min</label>
+        <input type="number" id="f-dribbles" placeholder="0" style="width:90px;">
+      </div>
+      <div class="filter-group">
+        <label>Tackles Min</label>
+        <input type="number" id="f-tackles" placeholder="0" style="width:90px;">
+      </div>
+      <div class="filter-group">
+        <label>Key Passes Min</label>
+        <input type="number" id="f-keypasses" placeholder="0" style="width:100px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="filters-row mt16" style="gap:10px;">
+    <div class="filter-group">
+      <label>Sort by</label>
+      <select id="f-sort">
+        <option value="rating">Rating</option>
+        <option value="goals">Goals</option>
+        <option value="assists">Assists</option>
+        <option value="appearances">Appearances</option>
+        <option value="age">Age</option>
+        <option value="name">Name</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Direction</label>
+      <select id="f-sort-dir">
+        <option value="desc">High → Low</option>
+        <option value="asc">Low → High</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Per page</label>
+      <select id="f-per-page">
+        <option value="25">25</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+    <div class="filter-group" style="justify-content:flex-end;">
+      <label>&nbsp;</label>
+      <button class="btn btn-primary" onclick="loadPlayers(1)">Search</button>
+    </div>
+    <div class="filter-group" style="justify-content:flex-end;">
+      <label>&nbsp;</label>
+      <button class="btn btn-ghost" onclick="resetFilters()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="results-info" class="text-dim mb16" style="font-size:12px;"></div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('name')"       id="th-name">Name</th>
+          <th>Club</th>
+          <th>Competition</th>
+          <th>Cat</th>
+          <th>Pos</th>
+          <th>Nat</th>
+          <th onclick="sortBy('age')"        id="th-age">Age</th>
+          <th onclick="sortBy('appearances')"id="th-appearances" class="td-num">Apps</th>
+          <th onclick="sortBy('goals')"      id="th-goals"       class="td-num">Goals</th>
+          <th onclick="sortBy('assists')"    id="th-assists"     class="td-num">Ast</th>
+          <th onclick="sortBy('rating')"     id="th-rating"      class="td-num sorted">Rating</th>
+          <th class="td-num">Mins</th>
+          <th class="td-num" id="th-adv-1" style="display:none;">Pass%</th>
+          <th class="td-num" id="th-adv-2" style="display:none;">Duels</th>
+          <th class="td-num" id="th-adv-3" style="display:none;">Tackles</th>
+        </tr>
+      </thead>
+      <tbody id="players-tbody">
+        <tr><td colspan="15" class="loading">Loading players</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pagination" id="pagination"></div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.pos-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  background: var(--green-bg);
+  border: 1px solid rgba(58,141,191,0.25);
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pos-filter-tag button {
+  background: none;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.pos-filter-tag button:hover { opacity: 1; }
+</style>
+<script>
+let currentPage = 1;
+let currentSort = 'rating';
+let currentDir  = 'desc';
+let advOpen     = false;
+let positionTags = [];
+
+function addPosTag() {
+  const sel = document.getElementById('f-specific-pos-select');
+  const val = sel.value;
+  if (!val || positionTags.includes(val)) { sel.value = ''; return; }
+  positionTags.push(val);
+  sel.value = '';
+  renderPosTags();
+  loadPlayers(1);
+}
+
+function removePosTag(val) {
+  positionTags = positionTags.filter(t => t !== val);
+  renderPosTags();
+  loadPlayers(1);
+}
+
+function renderPosTags() {
+  const container = document.getElementById('pos-tags');
+  container.innerHTML = positionTags.map(t =>
+    `<span class="pos-filter-tag">${t}<button onclick="removePosTag('${t}')" title="Remove">×</button></span>`
+  ).join('');
+}
+
+function toggleAdvanced() {
+  advOpen = !advOpen;
+  document.getElementById('adv-filters').classList.toggle('open', advOpen);
+  document.getElementById('toggle-adv').textContent = advOpen ? '– Advanced' : '+ Advanced';
+  ['th-adv-1','th-adv-2','th-adv-3'].forEach(id => {
+    document.getElementById(id).style.display = advOpen ? '' : 'none';
+  });
+}
+
+function sortBy(col) {
+  if (currentSort === col) {
+    currentDir = currentDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    currentSort = col;
+    currentDir  = 'desc';
+  }
+  document.getElementById('f-sort').value     = currentSort;
+  document.getElementById('f-sort-dir').value = currentDir;
+  loadPlayers(1);
+}
+
+function resetFilters() {
+  ['f-competition','f-club','f-nationality','f-age-min','f-age-max',
+   'f-apps','f-rating','f-goals','f-assists',
+   'f-pass-acc','f-duels','f-aerial','f-dribbles','f-tackles','f-keypasses']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('f-position').value  = '';
+  document.getElementById('f-sort').value      = 'rating';
+  document.getElementById('f-sort-dir').value  = 'desc';
+  positionTags = [];
+  renderPosTags();
+  currentSort = 'rating'; currentDir = 'desc';
+  loadPlayers(1);
+}
+
+function buildParams(page) {
+  const p = new URLSearchParams();
+  const g = id => document.getElementById(id)?.value || '';
+  p.set('competition', g('f-competition'));
+  p.set('club',        g('f-club'));
+  p.set('position',    g('f-position'));
+  p.set('specific_pos', positionTags.join(','));
+  p.set('nationality', g('f-nationality'));
+  p.set('age_min',     g('f-age-min'));
+  p.set('age_max',     g('f-age-max'));
+  p.set('apps_min',    g('f-apps'));
+  p.set('rating_min',  g('f-rating'));
+  p.set('goals_min',   g('f-goals'));
+  p.set('assists_min', g('f-assists'));
+  p.set('pass_acc_min',g('f-pass-acc'));
+  p.set('duels_min',   g('f-duels'));
+  p.set('aerial_min',  g('f-aerial'));
+  p.set('dribbles_min',g('f-dribbles'));
+  p.set('tackles_min', g('f-tackles'));
+  p.set('key_passes_min', g('f-keypasses'));
+  p.set('sort_by',  document.getElementById('f-sort').value);
+  p.set('sort_dir', document.getElementById('f-sort-dir').value);
+  p.set('per_page', document.getElementById('f-per-page').value);
+  p.set('page', page);
+  return p;
+}
+
+function ratingBadge(r) {
+  if (!r || r == 0) return '—';
+  const cls = r >= 7.0 ? 'rating-high' : r >= 6.0 ? 'rating-mid' : 'rating-low';
+  return `<span class="rating-badge ${cls}">${parseFloat(r).toFixed(2)}</span>`;
+}
+
+async function loadPlayers(page) {
+  currentPage = page;
+  const tbody = document.getElementById('players-tbody');
+  tbody.innerHTML = '<tr><td colspan="14" class="loading">Loading players</td></tr>';
+
+  const params = buildParams(page);
+  const res    = await fetch('/api/players?' + params.toString());
+  const data   = await res.json();
+
+  document.getElementById('results-info').textContent =
+    `${data.total} player(s) found · Page ${data.page} of ${data.total_pages}`;
+
+  if (!data.players.length) {
+    tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--text3);">No players match the filters.</td></tr>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = data.players.map(p => {
+    const s    = p.stats || {};
+    const path = `/player/${p.path}`;
+      const specificPos = (p.positions || []).join(', ') || '—';
+      return `<tr>
+      <td><a href="${path}">${p.name}</a></td>
+      <td><a href="/competition/${p.country}/${p.competition}/${p.club_slug}">${p.team}</a></td>
+      <td style="color:var(--text2);font-size:11px;">${p.competition.replace(/_/g,' ')}</td>
+      <td><span class="pos-badge">${p.position || '?'}</span></td>
+      <td style="color:var(--text2);font-size:11px;">${specificPos}</td>
+      <td style="color:var(--text2);">${p.nationality || '—'}</td>
+      <td>${p.age || '—'}</td>
+      <td class="td-num">${s.appearances ?? '—'}</td>
+      <td class="td-num">${s.goals ?? '—'}</td>
+      <td class="td-num">${s.assists ?? '—'}</td>
+      <td class="td-num">${ratingBadge(s.rating)}</td>
+      <td class="td-num">${s.minutesPlayed ?? '—'}</td>
+      <td class="td-num" style="display:${advOpen?'':'none'}">${s.accuratePassesPercentage ? parseFloat(s.accuratePassesPercentage).toFixed(1)+'%' : '—'}</td>
+      <td class="td-num" style="display:${advOpen?'':'none'}">${s.totalDuelsWon ?? '—'}</td>
+      <td class="td-num" style="display:${advOpen?'':'none'}">${s.tackles ?? '—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const pg = document.getElementById('pagination');
+  let html = '';
+  html += `<button onclick="loadPlayers(${page-1})" ${page<=1?'disabled':''}>← Prev</button>`;
+  const start = Math.max(1, page-2), end = Math.min(data.total_pages, page+2);
+  for (let i=start; i<=end; i++)
+    html += `<button class="${i===page?'active':''}" onclick="loadPlayers(${i})">${i}</button>`;
+  html += `<button onclick="loadPlayers(${page+1})" ${page>=data.total_pages?'disabled':''}>Next →</button>`;
+  pg.innerHTML = html;
+}
+
+// Auto-load on enter
+document.addEventListener('keydown', e => { if (e.key === 'Enter') loadPlayers(1); });
+
+// Initial load
+loadPlayers(1);
+</script>
+{% endblock %}

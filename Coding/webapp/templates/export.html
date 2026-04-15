@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Export — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Export Data</h1>
+  <div class="sub">Export filtered player data to CSV</div>
+</div>
+
+<div class="grid-2" style="gap:20px; align-items:start;">
+
+  <div class="card">
+    <div class="card-title">Filter & Export</div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+
+      <div class="filter-group" style="width:100%;">
+        <label>Competition</label>
+        <select id="ex-competition" style="width:100%;">
+          <option value="">All competitions</option>
+          {% for c in competitions %}
+            <option value="{{ c.competition }}">{{ c.competition.replace('_',' ') }} ({{ c.country.replace('_',' ') }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="filter-group" style="width:100%;">
+        <label>Club</label>
+        <input type="text" id="ex-club" placeholder="Leave blank for all clubs" style="width:100%;">
+      </div>
+
+      <div class="filter-group" style="width:100%;">
+        <label>Position</label>
+        <select id="ex-position" style="width:100%;">
+          <option value="">All positions</option>
+          <option value="G">Goalkeeper</option>
+          <option value="D">Defender</option>
+          <option value="M">Midfielder</option>
+          <option value="F">Forward</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="filter-group" style="flex:1;">
+          <label>Min Age</label>
+          <input type="number" id="ex-age-min" placeholder="16" style="width:100%;">
+        </div>
+        <div class="filter-group" style="flex:1;">
+          <label>Max Age</label>
+          <input type="number" id="ex-age-max" placeholder="40" style="width:100%;">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="filter-group" style="flex:1;">
+          <label>Min Apps</label>
+          <input type="number" id="ex-apps" placeholder="0" style="width:100%;">
+        </div>
+        <div class="filter-group" style="flex:1;">
+          <label>Min Rating</label>
+          <input type="number" id="ex-rating" placeholder="0.0" step="0.1" style="width:100%;">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <div class="filter-group" style="flex:1;">
+          <label>Min Goals</label>
+          <input type="number" id="ex-goals" placeholder="0" style="width:100%;">
+        </div>
+        <div class="filter-group" style="flex:1;">
+          <label>Min Assists</label>
+          <input type="number" id="ex-assists" placeholder="0" style="width:100%;">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button class="btn btn-primary" onclick="previewExport()">Preview</button>
+        <button class="btn btn-ghost"   onclick="downloadCSV()">⬇ Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div>
+    <div id="preview-info" class="text-dim mb16" style="font-size:12px;"></div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div class="table-wrap" style="max-height:520px; overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Club</th>
+              <th>Pos</th>
+              <th>Age</th>
+              <th class="td-num">Apps</th>
+              <th class="td-num">Goals</th>
+              <th class="td-num">Ast</th>
+              <th class="td-num">Rating</th>
+            </tr>
+          </thead>
+          <tbody id="preview-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text3);">Set filters and click Preview</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getFilters() {
+  const g = id => document.getElementById(id)?.value || '';
+  return new URLSearchParams({
+    competition: g('ex-competition'),
+    club:        g('ex-club'),
+    position:    g('ex-position'),
+    age_min:     g('ex-age-min'),
+    age_max:     g('ex-age-max'),
+    apps_min:    g('ex-apps'),
+    rating_min:  g('ex-rating'),
+    goals_min:   g('ex-goals'),
+    assists_min: g('ex-assists'),
+    sort_by:     'rating',
+    sort_dir:    'desc',
+  });
+}
+
+function ratingBadge(r) {
+  if (!r || r == 0) return '—';
+  const cls = r >= 7.0 ? 'rating-high' : r >= 6.0 ? 'rating-mid' : 'rating-low';
+  return `<span class="rating-badge ${cls}">${parseFloat(r).toFixed(2)}</span>`;
+}
+
+async function previewExport() {
+  const tbody = document.getElementById('preview-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" class="loading">Loading</td></tr>';
+  const params = getFilters();
+  params.set('per_page', 100);
+  params.set('page', 1);
+  const res  = await fetch('/api/players?' + params.toString());
+  const data = await res.json();
+  document.getElementById('preview-info').textContent =
+    `${data.total} player(s) match — showing first ${Math.min(data.total,100)}`;
+  if (!data.players.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text3);">No results</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.players.map(p => {
+    const s = p.stats || {};
+    return `<tr>
+      <td>${p.name}</td>
+      <td style="color:var(--text2);">${p.team}</td>
+      <td><span class="pos-badge">${p.position||'?'}</span></td>
+      <td>${p.age||'—'}</td>
+      <td class="td-num">${s.appearances??'—'}</td>
+      <td class="td-num">${s.goals??'—'}</td>
+      <td class="td-num">${s.assists??'—'}</td>
+      <td class="td-num">${ratingBadge(s.rating)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function downloadCSV() {
+  const params = getFilters();
+  window.location.href = '/api/export/csv?' + params.toString();
+}
+</script>
+{% endblock %}

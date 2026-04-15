@@ -1,0 +1,353 @@
+{
+    "team_id": "2948",
+    "team_name": "FC Utrecht",
+    "tournament_id": "37",
+    "season_id": "77012",
+    "competition_name": "VriendenLoterij_Eredivisie",
+    "competition_country": "Netherlands",
+    "profile": {
+        "team": {
+            "name": "FC Utrecht",
+            "slug": "fc-utrecht",
+            "shortName": "Utrecht",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Netherlands",
+                "slug": "netherlands",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 35,
+                "flag": "netherlands",
+                "alpha2": "NL",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "VriendenLoterij Eredivisie",
+                "slug": "eredivisie",
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "VriendenLoterij Eredivisie",
+                    "slug": "eredivisie",
+                    "primaryColorHex": "#292766",
+                    "secondaryColorHex": "#7c79c3",
+                    "category": {
+                        "name": "Netherlands",
+                        "slug": "netherlands",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "NL",
+                            "alpha3": "NLD",
+                            "name": "Netherlands",
+                            "slug": "netherlands"
+                        },
+                        "id": 35,
+                        "flag": "netherlands",
+                        "alpha2": "NL",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 150763,
+                    "hasPerformanceGraphFeature": true,
+                    "country": {},
+                    "id": 37,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 515,
+                "isLive": false,
+                "id": 39
+            },
+            "primaryUniqueTournament": {
+                "name": "VriendenLoterij Eredivisie",
+                "slug": "eredivisie",
+                "primaryColorHex": "#292766",
+                "secondaryColorHex": "#7c79c3",
+                "category": {
+                    "name": "Netherlands",
+                    "slug": "netherlands",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "NL",
+                        "alpha3": "NLD",
+                        "name": "Netherlands",
+                        "slug": "netherlands"
+                    },
+                    "id": 35,
+                    "flag": "netherlands",
+                    "alpha2": "NL",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 150763,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 37,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 74557,
+            "manager": {
+                "name": "Ron Jans",
+                "slug": "ron-jans",
+                "shortName": "R. Jans",
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 53005
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 52.078356,
+                    "longitude": 5.145871
+                },
+                "hidden": false,
+                "slug": "stadion-galgenwaard",
+                "name": "Stadion Galgenwaard",
+                "capacity": 23750,
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 786,
+                "city": {
+                    "name": "Utrecht"
+                },
+                "stadium": {
+                    "name": "Stadion Galgenwaard",
+                    "capacity": 23750
+                }
+            },
+            "nameCode": "FCU",
+            "class": 0,
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "NL",
+                "alpha3": "NLD",
+                "name": "Netherlands",
+                "slug": "netherlands"
+            },
+            "id": 2948,
+            "fullName": "FC Utrecht",
+            "teamColors": {
+                "primary": "#ff0000",
+                "secondary": "#ffffff",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 15638400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.88",
+            "position": 8,
+            "value": "38",
+            "form": [
+                "W",
+                "D",
+                "W",
+                "D",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 40,
+            "goalsConceded": 31,
+            "ownGoals": 0,
+            "assists": 30,
+            "shots": 393,
+            "penaltyGoals": 1,
+            "penaltiesTaken": 1,
+            "freeKickGoals": 0,
+            "freeKickShots": 12,
+            "goalsFromInsideTheBox": 35,
+            "goalsFromOutsideTheBox": 5,
+            "shotsFromInsideTheBox": 269,
+            "shotsFromOutsideTheBox": 124,
+            "headedGoals": 10,
+            "leftFootGoals": 11,
+            "rightFootGoals": 19,
+            "bigChances": 68,
+            "bigChancesCreated": 49,
+            "bigChancesMissed": 46,
+            "shotsOnTarget": 136,
+            "shotsOffTarget": 148,
+            "blockedScoringAttempt": 109,
+            "successfulDribbles": 174,
+            "dribbleAttempts": 402,
+            "corners": 145,
+            "hitWoodwork": 9,
+            "fastBreaks": 29,
+            "fastBreakGoals": 2,
+            "fastBreakShots": 27,
+            "averageBallPossession": 47.259259259259,
+            "totalPasses": 10902,
+            "accuratePasses": 8652,
+            "accuratePassesPercentage": 79.36158503027,
+            "totalOwnHalfPasses": 5275,
+            "accurateOwnHalfPasses": 4603,
+            "accurateOwnHalfPassesPercentage": 87.260663507109,
+            "totalOppositionHalfPasses": 5627,
+            "accurateOppositionHalfPasses": 4049,
+            "accurateOppositionHalfPassesPercentage": 71.95663763995,
+            "totalLongBalls": 1026,
+            "accurateLongBalls": 526,
+            "accurateLongBallsPercentage": 51.267056530214,
+            "totalCrosses": 536,
+            "accurateCrosses": 159,
+            "accurateCrossesPercentage": 29.664179104478,
+            "cleanSheets": 6,
+            "tackles": 452,
+            "interceptions": 247,
+            "saves": 86,
+            "errorsLeadingToGoal": 1,
+            "errorsLeadingToShot": 15,
+            "penaltiesCommited": 3,
+            "penaltyGoalsConceded": 1,
+            "clearances": 672,
+            "clearancesOffLine": 4,
+            "lastManTackles": 1,
+            "totalDuels": 2725,
+            "duelsWon": 1409,
+            "duelsWonPercentage": 51.706422018349,
+            "totalGroundDuels": 1857,
+            "groundDuelsWon": 923,
+            "groundDuelsWonPercentage": 49.703823371029,
+            "totalAerialDuels": 868,
+            "aerialDuelsWon": 486,
+            "aerialDuelsWonPercentage": 55.990783410138,
+            "possessionLost": 3661,
+            "offsides": 30,
+            "fouls": 298,
+            "yellowCards": 39,
+            "yellowRedCards": 1,
+            "redCards": 1,
+            "avgRating": 6.8833746898263,
+            "accurateFinalThirdPassesAgainst": 2458,
+            "accurateOppositionHalfPassesAgainst": 5106,
+            "accurateOwnHalfPassesAgainst": 5018,
+            "accuratePassesAgainst": 10124,
+            "bigChancesAgainst": 50,
+            "bigChancesCreatedAgainst": 36,
+            "bigChancesMissedAgainst": 31,
+            "clearancesAgainst": 705,
+            "cornersAgainst": 118,
+            "crossesSuccessfulAgainst": 77,
+            "crossesTotalAgainst": 396,
+            "dribbleAttemptsTotalAgainst": 397,
+            "dribbleAttemptsWonAgainst": 192,
+            "errorsLeadingToGoalAgainst": 2,
+            "errorsLeadingToShotAgainst": 21,
+            "hitWoodworkAgainst": 7,
+            "interceptionsAgainst": 236,
+            "keyPassesAgainst": 246,
+            "longBallsSuccessfulAgainst": 636,
+            "longBallsTotalAgainst": 1459,
+            "offsidesAgainst": 27,
+            "redCardsAgainst": 2,
+            "shotsAgainst": 336,
+            "shotsBlockedAgainst": 86,
+            "shotsFromInsideTheBoxAgainst": 202,
+            "shotsFromOutsideTheBoxAgainst": 134,
+            "shotsOffTargetAgainst": 130,
+            "shotsOnTargetAgainst": 120,
+            "blockedScoringAttemptAgainst": 86,
+            "tacklesAgainst": 458,
+            "totalFinalThirdPassesAgainst": 3545,
+            "oppositionHalfPassesTotalAgainst": 6828,
+            "ownHalfPassesTotalAgainst": 5570,
+            "totalPassesAgainst": 12398,
+            "yellowCardsAgainst": 51,
+            "throwIns": 525,
+            "goalKicks": 214,
+            "ballRecovery": 1356,
+            "freeKicks": 298,
+            "id": 47590,
+            "matches": 27,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

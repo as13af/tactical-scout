@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% block title %}Compare Players — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Compare Players</h1>
+  <div class="sub">Search and compare two players side by side</div>
+</div>
+
+<div class="grid-2" style="gap:16px; margin-bottom:24px;">
+  <!-- Player A -->
+  <div>
+    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Player A</div>
+    <div class="compare-search">
+      <input type="text" id="search-a" placeholder="Search player name…"
+             class="filter-group input" oninput="triggerSearch('a')" onkeydown="onKeyDown('a', event)"
+             autocomplete="off"
+             style="width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:6px;
+                    color:var(--text); padding:10px 36px 10px 14px; font-family:'CoFoSans', sans-serif; font-size:13px;">
+      <button type="button" id="clear-a" class="search-clear-btn" style="display:none" onclick="clearPlayer('a')">&#x2715;</button>
+      <div class="compare-autocomplete" id="ac-a"></div>
+    </div>
+  </div>
+  <!-- Player B -->
+  <div>
+    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Player B</div>
+    <div class="compare-search">
+      <input type="text" id="search-b" placeholder="Search player name…"
+             class="filter-group input" oninput="triggerSearch('b')" onkeydown="onKeyDown('b', event)"
+             autocomplete="off"
+             style="width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:6px;
+                    color:var(--text); padding:10px 36px 10px 14px; font-family:'CoFoSans', sans-serif; font-size:13px;">
+      <button type="button" id="clear-b" class="search-clear-btn" style="display:none" onclick="clearPlayer('b')">&#x2715;</button>
+      <div class="compare-autocomplete" id="ac-b"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Compare result -->
+<div id="compare-result" style="display:none;">
+
+  <!-- Heatmaps -->
+  <div class="grid-2" style="gap:16px; margin-bottom:20px;">
+    <div class="heatmap-wrap" id="heatmap-a"></div>
+    <div class="heatmap-wrap" id="heatmap-b"></div>
+  </div>
+
+  <!-- Profile row -->
+  <div class="grid-2" style="gap:16px; margin-bottom:20px;">
+    <div class="compare-col" id="profile-a"></div>
+    <div class="compare-col" id="profile-b"></div>
+  </div>
+
+  <!-- Stat rows -->
+  <div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:0;">Statistics Comparison</div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <label class="p90-toggle-wrap">
+          <input type="checkbox" id="p90-toggle" onchange="renderCompare()">
+            <span class="p90-toggle-track"><span class="p90-toggle-thumb"></span></span>
+          <span class="p90-toggle-label">Per 90</span>
+        </label>
+        <!-- League avg controls (hidden until a player is loaded) -->
+        <label class="p90-toggle-wrap" id="league-avg-toggle-wrap" style="display:none;">
+          <input type="checkbox" id="league-avg-toggle" onchange="renderCompare()">
+          <span class="p90-toggle-track"><span class="p90-toggle-thumb"></span></span>
+          <span class="p90-toggle-label">League Avg</span>
+        </label>
+        <select id="pos-mode-select" class="pos-mode-select" onchange="onPosModeChange()" style="display:none;" title="Position matching mode for league average">
+          <option value="exact">Exact position</option>
+          <option value="grouped">Broad group (DEF / MID / FWD)</option>
+        </select>
+      </div>
+    </div>
+    <!-- Pool info row -->
+    <div id="pool-info" style="display:none; margin-bottom:10px;"></div>
+    <!-- Small-pool warnings -->
+    <div id="pool-warnings"></div>
+    <div id="stat-rows"></div>
+  </div>
+
+</div>
+
+<div id="compare-placeholder" class="card" style="text-align:center; padding:64px; color:var(--text3);">
+  Search for two players above to compare them
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedA = null, selectedB = null;
+let pathA     = null, pathB     = null;
+let leagueAvgA = null, leagueAvgB = null;
+let debounceTimers = {};
+const focusedIdx = { a: -1, b: -1 };
+
+function buildDropdown(side, data) {
+  const ac = document.getElementById(`ac-${side}`);
+  ac.innerHTML = '';
+  focusedIdx[side] = -1;
+
+  if (!data.length) {
+    const el = document.createElement('div');
+    el.className = 'autocomplete-item ac-empty';
+    el.textContent = 'No players found';
+    ac.appendChild(el);
+    ac.classList.add('open');
+    return;
+  }
+
+  data.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.tabIndex = -1;
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'ac-name';
+    nameDiv.textContent = p.name;
+    const teamDiv = document.createElement('div');
+    teamDiv.className = 'ac-team';
+    teamDiv.textContent = p.team;
+    item.appendChild(nameDiv);
+    item.appendChild(teamDiv);
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      selectPlayer(side, p.path, p.name, p.team);
+    });
+    ac.appendChild(item);
+  });
+  ac.classList.add('open');
+}
+
+function moveFocus(side, dir) {
+  const ac    = document.getElementById(`ac-${side}`);
+  const items = Array.from(ac.querySelectorAll('.autocomplete-item:not(.ac-empty)'));
+  if (!items.length) return;
+  items[focusedIdx[side]]?.classList.remove('focused');
+  focusedIdx[side] = Math.max(-1, Math.min(focusedIdx[side] + dir, items.length - 1));
+  items[focusedIdx[side]]?.classList.add('focused');
+  items[focusedIdx[side]]?.scrollIntoView({ block: 'nearest' });
+}
+
+function onKeyDown(side, event) {
+  const ac = document.getElementById(`ac-${side}`);
+  if (!ac.classList.contains('open')) return;
+  if      (event.key === 'ArrowDown') { event.preventDefault(); moveFocus(side,  1); }
+  else if (event.key === 'ArrowUp')   { event.preventDefault(); moveFocus(side, -1); }
+  else if (event.key === 'Enter') {
+    const items = Array.from(ac.querySelectorAll('.autocomplete-item:not(.ac-empty)'));
+    if (focusedIdx[side] >= 0 && items[focusedIdx[side]])
+      items[focusedIdx[side]].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  } else if (event.key === 'Escape') {
+    ac.classList.remove('open');
+    focusedIdx[side] = -1;
+  }
+}
+
+async function triggerSearch(side) {
+  const inp = document.getElementById(`search-${side}`);
+  if (inp.readOnly) return;
+  const q  = inp.value.trim();
+  const ac  = document.getElementById(`ac-${side}`);
+  if (!q || q.length < 2) { ac.classList.remove('open'); return; }
+
+  clearTimeout(debounceTimers[side]);
+  debounceTimers[side] = setTimeout(async () => {
+    try {
+      const res  = await fetch(`/api/player_search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      buildDropdown(side, data);
+    } catch (_) {}
+  }, 250);
+}
+
+async function selectPlayer(side, path, name, team) {
+  const inp      = document.getElementById(`search-${side}`);
+  const clearBtn = document.getElementById(`clear-${side}`);
+  inp.value    = `${name} — ${team}`;
+  inp.readOnly = true;
+  inp.classList.add('selected');
+  clearBtn.style.display = 'block';
+  document.getElementById(`ac-${side}`).classList.remove('open');
+
+  if (side === 'a') { pathA = path; leagueAvgA = null; }
+  else              { pathB = path; leagueAvgB = null; }
+
+  try {
+    const res  = await fetch(`/api/player_detail?path=${encodeURIComponent(path)}`);
+    const json = await res.json();
+    if (side === 'a') selectedA = json;
+    else              selectedB = json;
+    if (selectedA && selectedB) renderCompare();
+  } catch (_) {}
+
+  // Fetch league avg in the background; re-render when ready
+  fetchLeagueAvg(side, path);
+}
+
+function clearPlayer(side) {
+  const inp      = document.getElementById(`search-${side}`);
+  const clearBtn = document.getElementById(`clear-${side}`);
+  inp.value    = '';
+  inp.readOnly = false;
+  inp.classList.remove('selected');
+  clearBtn.style.display = 'none';
+  if (side === 'a') { selectedA = null; pathA = null; leagueAvgA = null; }
+  else              { selectedB = null; pathB = null; leagueAvgB = null; }
+  updateLeagueAvgControls();
+  document.getElementById('compare-result').style.display      = 'none';
+  document.getElementById('compare-placeholder').style.display = 'block';
+  inp.focus();
+}
+
+function profileCard(json, side) {
+  const d = json.data || {};
+  const p = d.profile?.player || {};
+  const s = d.statistics?.statistics || {};
+  const pos = (d.positions || []).map(x => `<span class="tag">${x}</span>`).join(' ');
+  const r = parseFloat(s.rating || 0);
+  const ratingColor = r >= 7 ? 'var(--green)' : r >= 6 ? 'var(--amber)' : 'var(--red)';
+  return `
+    <div style="margin-bottom:12px;">
+      <div style="font-family:'BasementGrotesque', sans-serif;font-size:18px;font-weight:800;">${d.player_name || ''}</div>
+      <div style="color:var(--text2);font-size:12px;margin:4px 0;">${d.team || ''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;">${pos}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+      ${p.age       ? `<div><span style="color:var(--text3);">Age</span><br>${p.age}</div>` : ''}
+      ${p.height    ? `<div><span style="color:var(--text3);">Height</span><br>${p.height} cm</div>` : ''}
+      ${p.preferredFoot ? `<div><span style="color:var(--text3);">Foot</span><br>${p.preferredFoot}</div>` : ''}
+      ${p.nationality ? `<div><span style="color:var(--text3);">Nat.</span><br>${p.nationality}</div>` : ''}
+    </div>
+    ${r > 0 ? `<div style="margin-top:12px;font-family:'BasementGrotesque', sans-serif;font-size:32px;font-weight:800;color:${ratingColor};">${r.toFixed(2)} <span style="font-size:12px;color:var(--text3);font-family:'CoFoSans';">avg rating</span></div>` : ''}
+  `;
+}
+
+function heatmapHtml(json, name) {
+  const h = json.heatmap;
+  if (!h) return `<div style="color:var(--text3);font-size:12px;text-align:center;padding:24px;">No heatmap available</div>`;
+  return `
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${name}</div>
+    <img src="/heatmap/${h}" style="max-width:100%;border-radius:4px;">
+  `;
+}
+
+// ── League avg helpers ──────────────────────────────────────────────────────
+async function fetchLeagueAvg(side, path) {
+  const mode = document.getElementById('pos-mode-select')?.value || 'exact';
+  try {
+    const res  = await fetch(`/api/league_position_avg?player=${encodeURIComponent(path)}&pos_mode=${encodeURIComponent(mode)}`);
+    const data = await res.json();
+    if (side === 'a') leagueAvgA = data.error ? null : data;
+    else              leagueAvgB = data.error ? null : data;
+  } catch (_) {
+    if (side === 'a') leagueAvgA = null;
+    else              leagueAvgB = null;
+  }
+  updateLeagueAvgControls();
+  if (selectedA && selectedB) renderCompare();
+}
+
+function updateLeagueAvgControls() {
+  const hasAvg     = leagueAvgA !== null || leagueAvgB !== null;
+  const toggleWrap = document.getElementById('league-avg-toggle-wrap');
+  const modeSelect = document.getElementById('pos-mode-select');
+  if (toggleWrap) toggleWrap.style.display = hasAvg ? 'flex' : 'none';
+  if (modeSelect) modeSelect.style.display = hasAvg ? ''     : 'none';
+}
+
+function onPosModeChange() {
+  leagueAvgA = null;
+  leagueAvgB = null;
+  if (pathA) fetchLeagueAvg('a', pathA);
+  if (pathB) fetchLeagueAvg('b', pathB);
+}
+
+// [label, key, higherIsBetter, canBeP90, isPercent]
+// canBeP90: true = divide by (mins/90) when toggle on; isPercent: never divide
+const COMPARE_STATS = [
+  ['Appearances',       'appearances',              false, false, false],
+  ['Goals',             'goals',                    true,  true,  false],
+  ['Assists',           'assists',                  true,  true,  false],
+  ['Minutes Played',    'minutesPlayed',            true,  false, false],
+  ['Rating',            'rating',                   true,  false, true ],
+  ['Shots',             'totalShots',               true,  true,  false],
+  ['Shots on Target',   'shotsOnTarget',            true,  true,  false],
+  ['Key Passes',        'keyPasses',                true,  true,  false],
+  ['Pass Accuracy %',   'accuratePassesPercentage', true,  false, true ],
+  ['Accurate Passes',   'accuratePasses',           true,  true,  false],
+  ['Dribbles',          'successfulDribbles',       true,  true,  false],
+  ['Duels Won',         'totalDuelsWon',            true,  true,  false],
+  ['Duels Won %',       'totalDuelsWonPercentage',  true,  false, true ],
+  ['Aerial Won',        'aerialDuelsWon',           true,  true,  false],
+  ['Aerial Won %',      'aerialDuelsWonPercentage', true,  false, true ],
+  ['Clearances',        'clearances',               true,  true,  false],
+  ['Ball Recoveries',   'ballRecovery',             true,  true,  false],
+  ['Yellow Cards',      'yellowCards',              false, false, false],
+  ['Red Cards',         'redCards',                 false, false, false],
+];
+
+function renderCompare() {
+  document.getElementById('compare-placeholder').style.display = 'none';
+  document.getElementById('compare-result').style.display      = 'block';
+
+  const dA = selectedA.data || {}, dB = selectedB.data || {};
+  const sA = dA.statistics?.statistics || {}, sB = dB.statistics?.statistics || {};
+  const p90On   = document.getElementById('p90-toggle')?.checked    || false;
+  const showAvg = document.getElementById('league-avg-toggle')?.checked || false;
+  const minsA = parseFloat(sA.minutesPlayed || 0);
+  const minsB = parseFloat(sB.minutesPlayed || 0);
+
+  document.getElementById('profile-a').innerHTML  = profileCard(selectedA, 'a');
+  document.getElementById('profile-b').innerHTML  = profileCard(selectedB, 'b');
+  document.getElementById('heatmap-a').innerHTML  = heatmapHtml(selectedA, dA.player_name || 'Player A');
+  document.getElementById('heatmap-b').innerHTML  = heatmapHtml(selectedB, dB.player_name || 'Player B');
+
+  // ── Pool info bar ──────────────────────────────────────────────────────────
+  const poolInfoEl = document.getElementById('pool-info');
+  const poolWarEl  = document.getElementById('pool-warnings');
+  poolWarEl.innerHTML = '';
+  if (showAvg && (leagueAvgA || leagueAvgB)) {
+    poolInfoEl.style.display = 'block';
+    const parts = [];
+    if (leagueAvgA) {
+      const posA = (leagueAvgA.positions_used || []).join('/');
+      parts.push(`<span class="pool-tag ${leagueAvgA.small_pool ? 'pool-tag-warn' : ''}">A: ${leagueAvgA.pool_size} <em>${posA}</em> in ${leagueAvgA.competition.replace(/_/g,' ')}${leagueAvgA.small_pool ? ' ⚠' : ''}</span>`);
+    }
+    if (leagueAvgB) {
+      const posB = (leagueAvgB.positions_used || []).join('/');
+      parts.push(`<span class="pool-tag ${leagueAvgB.small_pool ? 'pool-tag-warn' : ''}">B: ${leagueAvgB.pool_size} <em>${posB}</em> in ${leagueAvgB.competition.replace(/_/g,' ')}${leagueAvgB.small_pool ? ' ⚠' : ''}</span>`);
+    }
+    poolInfoEl.innerHTML = '<span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-right:8px;">League avg pool</span>' + parts.join('');
+
+    // Small-pool warnings
+    const warns = [];
+    if (leagueAvgA?.small_pool) warns.push(`Player A's positional pool is very small (${leagueAvgA.pool_size} player${leagueAvgA.pool_size !== 1 ? 's' : ''}) — averages may not be representative.`);
+    if (leagueAvgB?.small_pool) warns.push(`Player B's positional pool is very small (${leagueAvgB.pool_size} player${leagueAvgB.pool_size !== 1 ? 's' : ''}) — averages may not be representative.`);
+    poolWarEl.innerHTML = warns.map(w => `<div class="pool-warning">${w}</div>`).join('');
+  } else {
+    poolInfoEl.style.display = 'none';
+  }
+
+  const rows = COMPARE_STATS.map(([label, key, higherIsBetter, canBeP90, isPercent]) => {
+    let va = parseFloat(sA[key] ?? 0);
+    let vb = parseFloat(sB[key] ?? 0);
+
+    // Apply per-90 conversion
+    const applyP90 = p90On && canBeP90 && !isPercent;
+    if (applyP90) {
+      va = minsA > 0 ? va / (minsA / 90) : 0;
+      vb = minsB > 0 ? vb / (minsB / 90) : 0;
+    }
+
+    const aWins = higherIsBetter ? va > vb : va < vb;
+    const bWins = higherIsBetter ? vb > va : vb < va;
+
+    // Format: percentages and rating → 2 dp; p90 values → 2 dp; others → integer
+    const fmt = v => {
+      if (v <= 0) return '—';
+      if (isPercent || applyP90) return v.toFixed(2);
+      return v % 1 === 0 ? v : v.toFixed(2);
+    };
+    const suffix = applyP90 ? '<span style="font-size:10px;color:var(--text3);"> p90</span>' : '';
+    const displayLabel = label + (applyP90 ? ' <span style="font-size:10px;color:var(--text3);">/90</span>' : '');
+
+    // ── League avg reference sub-line ────────────────────────────────────────
+    function avgRef(lAvg, pval) {
+      if (!showAvg || !lAvg) return '';
+      // Use p90 bucket if applicable, else raw bucket
+      const avgVal = (applyP90 && lAvg.p90_averages?.[key] !== undefined)
+        ? lAvg.p90_averages[key]
+        : (lAvg.averages?.[key] ?? null);
+      if (avgVal === null) return '';
+      const delta       = pval - avgVal;
+      const absDelta    = Math.abs(delta);
+      if (absDelta < 0.0005) return `<span class="avg-ref avg-neutral">avg ${fmt(avgVal)}</span>`;
+      const betterThan  = higherIsBetter ? delta > 0 : delta < 0;
+      const cls         = betterThan ? 'avg-above' : 'avg-below';
+      const sign        = delta > 0 ? '+' : '';
+      return `<span class="avg-ref ${cls}">avg ${fmt(avgVal)} <span class="avg-delta">${sign}${fmt(delta)}</span></span>`;
+    }
+
+    return `
+      <div class="compare-stat-row">
+        <div class="compare-val-left  ${aWins ? 'better' : ''}">${fmt(va)}${suffix}${avgRef(leagueAvgA, va)}</div>
+        <div class="label">${displayLabel}</div>
+        <div class="compare-val-right ${bWins ? 'better' : ''}">${fmt(vb)}${suffix}${avgRef(leagueAvgB, vb)}</div>
+      </div>`;
+  }).join('');
+  const nameHeader = `
+    <div class="compare-stat-row compare-name-header">
+      <div class="compare-val-left" style="font-family:'BasementGrotesque', sans-serif;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;">${dA.player_name || 'Player A'}</div>
+      <div class="label"></div>
+      <div class="compare-val-right" style="font-family:'BasementGrotesque', sans-serif;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;">${dB.player_name || 'Player B'}</div>
+    </div>`;
+  document.getElementById('stat-rows').innerHTML = nameHeader + rows;
+}
+
+// Close autocomplete on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.compare-search')) {
+    document.querySelectorAll('.compare-autocomplete').forEach(el => el.classList.remove('open'));
+    Object.keys(focusedIdx).forEach(k => focusedIdx[k] = -1);
+  }
+});
+</script>
+{% endblock %}

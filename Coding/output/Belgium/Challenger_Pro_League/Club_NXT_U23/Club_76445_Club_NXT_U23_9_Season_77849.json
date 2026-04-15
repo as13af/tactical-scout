@@ -1,0 +1,569 @@
+{
+    "team_id": "76445",
+    "team_name": "Club NXT U23",
+    "tournament_id": "9",
+    "season_id": "77849",
+    "competition_name": "Challenger_Pro_League",
+    "competition_country": "Belgium",
+    "profile": {
+        "team": {
+            "name": "Club NXT U23",
+            "slug": "club-nxt-u23",
+            "shortName": "Club NXT U23",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Belgium",
+                "slug": "belgium",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 33,
+                "flag": "belgium",
+                "alpha2": "BE",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "U21 Pro League",
+                "slug": "u21-pro-league",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "Reserve League 1A",
+                    "slug": "reserve-league-1a",
+                    "primaryColorHex": "#5b5a5a",
+                    "secondaryColorHex": "#919191",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 1122,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 1117,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 32548
+            },
+            "primaryUniqueTournament": {
+                "name": "Challenger Pro League",
+                "slug": "challenger-pro-league",
+                "primaryColorHex": "#0E0027",
+                "secondaryColorHex": "#a9ee17",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 6809,
+                "hasPerformanceGraphFeature": false,
+                "country": {},
+                "id": 9,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 4301,
+            "manager": {
+                "name": "Jonas De Roeck",
+                "slug": "jonas-de-roeck",
+                "shortName": "J. D. Roeck",
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 788822
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 51.193346,
+                    "longitude": 3.180585
+                },
+                "hidden": false,
+                "slug": "jan-breydel-stadium",
+                "name": "Jan Breydel Stadium",
+                "capacity": 29975,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 1187,
+                "city": {
+                    "name": "Bruges"
+                },
+                "stadium": {
+                    "name": "Jan Breydel Stadium",
+                    "capacity": 29975
+                }
+            },
+            "nameCode": "NXT",
+            "disabled": false,
+            "national": false,
+            "parentTeam": {
+                "name": "Club Brugge KV",
+                "slug": "club-brugge-kv",
+                "shortName": "Club Brugge",
+                "gender": "M",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "tournament": {
+                    "name": "Pro League",
+                    "slug": "pro-league",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "uniqueTournament": {
+                        "name": "Pro League",
+                        "slug": "pro-league",
+                        "primaryColorHex": "#16002b",
+                        "secondaryColorHex": "#ff1740",
+                        "category": {
+                            "name": "Belgium",
+                            "slug": "belgium",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "priority": 0,
+                            "country": {
+                                "alpha2": "BE",
+                                "alpha3": "BEL",
+                                "name": "Belgium",
+                                "slug": "belgium"
+                            },
+                            "id": 33,
+                            "flag": "belgium",
+                            "alpha2": "BE",
+                            "transferPeriod": [
+                                {
+                                    "activeFrom": "06-01 00:00",
+                                    "activeTo": "09-18 00:00"
+                                },
+                                {
+                                    "activeFrom": "12-30 00:00",
+                                    "activeTo": "02-16 00:00"
+                                }
+                            ]
+                        },
+                        "userCount": 69514,
+                        "hasPerformanceGraphFeature": false,
+                        "country": {},
+                        "id": 38,
+                        "displayInverseHomeAwayTeams": false
+                    },
+                    "priority": 498,
+                    "isLive": false,
+                    "id": 38
+                },
+                "primaryUniqueTournament": {
+                    "name": "Pro League",
+                    "slug": "pro-league",
+                    "primaryColorHex": "#16002b",
+                    "secondaryColorHex": "#ff1740",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 69514,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 38,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "userCount": 298255,
+                "manager": {
+                    "name": "Ivan Leko",
+                    "slug": "ivan-leko",
+                    "shortName": "I. Leko",
+                    "country": {
+                        "alpha2": "HR",
+                        "alpha3": "HRV",
+                        "name": "Croatia",
+                        "slug": "croatia"
+                    },
+                    "id": 786964
+                },
+                "venue": {
+                    "venueCoordinates": {
+                        "latitude": 51.193346,
+                        "longitude": 3.180585
+                    },
+                    "hidden": false,
+                    "slug": "jan-breydel-stadium",
+                    "name": "Jan Breydel Stadium",
+                    "capacity": 29975,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 1187,
+                    "city": {
+                        "name": "Bruges"
+                    },
+                    "stadium": {
+                        "name": "Jan Breydel Stadium",
+                        "capacity": 29975
+                    }
+                },
+                "nameCode": "BRU",
+                "class": 4,
+                "disabled": false,
+                "national": false,
+                "type": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 2888,
+                "fullName": "Club Brugge KV",
+                "teamColors": {
+                    "primary": "#0080ff",
+                    "secondary": "#000000",
+                    "text": "#000000"
+                },
+                "foundationDateTimestamp": -2465683200,
+                "timeActive": []
+            },
+            "type": 0,
+            "country": {
+                "alpha2": "BE",
+                "alpha3": "BEL",
+                "name": "Belgium",
+                "slug": "belgium"
+            },
+            "id": 76445,
+            "fullName": "Club NXT U23",
+            "teamColors": {
+                "primary": "#0080ff",
+                "secondary": "#ffffff",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1598832000,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.73",
+            "position": 16,
+            "value": "18",
+            "form": [
+                "L",
+                "D",
+                "D",
+                "L",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 33,
+            "goalsConceded": 55,
+            "ownGoals": 1,
+            "assists": 21,
+            "shots": 372,
+            "penaltyGoals": 2,
+            "penaltiesTaken": 3,
+            "freeKickGoals": 1,
+            "freeKickShots": 14,
+            "goalsFromInsideTheBox": 25,
+            "goalsFromOutsideTheBox": 6,
+            "shotsFromInsideTheBox": 217,
+            "shotsFromOutsideTheBox": 155,
+            "headedGoals": 2,
+            "leftFootGoals": 13,
+            "rightFootGoals": 16,
+            "bigChances": 48,
+            "bigChancesCreated": 35,
+            "bigChancesMissed": 27,
+            "shotsOnTarget": 130,
+            "shotsOffTarget": 137,
+            "blockedScoringAttempt": 105,
+            "successfulDribbles": 278,
+            "dribbleAttempts": 608,
+            "corners": 122,
+            "hitWoodwork": 8,
+            "fastBreaks": 24,
+            "fastBreakGoals": 0,
+            "fastBreakShots": 24,
+            "averageBallPossession": 55.53125,
+            "totalPasses": 15874,
+            "accuratePasses": 13524,
+            "accuratePassesPercentage": 85.195917853093,
+            "totalOwnHalfPasses": 9146,
+            "accurateOwnHalfPasses": 8408,
+            "accurateOwnHalfPassesPercentage": 91.930898753553,
+            "totalOppositionHalfPasses": 6728,
+            "accurateOppositionHalfPasses": 5116,
+            "accurateOppositionHalfPassesPercentage": 76.040428061831,
+            "totalLongBalls": 1077,
+            "accurateLongBalls": 551,
+            "accurateLongBallsPercentage": 51.160631383473,
+            "totalCrosses": 477,
+            "accurateCrosses": 114,
+            "accurateCrossesPercentage": 23.899371069182,
+            "cleanSheets": 5,
+            "tackles": 510,
+            "interceptions": 235,
+            "saves": 127,
+            "errorsLeadingToGoal": 4,
+            "errorsLeadingToShot": 16,
+            "penaltiesCommited": 10,
+            "penaltyGoalsConceded": 8,
+            "clearances": 808,
+            "clearancesOffLine": 3,
+            "lastManTackles": 5,
+            "totalDuels": 3167,
+            "duelsWon": 1637,
+            "duelsWonPercentage": 51.689295863593,
+            "totalGroundDuels": 2385,
+            "groundDuelsWon": 1254,
+            "groundDuelsWonPercentage": 52.578616352201,
+            "totalAerialDuels": 782,
+            "aerialDuelsWon": 383,
+            "aerialDuelsWonPercentage": 48.976982097187,
+            "possessionLost": 4130,
+            "offsides": 49,
+            "fouls": 379,
+            "yellowCards": 53,
+            "yellowRedCards": 1,
+            "redCards": 4,
+            "avgRating": 6.7368209255533,
+            "accurateFinalThirdPassesAgainst": 2683,
+            "accurateOppositionHalfPassesAgainst": 4620,
+            "accurateOwnHalfPassesAgainst": 5459,
+            "accuratePassesAgainst": 10079,
+            "bigChancesAgainst": 69,
+            "bigChancesCreatedAgainst": 51,
+            "bigChancesMissedAgainst": 38,
+            "clearancesAgainst": 626,
+            "cornersAgainst": 158,
+            "crossesSuccessfulAgainst": 155,
+            "crossesTotalAgainst": 629,
+            "dribbleAttemptsTotalAgainst": 425,
+            "dribbleAttemptsWonAgainst": 172,
+            "errorsLeadingToGoalAgainst": 2,
+            "errorsLeadingToShotAgainst": 4,
+            "hitWoodworkAgainst": 9,
+            "interceptionsAgainst": 351,
+            "keyPassesAgainst": 394,
+            "longBallsSuccessfulAgainst": 889,
+            "longBallsTotalAgainst": 1779,
+            "offsidesAgainst": 58,
+            "redCardsAgainst": 2,
+            "shotsAgainst": 508,
+            "shotsBlockedAgainst": 124,
+            "shotsFromInsideTheBoxAgainst": 310,
+            "shotsFromOutsideTheBoxAgainst": 198,
+            "shotsOffTargetAgainst": 203,
+            "shotsOnTargetAgainst": 182,
+            "blockedScoringAttemptAgainst": 123,
+            "tacklesAgainst": 606,
+            "totalFinalThirdPassesAgainst": 3802,
+            "oppositionHalfPassesTotalAgainst": 6375,
+            "ownHalfPassesTotalAgainst": 6075,
+            "totalPassesAgainst": 12450,
+            "yellowCardsAgainst": 64,
+            "throwIns": 630,
+            "goalKicks": 293,
+            "ballRecovery": 1540,
+            "freeKicks": 470,
+            "id": 47579,
+            "matches": 32,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

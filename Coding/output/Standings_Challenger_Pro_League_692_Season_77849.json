@@ -1,0 +1,730 @@
+{
+    "standings": [
+        {
+            "type": "total",
+            "descriptions": [],
+            "tieBreakingRule": {
+                "text": "In the event that two (or more) teams have an equal number of points, the following rules break the tie:\n\n1. Number of victories\n2. Goal difference\n3. Goals scored",
+                "id": 1347
+            },
+            "rows": [
+                {
+                    "team": {
+                        "name": "SK Beveren",
+                        "slug": "sk-beveren",
+                        "shortName": "Beveren",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 10064,
+                        "nameCode": "BEV",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 4859,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#ffff00",
+                            "text": "#ffff00"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion",
+                        "id": 11
+                    },
+                    "position": 1,
+                    "matches": 25,
+                    "wins": 22,
+                    "scoresFor": 55,
+                    "scoresAgainst": 17,
+                    "id": 1690065,
+                    "losses": 0,
+                    "draws": 3,
+                    "points": 69,
+                    "scoreDiffFormatted": "+38",
+                    "team_id": 4859
+                },
+                {
+                    "team": {
+                        "name": "KV Kortrijk",
+                        "slug": "kv-kortrijk",
+                        "shortName": "Kortrijk",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 13616,
+                        "nameCode": "KOR",
+                        "national": false,
+                        "type": 0,
+                        "id": 4858,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion",
+                        "id": 11
+                    },
+                    "position": 2,
+                    "matches": 25,
+                    "wins": 17,
+                    "scoresFor": 46,
+                    "scoresAgainst": 25,
+                    "id": 1690045,
+                    "losses": 5,
+                    "draws": 3,
+                    "points": 54,
+                    "scoreDiffFormatted": "+21",
+                    "team_id": 4858
+                },
+                {
+                    "team": {
+                        "name": "K. Beerschot V.A.",
+                        "slug": "k-beerschot-va",
+                        "shortName": "Beerschot",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 11787,
+                        "nameCode": "BEE",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 169260,
+                        "teamColors": {
+                            "primary": "#6230b6",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 3,
+                    "matches": 26,
+                    "wins": 14,
+                    "scoresFor": 37,
+                    "scoresAgainst": 25,
+                    "id": 1690033,
+                    "losses": 6,
+                    "draws": 6,
+                    "points": 48,
+                    "scoreDiffFormatted": "+12",
+                    "team_id": 169260
+                },
+                {
+                    "team": {
+                        "name": "Lommel SK",
+                        "slug": "lommel-sk",
+                        "shortName": "Lommel",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 8167,
+                        "nameCode": "LOM",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 5046,
+                        "teamColors": {
+                            "primary": "#008000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 4,
+                    "matches": 26,
+                    "wins": 13,
+                    "scoresFor": 49,
+                    "scoresAgainst": 37,
+                    "id": 1690047,
+                    "losses": 7,
+                    "draws": 6,
+                    "points": 45,
+                    "scoreDiffFormatted": "+12",
+                    "team_id": 5046
+                },
+                {
+                    "team": {
+                        "name": "RFC Liège",
+                        "slug": "rfc-liege",
+                        "shortName": "Club Liège",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2981,
+                        "nameCode": "LIE",
+                        "national": false,
+                        "type": 0,
+                        "id": 389226,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 5,
+                    "matches": 26,
+                    "wins": 13,
+                    "scoresFor": 37,
+                    "scoresAgainst": 31,
+                    "id": 1690054,
+                    "losses": 9,
+                    "draws": 4,
+                    "points": 43,
+                    "scoreDiffFormatted": "+6",
+                    "team_id": 389226
+                },
+                {
+                    "team": {
+                        "name": "Patro Eisden Maasmechelen",
+                        "slug": "patro-eisden-maasmechelen",
+                        "shortName": "Patro",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3992,
+                        "nameCode": "PMA",
+                        "national": false,
+                        "type": 0,
+                        "id": 35076,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Promotion Playoffs",
+                        "id": 26
+                    },
+                    "position": 6,
+                    "matches": 26,
+                    "wins": 12,
+                    "scoresFor": 37,
+                    "scoresAgainst": 32,
+                    "id": 1690052,
+                    "losses": 7,
+                    "draws": 7,
+                    "points": 43,
+                    "scoreDiffFormatted": "+5",
+                    "team_id": 35076
+                },
+                {
+                    "team": {
+                        "name": "KAA Gent Reserve U23",
+                        "slug": "kaa-gent-reserve-u23",
+                        "shortName": "Jong Gent U23",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3283,
+                        "nameCode": "GNT",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 76451,
+                        "teamColors": {
+                            "primary": "#0033ff",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 7,
+                    "matches": 25,
+                    "wins": 11,
+                    "scoresFor": 35,
+                    "scoresAgainst": 34,
+                    "id": 1690027,
+                    "losses": 11,
+                    "draws": 3,
+                    "points": 36,
+                    "scoreDiffFormatted": "+1",
+                    "team_id": 76451
+                },
+                {
+                    "team": {
+                        "name": "KAS Eupen",
+                        "slug": "kas-eupen",
+                        "shortName": "Eupen",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 6746,
+                        "nameCode": "EUP",
+                        "national": false,
+                        "type": 0,
+                        "id": 2926,
+                        "teamColors": {
+                            "primary": "#ffffff",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 8,
+                    "matches": 25,
+                    "wins": 9,
+                    "scoresFor": 34,
+                    "scoresAgainst": 30,
+                    "id": 1690037,
+                    "losses": 7,
+                    "draws": 9,
+                    "points": 36,
+                    "scoreDiffFormatted": "+4",
+                    "team_id": 2926
+                },
+                {
+                    "team": {
+                        "name": "KSC Lokeren",
+                        "slug": "ksc-lokeren-temse",
+                        "shortName": "Lokeren",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3619,
+                        "nameCode": "KSC",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 371484,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 9,
+                    "matches": 25,
+                    "wins": 8,
+                    "scoresFor": 35,
+                    "scoresAgainst": 35,
+                    "id": 1690042,
+                    "losses": 8,
+                    "draws": 9,
+                    "points": 33,
+                    "scoreDiffFormatted": "0",
+                    "team_id": 371484
+                },
+                {
+                    "team": {
+                        "name": "Koninklijke Lierse Sportkring",
+                        "slug": "lierse-kempenzonen",
+                        "shortName": "K. Lierse SK",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3479,
+                        "nameCode": "LIE",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 116075,
+                        "teamColors": {
+                            "primary": "#ffe500",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 10,
+                    "matches": 25,
+                    "wins": 7,
+                    "scoresFor": 28,
+                    "scoresAgainst": 35,
+                    "id": 1690039,
+                    "losses": 12,
+                    "draws": 6,
+                    "points": 27,
+                    "scoreDiffFormatted": "-7",
+                    "team_id": 116075
+                },
+                {
+                    "team": {
+                        "name": "RSCA Futures U23",
+                        "slug": "rsca-futures-u23",
+                        "shortName": "RSCA Futures U23",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2755,
+                        "nameCode": "RSC",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 421120,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 11,
+                    "matches": 25,
+                    "wins": 6,
+                    "scoresFor": 36,
+                    "scoresAgainst": 39,
+                    "id": 1690062,
+                    "losses": 10,
+                    "draws": 9,
+                    "points": 27,
+                    "scoreDiffFormatted": "-3",
+                    "team_id": 421120
+                },
+                {
+                    "team": {
+                        "name": "RWDM Brussels",
+                        "slug": "rwd-molenbeek",
+                        "shortName": "RWDM Brussels",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 6791,
+                        "nameCode": "MOL",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 204219,
+                        "teamColors": {
+                            "primary": "#ffffff",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [
+                        {
+                            "text": "3 points deducted due to decision by the Federation",
+                            "id": 34
+                        }
+                    ],
+                    "position": 12,
+                    "matches": 26,
+                    "wins": 7,
+                    "scoresFor": 40,
+                    "scoresAgainst": 43,
+                    "id": 1690025,
+                    "losses": 11,
+                    "draws": 8,
+                    "points": 26,
+                    "scoreDiffFormatted": "-3",
+                    "team_id": 204219
+                },
+                {
+                    "team": {
+                        "name": "Royal Francs Borains",
+                        "slug": "royal-francs-borains",
+                        "shortName": "RFB",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2633,
+                        "nameCode": "RFB",
+                        "national": false,
+                        "type": 0,
+                        "id": 328498,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [
+                        {
+                            "text": "1 point deducted due to decision by FA",
+                            "id": 60
+                        }
+                    ],
+                    "position": 13,
+                    "matches": 25,
+                    "wins": 6,
+                    "scoresFor": 23,
+                    "scoresAgainst": 33,
+                    "id": 1690060,
+                    "losses": 12,
+                    "draws": 7,
+                    "points": 24,
+                    "scoreDiffFormatted": "-10",
+                    "team_id": 328498
+                },
+                {
+                    "team": {
+                        "name": "Jong KRC Genk U23",
+                        "slug": "jong-krc-genk-u23",
+                        "shortName": "Jong KRC Genk U23",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3334,
+                        "nameCode": "GNK",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 421124,
+                        "teamColors": {
+                            "primary": "#0000dd",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 14,
+                    "matches": 25,
+                    "wins": 6,
+                    "scoresFor": 33,
+                    "scoresAgainst": 50,
+                    "id": 1690031,
+                    "losses": 14,
+                    "draws": 5,
+                    "points": 23,
+                    "scoreDiffFormatted": "-17",
+                    "team_id": 421124
+                },
+                {
+                    "team": {
+                        "name": "RFC Seraing",
+                        "slug": "rfc-seraing",
+                        "shortName": "RFC Seraing",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 4301,
+                        "nameCode": "SER",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 204712,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 15,
+                    "matches": 24,
+                    "wins": 5,
+                    "scoresFor": 23,
+                    "scoresAgainst": 34,
+                    "id": 1690056,
+                    "losses": 11,
+                    "draws": 8,
+                    "points": 23,
+                    "scoreDiffFormatted": "-11",
+                    "team_id": 204712
+                },
+                {
+                    "team": {
+                        "name": "Club NXT U23",
+                        "slug": "club-nxt-u23",
+                        "shortName": "Club NXT U23",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 4095,
+                        "nameCode": "NXT",
+                        "disabled": false,
+                        "national": false,
+                        "parentTeam": {
+                            "name": "Club Brugge KV",
+                            "slug": "club-brugge-kv",
+                            "shortName": "Club Brugge",
+                            "gender": "M",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "userCount": 296535,
+                            "nameCode": "BRU",
+                            "disabled": false,
+                            "national": false,
+                            "type": 0,
+                            "id": 2888,
+                            "teamColors": {
+                                "primary": "#0080ff",
+                                "secondary": "#000000",
+                                "text": "#000000"
+                            }
+                        },
+                        "type": 0,
+                        "id": 76445,
+                        "teamColors": {
+                            "primary": "#0080ff",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 16,
+                    "matches": 26,
+                    "wins": 4,
+                    "scoresFor": 27,
+                    "scoresAgainst": 47,
+                    "id": 1690022,
+                    "losses": 18,
+                    "draws": 4,
+                    "points": 16,
+                    "scoreDiffFormatted": "-20",
+                    "team_id": 76445
+                },
+                {
+                    "team": {
+                        "name": "OC Charleroi",
+                        "slug": "oc-charleroi",
+                        "shortName": "Olympic Charleroi",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2200,
+                        "nameCode": "ROC",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 7735,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 17,
+                    "matches": 25,
+                    "wins": 3,
+                    "scoresFor": 21,
+                    "scoresAgainst": 49,
+                    "id": 1690050,
+                    "losses": 15,
+                    "draws": 7,
+                    "points": 16,
+                    "scoreDiffFormatted": "-28",
+                    "team_id": 7735
+                }
+            ],
+            "id": 182002,
+            "tournament": {
+                "name": "Challenger Pro League",
+                "slug": "challenger-pro-league",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE"
+                },
+                "uniqueTournament": {
+                    "name": "Challenger Pro League",
+                    "slug": "challenger-pro-league",
+                    "primaryColorHex": "#0E0027",
+                    "secondaryColorHex": "#a9ee17",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE"
+                    },
+                    "userCount": 6515,
+                    "hasPerformanceGraphFeature": false,
+                    "id": 9,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 16,
+                "isGroup": false,
+                "isLive": false,
+                "id": 692
+            },
+            "name": "Challenger Pro League 25/26",
+            "updatedAtTimestamp": 1772614709
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+@startuml
+title OVERALL PLAYER-CLUB MATCHING SYSTEM
+
+start
+
+:Load Player Dataset;
+:Load Team Dataset;
+
+partition "PLAYER MODELING" {
+    :Normalize Stats;
+    :Encode Tactical Role Vector;
+    :Generate Player Feature Vector;
+}
+
+partition "TEAM MODELING" {
+    :Extract Tactical Metrics;
+    :Generate Team Demand Vector;
+}
+
+partition "COMPATIBILITY ENGINE" {
+    :Tactical Similarity;
+    :Statistical Match Score;
+    :Physical Adaptation Score;
+    :Development Fit Score;
+    :Weighted Aggregation;
+}
+
+partition "IMPACT ENGINE" {
+    :Simulate xG Impact;
+    :Simulate Points Gain;
+}
+
+:Generate Explanation Report;
+
+stop
+@enduml

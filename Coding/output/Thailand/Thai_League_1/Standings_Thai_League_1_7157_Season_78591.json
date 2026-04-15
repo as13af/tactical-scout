@@ -1,0 +1,648 @@
+{
+    "standings": [
+        {
+            "type": "total",
+            "descriptions": [],
+            "tieBreakingRule": {
+                "text": "In the event that two (or more) teams have an equal number of points, the following rules break the tie:\n1. Goal difference\n2. Goals scored",
+                "id": 1238
+            },
+            "rows": [
+                {
+                    "team": {
+                        "name": "Buriram United",
+                        "slug": "buriram-united",
+                        "shortName": "Buriram",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 32046,
+                        "nameCode": "BUR",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 34218,
+                        "teamColors": {
+                            "primary": "#003399",
+                            "secondary": "#003399",
+                            "text": "#003399"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Champions League Elite",
+                        "id": 2090
+                    },
+                    "position": 1,
+                    "matches": 23,
+                    "wins": 19,
+                    "scoresFor": 65,
+                    "scoresAgainst": 20,
+                    "id": 1727325,
+                    "losses": 2,
+                    "draws": 2,
+                    "points": 59,
+                    "scoreDiffFormatted": "+45",
+                    "team_id": 34218
+                },
+                {
+                    "team": {
+                        "name": "Port FC",
+                        "slug": "port-fc",
+                        "shortName": "Port FC",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12537,
+                        "nameCode": "POR",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 40661,
+                        "teamColors": {
+                            "primary": "#0000fa",
+                            "secondary": "#ff0000",
+                            "text": "#ff0000"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Champions League 2",
+                        "id": 2061
+                    },
+                    "position": 2,
+                    "matches": 24,
+                    "wins": 13,
+                    "scoresFor": 46,
+                    "scoresAgainst": 20,
+                    "id": 1727341,
+                    "losses": 6,
+                    "draws": 5,
+                    "points": 44,
+                    "scoreDiffFormatted": "+26",
+                    "team_id": 40661
+                },
+                {
+                    "team": {
+                        "name": "Ratchaburi",
+                        "slug": "ratchaburi",
+                        "shortName": "Ratchaburi",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 8104,
+                        "nameCode": "RAT",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 85743,
+                        "teamColors": {
+                            "primary": "#fb5503",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Champions League 2",
+                        "id": 2061
+                    },
+                    "position": 3,
+                    "matches": 22,
+                    "wins": 13,
+                    "scoresFor": 36,
+                    "scoresAgainst": 21,
+                    "id": 1727345,
+                    "losses": 6,
+                    "draws": 3,
+                    "points": 42,
+                    "scoreDiffFormatted": "+15",
+                    "team_id": 85743
+                },
+                {
+                    "team": {
+                        "name": "True Bangkok United",
+                        "slug": "true-bangkok-united",
+                        "shortName": "Bangkok Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 18113,
+                        "nameCode": "BGK",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 85741,
+                        "teamColors": {
+                            "primary": "#851920",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 4,
+                    "matches": 22,
+                    "wins": 11,
+                    "scoresFor": 34,
+                    "scoresAgainst": 22,
+                    "id": 1727322,
+                    "losses": 3,
+                    "draws": 8,
+                    "points": 41,
+                    "scoreDiffFormatted": "+12",
+                    "team_id": 85741
+                },
+                {
+                    "team": {
+                        "name": "BG Pathum United",
+                        "slug": "bg-pathum-united",
+                        "shortName": "Pathum Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 10548,
+                        "nameCode": "PAU",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 35607,
+                        "teamColors": {
+                            "primary": "#1f32b6",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 5,
+                    "matches": 24,
+                    "wins": 11,
+                    "scoresFor": 36,
+                    "scoresAgainst": 26,
+                    "id": 1727324,
+                    "losses": 6,
+                    "draws": 7,
+                    "points": 40,
+                    "scoreDiffFormatted": "+10",
+                    "team_id": 35607
+                },
+                {
+                    "team": {
+                        "name": "PT Prachuap FC",
+                        "slug": "pt-prachuap-fc",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2733,
+                        "nameCode": "PRA",
+                        "national": false,
+                        "type": 0,
+                        "id": 252115,
+                        "teamColors": {
+                            "primary": "#ff6347",
+                            "secondary": "#87ceeb",
+                            "text": "#87ceeb"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 6,
+                    "matches": 24,
+                    "wins": 8,
+                    "scoresFor": 32,
+                    "scoresAgainst": 30,
+                    "id": 1727343,
+                    "losses": 5,
+                    "draws": 11,
+                    "points": 35,
+                    "scoreDiffFormatted": "+2",
+                    "team_id": 252115
+                },
+                {
+                    "team": {
+                        "name": "Ayutthaya United",
+                        "slug": "ayutthaya-united",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2021,
+                        "nameCode": "AYU",
+                        "national": false,
+                        "type": 0,
+                        "id": 256902,
+                        "teamColors": {
+                            "primary": "#0000ff",
+                            "secondary": "#5fdfff",
+                            "text": "#5fdfff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 7,
+                    "matches": 24,
+                    "wins": 8,
+                    "scoresFor": 31,
+                    "scoresAgainst": 34,
+                    "id": 1727320,
+                    "losses": 8,
+                    "draws": 8,
+                    "points": 32,
+                    "scoreDiffFormatted": "-3",
+                    "team_id": 256902
+                },
+                {
+                    "team": {
+                        "name": "Rayong FC",
+                        "slug": "rayong-fc",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3323,
+                        "nameCode": "RAY",
+                        "national": false,
+                        "type": 0,
+                        "id": 254730,
+                        "teamColors": {
+                            "primary": "#70bdf1",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 8,
+                    "matches": 23,
+                    "wins": 7,
+                    "scoresFor": 34,
+                    "scoresAgainst": 32,
+                    "id": 1727347,
+                    "losses": 8,
+                    "draws": 8,
+                    "points": 29,
+                    "scoreDiffFormatted": "+2",
+                    "team_id": 254730
+                },
+                {
+                    "team": {
+                        "name": "Chiangrai United",
+                        "slug": "chiangrai-united",
+                        "shortName": "Chiangrai Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2753,
+                        "nameCode": "CHI",
+                        "national": false,
+                        "type": 0,
+                        "id": 66566,
+                        "teamColors": {
+                            "primary": "#f96f02",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 9,
+                    "matches": 23,
+                    "wins": 6,
+                    "scoresFor": 29,
+                    "scoresAgainst": 32,
+                    "id": 1727327,
+                    "losses": 6,
+                    "draws": 11,
+                    "points": 29,
+                    "scoreDiffFormatted": "-3",
+                    "team_id": 66566
+                },
+                {
+                    "team": {
+                        "name": "Chonburi FC",
+                        "slug": "chonburi",
+                        "shortName": "Chonburi",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2644,
+                        "nameCode": "CHO",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 35886,
+                        "teamColors": {
+                            "primary": "#0106be",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 10,
+                    "matches": 24,
+                    "wins": 7,
+                    "scoresFor": 28,
+                    "scoresAgainst": 35,
+                    "id": 1727329,
+                    "losses": 10,
+                    "draws": 7,
+                    "points": 28,
+                    "scoreDiffFormatted": "-7",
+                    "team_id": 35886
+                },
+                {
+                    "team": {
+                        "name": "Uthai Thani FC",
+                        "slug": "uthai-thani-fc",
+                        "shortName": "Uthai Thani",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2757,
+                        "nameCode": "UTH",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 338810,
+                        "teamColors": {
+                            "primary": "#004000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 11,
+                    "matches": 23,
+                    "wins": 6,
+                    "scoresFor": 34,
+                    "scoresAgainst": 38,
+                    "id": 1727351,
+                    "losses": 10,
+                    "draws": 7,
+                    "points": 25,
+                    "scoreDiffFormatted": "-4",
+                    "team_id": 338810
+                },
+                {
+                    "team": {
+                        "name": "Sukhothai",
+                        "slug": "sukhothai",
+                        "shortName": "Sukhothai",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2336,
+                        "nameCode": "SUK",
+                        "national": false,
+                        "type": 0,
+                        "id": 212198,
+                        "teamColors": {
+                            "primary": "#ff8c00",
+                            "secondary": "#00008b",
+                            "text": "#00008b"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 12,
+                    "matches": 24,
+                    "wins": 5,
+                    "scoresFor": 18,
+                    "scoresAgainst": 34,
+                    "id": 1727349,
+                    "losses": 10,
+                    "draws": 9,
+                    "points": 24,
+                    "scoreDiffFormatted": "-16",
+                    "team_id": 212198
+                },
+                {
+                    "team": {
+                        "name": "Lamphun Warrior",
+                        "slug": "lamphun-warrior",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2984,
+                        "nameCode": "LAM",
+                        "national": false,
+                        "type": 0,
+                        "id": 310778,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 13,
+                    "matches": 24,
+                    "wins": 3,
+                    "scoresFor": 30,
+                    "scoresAgainst": 43,
+                    "id": 1727333,
+                    "losses": 8,
+                    "draws": 13,
+                    "points": 22,
+                    "scoreDiffFormatted": "-13",
+                    "team_id": 310778
+                },
+                {
+                    "team": {
+                        "name": "Kanchanaburi Power FC",
+                        "slug": "dragon-pathumwan-kanchanaburi",
+                        "shortName": "Kanchanaburi Power",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 1533,
+                        "nameCode": "DPK",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 393338,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 14,
+                    "matches": 25,
+                    "wins": 4,
+                    "scoresFor": 25,
+                    "scoresAgainst": 44,
+                    "id": 1727331,
+                    "losses": 11,
+                    "draws": 10,
+                    "points": 22,
+                    "scoreDiffFormatted": "-19",
+                    "team_id": 393338
+                },
+                {
+                    "team": {
+                        "name": "Muang Thong United",
+                        "slug": "muang-thong-united",
+                        "shortName": "Muang Thong Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 4370,
+                        "nameCode": "MUT",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 39946,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ff0000",
+                            "text": "#ff0000"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 15,
+                    "matches": 24,
+                    "wins": 4,
+                    "scoresFor": 21,
+                    "scoresAgainst": 44,
+                    "id": 1727336,
+                    "losses": 14,
+                    "draws": 6,
+                    "points": 18,
+                    "scoreDiffFormatted": "-23",
+                    "team_id": 39946
+                },
+                {
+                    "team": {
+                        "name": "Nakhon Ratchasima Mazda FC",
+                        "slug": "nakhon-ratchasima-mazda-fc",
+                        "shortName": "Nakhon Ratchasima",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 2243,
+                        "nameCode": "NRA",
+                        "national": false,
+                        "type": 0,
+                        "id": 188874,
+                        "teamColors": {
+                            "primary": "#ff4500",
+                            "secondary": "#ffcc00",
+                            "text": "#ffcc00"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 16,
+                    "matches": 23,
+                    "wins": 3,
+                    "scoresFor": 15,
+                    "scoresAgainst": 39,
+                    "id": 1727338,
+                    "losses": 15,
+                    "draws": 5,
+                    "points": 14,
+                    "scoreDiffFormatted": "-24",
+                    "team_id": 188874
+                }
+            ],
+            "id": 185952,
+            "tournament": {
+                "name": "Thai League 1",
+                "slug": "thai-league-1",
+                "category": {
+                    "name": "Thailand",
+                    "slug": "thailand",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "id": 485,
+                    "flag": "thailand",
+                    "alpha2": "TH"
+                },
+                "uniqueTournament": {
+                    "name": "Thai League 1",
+                    "slug": "thai-league-1",
+                    "primaryColorHex": "#b72026",
+                    "secondaryColorHex": "#e19b23",
+                    "category": {
+                        "name": "Thailand",
+                        "slug": "thailand",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "id": 485,
+                        "flag": "thailand",
+                        "alpha2": "TH"
+                    },
+                    "userCount": 4807,
+                    "hasPerformanceGraphFeature": true,
+                    "id": 1032,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 26,
+                "isGroup": false,
+                "isLive": false,
+                "id": 7157
+            },
+            "name": "Thai League 1 25/26",
+            "updatedAtTimestamp": 1773583004
+        }
+    ]
+}

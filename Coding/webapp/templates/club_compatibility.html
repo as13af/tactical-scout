@@ -1,0 +1,1060 @@
+﻿{% extends "base.html" %}
+{% block title %}Club Fit — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Club Fit Analysis</h1>
+  <div class="sub">Two-stage wizard: find the best leagues for your player, then drill down to clubs.</div>
+</div>
+
+<!-- Step indicator -->
+<div class="cf-steps">
+  <div class="cf-step active" id="step1-indicator">
+    <span class="cf-step-num">1</span>
+    <span class="cf-step-label">Leagues</span>
+  </div>
+  <div class="cf-step-line"></div>
+  <div class="cf-step inactive" id="step2-indicator">
+    <span class="cf-step-num">2</span>
+    <span class="cf-step-label">Clubs</span>
+  </div>
+  <div class="cf-step-line"></div>
+  <div class="cf-step inactive" id="step3-indicator">
+    <span class="cf-step-num">3</span>
+    <span class="cf-step-label">Full Analysis</span>
+  </div>
+</div>
+
+<!-- Stage 1 Setup -->
+<div class="card" id="s1-setup" style="margin-bottom:20px;">
+  <div class="wizard-stage-badge">Stage 1</div>
+  <div class="card-title" style="margin-bottom:16px;">Player &amp; Role</div>
+
+  <div class="compat-setup-grid" style="grid-template-columns:1fr 1fr;">
+
+    <!-- Player autocomplete -->
+    <div class="compat-field">
+      <label class="compat-label">Candidate Player</label>
+      <div class="ac-wrap" style="position:relative;">
+        <input type="text" id="player-input" class="compat-input" placeholder="Search player name..."
+               autocomplete="off" oninput="triggerSearch('player')" onkeydown="onKeyDown('player',event)">
+        <button class="search-clear-btn" id="player-clear" onclick="clearField('player')" style="display:none;">x</button>
+        <div class="autocomplete-list" id="player-dropdown" style="display:none;"></div>
+        <input type="hidden" id="player-path">
+      </div>
+      <div id="player-badge" class="compat-badge" style="display:none;"></div>
+    </div>
+
+    <!-- Role selector -->
+    <div class="compat-field">
+      <label class="compat-label">Role Profile</label>
+      <select id="role-select" class="compat-input">
+        <optgroup label="Back Line">
+          <option value="1. Back-Line/A_Central_Defend.json">Central Defender</option>
+          <option value="1. Back-Line/B_Ball_Playing_Defend.json">Ball Playing Defender</option>
+          <option value="1. Back-Line/C_Wing_Back.json">Wing Back</option>
+          <option value="1. Back-Line/D_Full_Back.json">Full Back</option>
+          <option value="1. Back-Line/E_Inverted_Wing_Back.json">Inverted Wing Back</option>
+          <option value="1. Back-Line/F_Inverted_Full_Back.json">Inverted Full Back</option>
+        </optgroup>
+        <optgroup label="Mid Line">
+          <option value="2. Mid-Line/G_Defensive_Midfielder.json">Defensive Midfielder</option>
+          <option value="2. Mid-Line/H_Deep_Lying_Playmaker.json">Deep Lying Playmaker</option>
+          <option value="2. Mid-Line/I_Central_Midfielder.json">Central Midfielder</option>
+          <option value="2. Mid-Line/J_Box_to_Box_Midfielder.json">Box-to-Box Midfielder</option>
+          <option value="2. Mid-Line/K_Advanced_Playmaker.json">Advanced Playmaker</option>
+          <option value="2. Mid-Line/L_Attacking_Midfielder.json">Attacking Midfielder</option>
+        </optgroup>
+        <optgroup label="Front Line">
+          <option value="3. Front-Line/M_Winger.json">Winger</option>
+          <option value="3. Front-Line/N_Inside_Forward.json">Inside Forward</option>
+          <option value="3. Front-Line/O_Advanced_Forward.json">Advanced Forward</option>
+          <option value="3. Front-Line/P_Target_Forward.json">Target Forward</option>
+          <option value="3. Front-Line/Q_False_Nine.json">False Nine</option>
+          <option value="3. Front-Line/R_Poacher.json">Poacher</option>
+        </optgroup>
+      </select>
+    </div>
+
+  </div>
+
+  <button class="compat-btn" id="analyse-leagues-btn" onclick="analyseLeagues()" disabled>Analyse Leagues</button>
+  <div id="s1-error" class="cf-error" style="display:none;"></div>
+</div>
+
+<!-- Stage 1 Results: League Grid -->
+<div id="s1-results" style="display:none; margin-bottom:20px;">
+  <div class="card">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">
+          League Suitability
+          <span id="s1-player-label" class="score-trio-sub" style="margin-left:8px;font-family:'CoFoSans',monospace;"></span>
+        </div>
+        <div class="cf-results-sub" id="s1-role-label"></div>
+      </div>
+      <div class="score-trio-sub" id="s1-count-label"></div>
+    </div>
+    <div class="cf-leagues-grid" id="league-grid"></div>
+  </div>
+</div>
+
+<!-- Stage 2 Setup -->
+<div id="s2-setup" style="display:none; margin-bottom:20px;">
+  <div class="card">
+    <div class="wizard-stage-badge">Stage 2</div>
+
+    <!-- Navigation bar showing context -->
+    <div class="cf-nav-bar" style="margin-bottom:16px;">
+      <button class="cf-back-btn" onclick="backToLeagues()">&larr; Leagues</button>
+      <div class="cf-nav-meta">
+        <span class="cf-nav-player" id="s2-player-name"></span>
+        <span class="cf-nav-sep">&middot;</span>
+        <span class="cf-nav-role" id="s2-role-name"></span>
+        <span class="cf-nav-sep">&rarr;</span>
+        <span class="cf-nav-player" style="color:var(--green);" id="s2-league-name"></span>
+        <span class="cf-nav-role" id="s2-country-label"></span>
+      </div>
+    </div>
+
+    <div class="card-title" style="margin-bottom:16px;">Club Suitability</div>
+
+    <!-- Club autocomplete (pre-filtered to selected league) -->
+    <div class="compat-field" style="max-width:420px; margin-bottom:16px;">
+      <label class="compat-label">Jump to Club (optional &mdash; or click Analyse All)</label>
+      <div class="ac-wrap" style="position:relative;">
+        <input type="text" id="club-input" class="compat-input" placeholder="Search club in this league..."
+               autocomplete="off" oninput="triggerSearch('club')" onkeydown="onKeyDown('club',event)">
+        <button class="search-clear-btn" id="club-clear" onclick="clearField('club')" style="display:none;">x</button>
+        <div class="autocomplete-list" id="club-dropdown" style="display:none;"></div>
+        <input type="hidden" id="club-path">
+      </div>
+      <div id="club-badge" class="compat-badge" style="display:none;"></div>
+    </div>
+
+    <button class="compat-btn" id="analyse-clubs-btn" onclick="analyseClubs()">Analyse All Clubs</button>
+    <div id="s2-error" class="cf-error" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- Stage 2 Results: Club Grid -->
+<div id="s2-results" style="display:none; margin-bottom:20px;">
+  <div class="card">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Club Fit Ranking</div>
+        <div class="cf-results-sub" id="s2-result-label"></div>
+      </div>
+    </div>
+    <div class="cf-clubs-grid" id="club-grid"></div>
+  </div>
+</div>
+
+<!-- Full Analysis Results -->
+<div id="results" style="display:none;">
+
+  <!-- Context nav bar -->
+  <div class="cf-nav-bar" style="margin-bottom:16px;">
+    <button class="cf-back-btn" onclick="backToClubs()">&larr; Clubs</button>
+    <div class="cf-nav-meta">
+      <span class="cf-nav-player" id="fa-player-label"></span>
+      <span class="cf-nav-sep">&middot;</span>
+      <span class="cf-nav-role" id="fa-role-label"></span>
+      <span class="cf-nav-sep">&rarr;</span>
+      <span class="cf-nav-player" style="color:var(--green);" id="fa-club-label"></span>
+    </div>
+  </div>
+
+  <!-- Combined score header -->
+  <div class="card cc-result-header" style="margin-bottom:16px;">
+    <div class="score-ring" id="score-ring" style="--pct:0">
+      <span id="overall-score-val">--</span>
+    </div>
+    <div class="compat-result-meta" style="flex:1;">
+      <div class="compat-result-name" id="res-player-name"></div>
+      <div class="compat-result-role" id="res-role-name"></div>
+      <div class="compat-result-detail" id="res-detail"></div>
+    </div>
+    <div id="verdict-block"></div>
+  </div>
+
+  <!-- Three-score tiles -->
+  <div class="score-trio" style="margin-bottom:16px;">
+    <div class="score-trio-item">
+      <div class="score-trio-label">Role Fitness</div>
+      <div class="score-ring-sm" id="role-ring" style="--pct:0;--ring-colour:var(--green)">
+        <span id="role-score-val">--</span>
+      </div>
+      <div class="score-trio-sub">vs Position Line profile</div>
+    </div>
+    <div class="score-trio-item">
+      <div class="score-trio-label">Squad Impact</div>
+      <div class="squad-impact-display" id="squad-impact-display">
+        <span id="squad-impact-val">--</span>
+      </div>
+      <div class="score-trio-sub" id="squad-impact-sub">vs squad positional avg</div>
+    </div>
+    <div class="score-trio-item">
+      <div class="score-trio-label">League Adaptation</div>
+      <div class="score-ring-sm" id="league-ring" style="--pct:0;--ring-colour:var(--green)">
+        <span id="league-score-val">--</span>
+      </div>
+      <div class="score-trio-sub" id="league-trio-sub">IFFHS intensity match</div>
+    </div>
+  </div>
+
+  <!-- Category comparison -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title" style="margin-bottom:14px;">Category Breakdown vs Squad</div>
+    <div class="cc-legend">
+      <span class="cc-legend-dot" style="background:var(--green);"></span> Candidate &nbsp;
+      <span class="cc-legend-dot" style="background:var(--border2);"></span> Squad Average
+    </div>
+    <div id="cat-compare"></div>
+  </div>
+
+  <!-- Metric comparison table -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title" style="margin-bottom:14px;">Metric Details vs Squad</div>
+    <div class="metric-table-wrap">
+      <table class="metric-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Category</th>
+            <th style="text-align:right;">Cand /90</th>
+            <th style="text-align:right;">Squad /90</th>
+            <th>Score</th>
+            <th style="text-align:right;">&Delta; Score</th>
+          </tr>
+        </thead>
+        <tbody id="metric-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Squad roster -->
+  <div class="card" id="squad-card" style="display:none;">
+    <div class="card-title" style="margin-bottom:14px;">
+      Current Squad &mdash; <span id="squad-pos-label">same position</span>
+      <span class="score-trio-sub" id="squad-count-label" style="margin-left:8px;"></span>
+    </div>
+    <div class="metric-table-wrap">
+      <table class="metric-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Pos</th>
+            <th>Age</th>
+            <th>Apps</th>
+            <th>Rating</th>
+            <th>Role Score</th>
+            <th style="width:120px;"></th>
+          </tr>
+        </thead>
+        <tbody id="squad-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Explanations + Contender Simulation -->
+  <div id="explanations-section" style="display:none;"></div>
+
+  <!-- Download buttons -->
+  <div style="margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap;">
+    <button class="btn btn-ghost" onclick="downloadClubFitCSV()" style="font-size:13px; padding:8px 18px;">
+      ⬇ Download Scouting Report (CSV)
+    </button>
+    <button class="btn btn-ghost" id="btn-download-pdf" onclick="downloadClubFitPDF()" style="font-size:13px; padding:8px 18px;">
+      📄 Download PDF Report
+    </button>
+  </div>
+
+</div><!-- /results -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Score ring animation
+function animateRingVal(ringEl, labelEl, target, showDecimal) {
+  ringEl.style.setProperty('--pct', '0');
+  const start = performance.now();
+  requestAnimationFrame(function frame(now) {
+    const t     = Math.min((now - start) / 800, 1);
+    const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const cur   = target * eased;
+    ringEl.style.setProperty('--pct', cur.toFixed(2));
+    labelEl.textContent = showDecimal ? cur.toFixed(1) : Math.round(cur).toString();
+    if (t < 1) requestAnimationFrame(frame);
+    else labelEl.textContent = showDecimal ? target.toFixed(1) : Math.round(target).toString();
+  });
+}
+
+// Wizard state
+const state = {
+  player: { path: '', name: '' },
+  club:   { path: '', name: '' },
+};
+let selectedLeagueKey     = '';
+let selectedLeagueName    = '';
+let selectedLeagueCountry = '';
+let selectedRoleName      = '';
+let selectedPlayerName    = '';
+
+const timers = { player: null, club: null };
+const hitems = { player: [], club:  [] };
+const hidxs  = { player: -1, club:  -1 };
+
+// Generic autocomplete
+function triggerSearch(side) {
+  clearTimeout(timers[side]);
+  const q = document.getElementById(side + '-input').value.trim();
+  if (q.length < 2) { closeDD(side); return; }
+  timers[side] = setTimeout(() => fetchItems(side, q), 220);
+}
+
+function fetchItems(side, q) {
+  let url;
+  if (side === 'player') {
+    url = '/api/player_search?q=' + encodeURIComponent(q);
+  } else {
+    url = '/api/club_search?q=' + encodeURIComponent(q);
+    if (selectedLeagueKey) url += '&league=' + encodeURIComponent(selectedLeagueKey);
+  }
+  fetch(url).then(r => r.json()).then(data => buildDD(side, data));
+}
+
+function buildDD(side, data) {
+  const dd = document.getElementById(side + '-dropdown');
+  dd.innerHTML = '';
+  hitems[side] = data;
+  hidxs[side]  = -1;
+  if (!data.length) {
+    const el = document.createElement('div');
+    el.className = 'autocomplete-item ac-empty';
+    el.textContent = 'No results found';
+    dd.appendChild(el); dd.style.display = 'block'; return;
+  }
+  data.forEach((item, i) => {
+    const el  = document.createElement('div');
+    el.className = 'autocomplete-item';
+    const n   = document.createElement('span');
+    n.textContent = item.name;
+    const sub = document.createElement('span');
+    sub.className = 'ac-team';
+    sub.textContent = side === 'player'
+      ? (item.team || '') + (item.competition ? ' \u00b7 ' + item.competition : '')
+      : item.competition + ' \u00b7 ' + item.country;
+    el.appendChild(n); el.appendChild(sub);
+    el.addEventListener('mousedown', e => { e.preventDefault(); selectItem(side, item); });
+    dd.appendChild(el);
+  });
+  dd.style.display = 'block';
+}
+
+function onKeyDown(side, e) {
+  const dd    = document.getElementById(side + '-dropdown');
+  const items = dd.querySelectorAll('.autocomplete-item:not(.ac-empty)');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    hidxs[side] = Math.min(hidxs[side] + 1, items.length - 1);
+    updateHL(side, items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    hidxs[side] = Math.max(hidxs[side] - 1, 0);
+    updateHL(side, items);
+  } else if (e.key === 'Enter' && hidxs[side] >= 0) {
+    e.preventDefault(); selectItem(side, hitems[side][hidxs[side]]);
+  } else if (e.key === 'Escape') { closeDD(side); }
+}
+
+function updateHL(side, items) {
+  items.forEach((el, i) => el.classList.toggle('focused', i === hidxs[side]));
+  if (hidxs[side] >= 0) items[hidxs[side]].scrollIntoView({ block: 'nearest' });
+}
+
+function selectItem(side, item) {
+  state[side].path = item.path;
+  state[side].name = item.name;
+  const inp = document.getElementById(side + '-input');
+  inp.value = item.name; inp.classList.add('selected'); inp.readOnly = true;
+  document.getElementById(side + '-clear').style.display = 'flex';
+  document.getElementById(side + '-path').value = item.path;
+  const badge  = document.getElementById(side + '-badge');
+  badge.textContent = side === 'player'
+    ? (item.team || '') + (item.competition ? ' \u00b7 ' + item.competition : '')
+    : item.competition + ' \u00b7 ' + item.country;
+  badge.style.display = 'block';
+  closeDD(side); checkReady();
+}
+
+function clearField(side) {
+  state[side].path = ''; state[side].name = '';
+  const inp = document.getElementById(side + '-input');
+  inp.value = ''; inp.readOnly = false; inp.classList.remove('selected');
+  inp.focus();
+  document.getElementById(side + '-clear').style.display  = 'none';
+  document.getElementById(side + '-path').value           = '';
+  document.getElementById(side + '-badge').style.display  = 'none';
+  closeDD(side); checkReady();
+}
+
+function closeDD(side) {
+  document.getElementById(side + '-dropdown').style.display = 'none';
+  hidxs[side] = -1;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ac-wrap')) { closeDD('player'); closeDD('club'); }
+});
+
+// Step helpers
+function checkReady() {
+  const btn = document.getElementById('analyse-leagues-btn');
+  if (btn) btn.disabled = !state.player.path;
+}
+
+function setStepActive(n) {
+  ['step1-indicator','step2-indicator','step3-indicator'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'cf-step ' + (i + 1 < n ? 'visited' : i + 1 === n ? 'active' : 'inactive');
+  });
+}
+
+// Stage 1 - Analyse Leagues
+function analyseLeagues() {
+  const role = document.getElementById('role-select').value;
+  if (!state.player.path || !role) return;
+
+  document.getElementById('s1-error').style.display    = 'none';
+  document.getElementById('s1-results').style.display  = 'none';
+  document.getElementById('s2-setup').style.display    = 'none';
+  document.getElementById('s2-results').style.display  = 'none';
+  document.getElementById('results').style.display     = 'none';
+
+  const btn = document.getElementById('analyse-leagues-btn');
+  btn.disabled = true; btn.textContent = 'Analysing...';
+
+  fetch('/api/league_suitability'
+      + '?player=' + encodeURIComponent(state.player.path)
+      + '&role='   + encodeURIComponent(role))
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false; btn.textContent = 'Analyse Leagues';
+      if (data.error) { showS1Error(data.error); return; }
+      selectedPlayerName = data.player_name;
+      selectedRoleName   = data.role_name;
+      renderLeagues(data);
+    })
+    .catch(() => {
+      btn.disabled = false; btn.textContent = 'Analyse Leagues';
+      showS1Error('Network error - is the server running?');
+    });
+}
+
+function renderLeagues(data) {
+  const grid = document.getElementById('league-grid');
+  grid.innerHTML = '';
+
+  document.getElementById('s1-player-label').textContent = data.player_name;
+  document.getElementById('s1-role-label').textContent   = 'Role: ' + data.role_name;
+  document.getElementById('s1-count-label').textContent  = data.leagues.length + ' leagues';
+
+  selectedLeagueKey = '';
+
+  data.leagues.forEach(lg => {
+    const score = lg.suitability_score;
+    const col   = score >= 70 ? 'var(--green)' : score >= 50 ? 'var(--amber)' : 'var(--red)';
+
+    const card    = document.createElement('div');
+    card.className = 'cf-league-card';
+    card.dataset.key = lg.league_key;
+    if (lg.league_key === (data._current_league || '')) card.classList.add('cf-current');
+
+    const rfPct  = Math.min(100, lg.role_fitness).toFixed(1);
+    const laPct  = Math.min(100, lg.league_adaptation).toFixed(1);
+    const laCol  = lg.league_adaptation >= 70 ? 'var(--green)' : lg.league_adaptation >= 45 ? 'var(--amber)' : 'var(--red)';
+    const rfFill = `background:${col};width:${rfPct}%`;
+    const laFill = `background:${laCol};width:${laPct}%`;
+    const rankText = lg.global_rank ? `#${lg.global_rank}` : '';
+    const moveTag  = lg.move_label  ? ` &middot; <span style="color:${laCol};font-size:10px;">${lg.move_label}</span>` : '';
+
+    card.innerHTML = `
+      <div class="cf-lc-header">
+        <div>
+          <div class="cf-lc-country">${lg.country}</div>
+          <div class="cf-lc-comp">${lg.league}${rankText ? ` <span style="font-size:10px;color:var(--text3);">(${rankText})</span>` : ''}</div>
+        </div>
+        <div>
+          <div class="cf-lc-score" style="color:${col};">${score.toFixed(1)}<span class="cf-lc-pct">%</span></div>
+        </div>
+      </div>
+      <div class="cf-lc-bars">
+        <div class="cf-lc-bar-row">
+          <span class="cf-lc-bar-label">Role Fit</span>
+          <div class="cf-lc-track"><div class="cf-lc-fill" style="${rfFill};"></div></div>
+          <span class="cf-lc-bar-val" style="color:${col};">${rfPct}</span>
+        </div>
+        <div class="cf-lc-bar-row">
+          <span class="cf-lc-bar-label">Lg. Adapt.</span>
+          <div class="cf-lc-track"><div class="cf-lc-fill" style="${laFill};"></div></div>
+          <span class="cf-lc-bar-val" style="color:${laCol};">${laPct}</span>
+        </div>
+      </div>
+      <div class="cf-lc-footer">
+        <span class="cf-lc-meta">Intensity ${(lg.league_intensity * 100).toFixed(1)}%${moveTag} &middot; ${lg.player_count} players</span>
+      </div>`;
+
+    const btn = document.createElement('button');
+    btn.className   = 'cf-lc-btn';
+    btn.textContent = 'Select';
+    btn.addEventListener('click', () => selectLeague(lg.league_key, lg.league, lg.country));
+    card.appendChild(btn);
+
+    grid.appendChild(card);
+  });
+
+  document.getElementById('s1-results').style.display = 'block';
+  setStepActive(1);
+  document.getElementById('s1-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Stage 1 to Stage 2 transition
+function selectLeague(key, name, country) {
+  selectedLeagueKey     = key;
+  selectedLeagueName    = name;
+  selectedLeagueCountry = country;
+
+  document.querySelectorAll('.cf-league-card').forEach(c => {
+    const isSelected = c.dataset.key === key;
+    c.classList.toggle('cf-selected', isSelected);
+    const btn = c.querySelector('.cf-lc-btn');
+    if (btn) btn.textContent = isSelected ? '\u2713 Selected' : 'Select';
+  });
+
+  const roleText = document.getElementById('role-select').options[document.getElementById('role-select').selectedIndex].text;
+  document.getElementById('s2-player-name').textContent   = selectedPlayerName;
+  document.getElementById('s2-role-name').textContent     = roleText;
+  document.getElementById('s2-league-name').textContent   = name;
+  document.getElementById('s2-country-label').textContent = ' \u00b7 ' + country;
+
+  clearField('club');
+
+  document.getElementById('s2-setup').style.display   = 'block';
+  document.getElementById('s2-results').style.display = 'none';
+  document.getElementById('results').style.display    = 'none';
+  setStepActive(2);
+  document.getElementById('s2-setup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function backToLeagues() {
+  document.getElementById('s2-setup').style.display   = 'none';
+  document.getElementById('s2-results').style.display = 'none';
+  document.getElementById('results').style.display    = 'none';
+  setStepActive(1);
+  document.getElementById('s1-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Stage 2 - Analyse Clubs
+function analyseClubs() {
+  if (!selectedLeagueKey || !state.player.path) return;
+  const role = document.getElementById('role-select').value;
+
+  document.getElementById('s2-error').style.display   = 'none';
+  document.getElementById('s2-results').style.display = 'none';
+  document.getElementById('results').style.display    = 'none';
+
+  const btn = document.getElementById('analyse-clubs-btn');
+  btn.disabled = true; btn.textContent = 'Analysing...';
+
+  fetch('/api/club_suitability'
+      + '?player=' + encodeURIComponent(state.player.path)
+      + '&league=' + encodeURIComponent(selectedLeagueKey)
+      + '&role='   + encodeURIComponent(role))
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false; btn.textContent = 'Analyse All Clubs';
+      if (data.error) { showS2Error(data.error); return; }
+      renderClubs(data);
+    })
+    .catch(() => {
+      btn.disabled = false; btn.textContent = 'Analyse All Clubs';
+      showS2Error('Network error - is the server running?');
+    });
+}
+
+function renderClubs(data) {
+  const grid = document.getElementById('club-grid');
+  grid.innerHTML = '';
+
+  const roleText = document.getElementById('role-select')
+    .options[document.getElementById('role-select').selectedIndex].text;
+  document.getElementById('s2-result-label').textContent =
+    data.player_name + ' as ' + roleText + ' \u00b7 ' + data.clubs.length + ' clubs in ' + data.league;
+
+  const vClsMap = {
+    'Starter Upgrade':    'verdict-good',
+    'Strong Signing':     'verdict-good',
+    'Squad Depth':        'verdict-mid',
+    'Development Option': 'verdict-mid',
+    'Below Squad Level':  'verdict-low',
+  };
+
+  data.clubs.forEach(cl => {
+    const score   = cl.overall_score;
+    const col     = score >= 70 ? 'var(--green)' : score >= 50 ? 'var(--amber)' : 'var(--red)';
+    const imp     = cl.squad_impact;
+    const impClr  = imp > 3 ? 'var(--green)' : imp < -3 ? 'var(--red)' : 'var(--amber)';
+    const impSign = imp >= 0 ? '+' : '';
+
+    const rfPct  = Math.min(100, cl.role_fitness).toFixed(1);
+    const laPct  = Math.min(100, cl.league_adaptation).toFixed(1);
+    const rfFill = `background:var(--green); width:${rfPct}%`;
+    const laFill = `background:var(--border2); width:${laPct}%`;
+
+    const vCls = vClsMap[cl.verdict] || 'verdict-mid';
+
+    const piCl     = cl.pool_info || {};
+    const piWarnCl = piCl.small_sample ? ' pool-tag-warn' : '';
+    const piTagCl  = piCl.position_line
+      ? `<span class="pool-tag${piWarnCl}">${piCl.position_line}</span>`
+      : '';
+    const piSizeCl = piCl.pool_size !== undefined ? piCl.pool_size : cl.player_count;
+
+    const card = document.createElement('div');
+    card.className = 'cf-club-card';
+    card.innerHTML = `
+      <div class="cf-cc-header">
+        <div>
+          <div class="cf-cc-name">${cl.club}</div>
+          <div style="margin-top:4px;">
+            <span class="verdict-badge ${vCls}" style="font-size:10px; padding:2px 8px;">${cl.verdict}</span>
+          </div>
+        </div>
+        <div class="cf-cc-score" style="color:${col};">${score.toFixed(1)}<span class="cf-cc-pct">%</span></div>
+      </div>
+      <div class="cf-cc-stats">
+        <div class="cf-cc-stat-row">
+          <span class="cf-cc-stat-label">Role Fitness</span>
+          <div class="cf-cc-stat-bar-track"><div class="cf-cc-stat-bar-fill" style="${rfFill};"></div></div>
+          <span class="cf-cc-stat-val" style="color:var(--green);">${rfPct}</span>
+        </div>
+        <div class="cf-cc-stat-row">
+          <span class="cf-cc-stat-label">League Adapt.</span>
+          <div class="cf-cc-stat-bar-track"><div class="cf-cc-stat-bar-fill" style="${laFill};"></div></div>
+          <span class="cf-cc-stat-val">${laPct}</span>
+        </div>
+        <div class="cf-cc-stat-row">
+          <span class="cf-cc-stat-label">Squad Impact</span>
+          <div style="flex:1;"></div>
+          <span class="cf-cc-stat-val" style="color:${impClr}; width:auto;">${impSign}${imp.toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="cf-cc-footer">
+        <span class="cf-lc-meta">${piSizeCl} positional players</span>${piTagCl}
+      </div>`;
+
+    const fullBtn = document.createElement('button');
+    fullBtn.className   = 'cf-analyse-btn';
+    fullBtn.textContent = 'Full Analysis';
+    fullBtn.addEventListener('click', () => doFullAnalysis(cl.club_path, cl.club));
+    card.appendChild(fullBtn);
+
+    grid.appendChild(card);
+  });
+
+  document.getElementById('s2-results').style.display = 'block';
+  document.getElementById('s2-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function backToClubs() {
+  document.getElementById('results').style.display = 'none';
+  setStepActive(2);
+  document.getElementById('s2-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Full Analysis
+function doFullAnalysis(clubPath, clubName) {
+  state.club.path = clubPath;
+  state.club.name = clubName;
+  const roleText = document.getElementById('role-select')
+    .options[document.getElementById('role-select').selectedIndex].text;
+  document.getElementById('fa-player-label').textContent = selectedPlayerName || state.player.name;
+  document.getElementById('fa-role-label').textContent   = roleText;
+  document.getElementById('fa-club-label').textContent   = clubName;
+  setStepActive(3);
+  runAnalysis();
+}
+
+function runAnalysis() {
+  const role = document.getElementById('role-select').value;
+  if (!state.player.path || !state.club.path || !role) return;
+
+  document.getElementById('results').style.display = 'none';
+
+  fetch('/api/club_compatibility'
+      + '?player=' + encodeURIComponent(state.player.path)
+      + '&role='   + encodeURIComponent(role)
+      + '&club='   + encodeURIComponent(state.club.path))
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { showError(data.error); return; }
+      renderResults(data);
+    })
+    .catch(() => { showError('Network error - is the server running?'); });
+}
+
+// Error helpers
+function showS1Error(msg) {
+  const el = document.getElementById('s1-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+function showS2Error(msg) {
+  const el = document.getElementById('s2-error');
+  el.textContent = msg; el.style.display = 'block';
+}
+function showError(msg) {
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+  el.innerHTML = '<div class="cf-error" style="padding:32px 0;">' + msg + '</div>';
+}
+
+// Render full analysis
+function renderResults(d) {
+  const scores = d.scores;
+  const cand   = d.candidate;
+  const target = d.target;
+
+  const combined = scores.combined_score;
+  const ringEl   = document.getElementById('score-ring');
+  ringEl.style.setProperty('--ring-colour',
+    combined >= 58 ? 'var(--green)' : combined >= 44 ? 'var(--amber)' : 'var(--red)');
+  ringEl.style.setProperty('--ring-glow-opacity', (Math.min(0.30, 0.08 + combined / 100 * 0.22)).toFixed(2));
+  animateRingVal(ringEl, document.getElementById('overall-score-val'), combined, true);
+
+  const vClsMap = {
+    'Starter Upgrade':    'verdict-good',
+    'Strong Signing':     'verdict-good',
+    'Squad Depth':        'verdict-mid',
+    'Development Option': 'verdict-mid',
+    'Below Squad Level':  'verdict-low',
+  };
+  const vb = document.getElementById('verdict-block');
+  vb.innerHTML = '';
+  const vs = document.createElement('span');
+  vs.className = 'verdict-badge ' + (vClsMap[d.verdict] || 'verdict-mid');
+  vs.textContent = d.verdict;
+  vb.appendChild(vs);
+
+  document.getElementById('res-player-name').textContent = cand.name;
+  document.getElementById('res-role-name').textContent   =
+    document.getElementById('role-select').options[document.getElementById('role-select').selectedIndex].text
+    + ' @ ' + target.club;
+  const srcRank = cand.global_rank ? ` (#${cand.global_rank})` : '';
+  const tgtRank = target.global_rank ? ` (#${target.global_rank})` : '';
+  document.getElementById('res-detail').textContent =
+    'Age ' + cand.age + ' \u00b7 ' + cand.positions.join(', ')
+    + ' \u00b7 ' + (cand.league_name || 'Origin')
+    + srcRank + ' \u2192 ' + target.competition + tgtRank
+    + (d.move_label ? ' \u00b7 ' + d.move_label : '');
+
+  const rf = scores.role_fitness;
+  const rfRing = document.getElementById('role-ring');
+  rfRing.style.setProperty('--ring-colour',
+    rf >= 70 ? 'var(--green)' : rf >= 45 ? 'var(--amber)' : 'var(--red)');
+  animateRingVal(rfRing, document.getElementById('role-score-val'), rf, true);
+
+  const imp    = scores.squad_impact;
+  const impEl  = document.getElementById('squad-impact-val');
+  const impBox = document.getElementById('squad-impact-display');
+  impEl.textContent = (imp >= 0 ? '+' : '') + imp.toFixed(1);
+  impBox.style.color = imp > 3 ? 'var(--green)' : imp < -3 ? 'var(--red)' : 'var(--amber)';
+  const pi      = d.pool_info || {};
+  const piLine  = pi.position_line || '';
+  const piSize  = pi.pool_size !== undefined ? pi.pool_size : target.player_count;
+  const piWarn  = pi.small_sample ? ' pool-tag-warn' : '';
+  const piTag   = piLine ? ` <span class="pool-tag${piWarn}">${piLine} \u00b7 ${piSize} players</span>` : '';
+  document.getElementById('squad-impact-sub').innerHTML = target.player_count > 0
+    ? 'Squad avg: ' + target.squad_avg_score.toFixed(1) + piTag
+    : 'No data in this position at club' + piTag;
+
+  const la = scores.league_adaptation;
+  const laRing = document.getElementById('league-ring');
+  laRing.style.setProperty('--ring-colour',
+    la >= 70 ? 'var(--green)' : la >= 45 ? 'var(--amber)' : 'var(--red)');
+  animateRingVal(laRing, document.getElementById('league-score-val'), la, true);
+  document.getElementById('league-trio-sub').innerHTML =
+    (cand.league_intensity * 100).toFixed(1) + '% \u2192 ' + (target.league_intensity * 100).toFixed(1) + '%'
+    + (d.move_label ? ' <span style="font-size:10px;color:var(--text3);">(' + d.move_label + ')</span>' : '');
+
+  const catWrap   = document.getElementById('cat-compare');
+  catWrap.innerHTML = '';
+  const weights   = cand.role_fitness.weights;
+  const catScores = cand.role_fitness.category_scores;
+  const sqCatAvgs = target.avg_category_scores;
+  const cats      = Object.keys(weights).sort((a, b) => (catScores[b] || 0) - (catScores[a] || 0));
+
+  cats.forEach(cat => {
+    const candScore = catScores[cat] || 0;
+    const sqScore   = sqCatAvgs[cat]  || 0;
+    const delta     = candScore - sqScore;
+    const candClr   = candScore >= 70 ? 'linear-gradient(90deg,#2a7aaf 0%,#3a8dbf 100%)'
+                    : candScore >= 45 ? 'linear-gradient(90deg,#6ba3c8 0%,#87bde0 100%)'
+                    :                   'linear-gradient(90deg,#c04040 0%,#e05c5c 100%)';
+    const deltaClr  = delta > 2 ? 'var(--green)' : delta < -2 ? 'var(--red)' : 'var(--amber)';
+    const row = document.createElement('div');
+    row.className = 'cc-cat-row';
+    row.innerHTML = `
+      <div class="cc-cat-header">
+        <span class="cat-bar-name">${fmtCat(cat)}</span>
+        <span class="cat-bar-meta"><span style="color:${deltaClr};">${delta >= 0 ? '+' : ''}${delta.toFixed(1)}</span></span>
+      </div>
+      <div class="cc-bar-pair">
+        <div class="cc-bar-line">
+          <span class="cc-bar-tag">Candidate</span>
+          <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${candScore}%; background:${candClr};"></div></div>
+          <span class="cc-bar-num">${candScore.toFixed(1)}</span>
+        </div>
+        <div class="cc-bar-line">
+          <span class="cc-bar-tag">Squad avg</span>
+          <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${sqScore}%; background:var(--border2);"></div></div>
+          <span class="cc-bar-num" style="color:var(--text2);">${sqScore.toFixed(1)}</span>
+        </div>
+      </div>`;
+    catWrap.appendChild(row);
+  });
+
+  const tbody = document.getElementById('metric-tbody');
+  tbody.innerHTML = '';
+  d.metric_deltas.forEach(m => {
+    const delta       = m.score_delta;
+    const rawDelta    = m.raw_delta;
+    const hib         = m.higher_is_better;
+    const deltaClr    = (hib ? delta > 0 : delta < 0)       ? 'var(--green)'
+                      : (hib ? delta < 0 : delta > 0)       ? 'var(--red)'
+                      :                                        'var(--text2)';
+    const rawDeltaClr = (hib ? rawDelta > 0 : rawDelta < 0) ? 'var(--green)'
+                      : (hib ? rawDelta < 0 : rawDelta > 0) ? 'var(--red)'
+                      :                                        'var(--text2)';
+    const cFill  = m.candidate_score >= 70 ? 'linear-gradient(90deg,#2a7aaf 0%,#3a8dbf 100%)'
+                 : m.candidate_score >= 45 ? 'linear-gradient(90deg,#6ba3c8 0%,#87bde0 100%)'
+                 :                           'linear-gradient(90deg,#c04040 0%,#e05c5c 100%)';
+    const arrow    = hib ? '\u2191' : '\u2193';
+    const arrowClr = hib ? 'color:var(--green)' : 'color:var(--red)';
+    const rawSign  = rawDelta >= 0 ? '+' : '';
+    const squadRawLabel = m.squad_avg_raw > 0
+      ? `${fmtRaw(m.squad_avg_raw)} <span style="font-size:10px;color:${rawDeltaClr};">${rawSign}${fmtRaw(rawDelta)}</span>`
+      : '<span style="color:var(--text3);">\u2014</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="metric-name">${m.name} <span style="${arrowClr}; font-size:11px;">${arrow}</span></td>
+      <td><span class="tag tag-sm">${fmtCat(m.category)}</span></td>
+      <td class="metric-raw" style="text-align:right; color:var(--text);">${fmtRaw(m.candidate_raw)}</td>
+      <td class="metric-raw" style="text-align:right;">${squadRawLabel}</td>
+      <td class="metric-bar-cell">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="metric-bar-track" style="flex:1;">
+            <div class="metric-bar-fill" style="width:${m.candidate_score}%; background:${cFill};"></div>
+          </div>
+          <span style="font-variant-numeric:tabular-nums;min-width:32px;">${m.candidate_score.toFixed(1)}</span>
+        </div>
+      </td>
+      <td style="text-align:right; font-weight:600; color:${deltaClr}; font-variant-numeric:tabular-nums;">
+        ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  const squadCard   = document.getElementById('squad-card');
+  const squadTbody  = document.getElementById('squad-tbody');
+  squadTbody.innerHTML = '';
+  const squadPlayers = target.squad_players || [];
+
+  if (squadPlayers.length > 0) {
+    document.getElementById('squad-pos-label').textContent   = 'same position line';
+    document.getElementById('squad-count-label').textContent =
+      squadPlayers.length + ' player' + (squadPlayers.length !== 1 ? 's' : '');
+    squadCard.style.display = 'block';
+
+    const trCand = document.createElement('tr');
+    trCand.className = 'squad-row-cand';
+    trCand.innerHTML = `
+      <td class="metric-name" style="color:var(--green);">\u2605 ${cand.name}</td>
+      <td><span class="tag tag-sm" style="border-color:var(--green);color:var(--green);">${cand.positions.join('/')}</span></td>
+      <td style="color:var(--text2);">${cand.age}</td>
+      <td style="color:var(--text2);">\u2014</td>
+      <td style="color:var(--text2);">\u2014</td>
+      <td colspan="2">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="metric-bar-track" style="flex:1;height:10px;">
+            <div class="metric-bar-fill" style="width:${rf}%;background:var(--green);height:100%;"></div>
+          </div>
+          <strong style="color:var(--green);min-width:36px;">${rf.toFixed(1)}</strong>
+        </div>
+      </td>`;
+    squadTbody.appendChild(trCand);
+
+    squadPlayers.forEach(sp => {
+      const sc    = sp.overall_score;
+      const scClr = sc >= 70 ? 'linear-gradient(90deg,#2a7aaf 0%,#3a8dbf 100%)'
+                  : sc >= 45 ? 'linear-gradient(90deg,#6ba3c8 0%,#87bde0 100%)'
+                  :             'linear-gradient(90deg,#c04040 0%,#e05c5c 100%)';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="metric-name">${sp.name}</td>
+        <td><span class="tag tag-sm">${(sp.positions || [sp.position]).join('/')}</span></td>
+        <td style="color:var(--text2);">${sp.age}</td>
+        <td style="color:var(--text2);">${sp.appearances}</td>
+        <td style="color:var(--text2);">${sp.rating > 0 ? sp.rating.toFixed(2) : '\u2014'}</td>
+        <td colspan="2">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="metric-bar-track" style="flex:1;height:10px;">
+              <div class="metric-bar-fill" style="width:${sc}%;background:${scClr};height:100%;"></div>
+            </div>
+            <span style="font-variant-numeric:tabular-nums;min-width:36px;">${sc.toFixed(1)}</span>
+          </div>
+        </td>`;
+      squadTbody.appendChild(tr);
+    });
+  } else {
+    squadCard.style.display = 'none';
+  }
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderExplanations(d);
+}
+
+function fmtCat(k) {
+  return k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+function fmtRaw(v) {
+  if (v === null || v === undefined) return '\u2014';
+  return (v % 1 === 0) ? v.toFixed(0) : v.toFixed(2);
+}
+
+// ── Render explanations + contender simulation ────────────────────────────────
+function renderExplanations(d) {
+  const exEl = document.getElementById('explanations-section');
+  if (!exEl) return;
+  const exp = d.explanations || {};
+  const cs  = d.contender_simulation || {};
+
+  const ptGain = cs.points_gain || 0;
+  const ptSign = ptGain >= 0 ? '+' : '';
+  const ptCol  = ptGain > 0 ? 'var(--green)' : ptGain < 0 ? 'var(--red)' : 'var(--text2)';
+
+  exEl.innerHTML = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:14px;">Scouting Narrative</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="explain-narrative-card">
+          <div class="explain-narrative-label">Why the Club Needs This Player</div>
+          <div class="explain-narrative-text">${exp.why_club_needs_player || '\u2014'}</div>
+        </div>
+        <div class="explain-narrative-card">
+          <div class="explain-narrative-label">Why the Player Fits the Club</div>
+          <div class="explain-narrative-text">${exp.why_player_fits_club || '\u2014'}</div>
+        </div>
+        <div class="explain-narrative-card">
+          <div class="explain-narrative-label">Why the Club Becomes a Contender</div>
+          <div class="explain-narrative-text">${exp.why_club_becomes_contender || '\u2014'}</div>
+        </div>
+        <div class="explain-narrative-card" style="border-left-color: var(--amber);">
+          <div class="explain-narrative-label" style="color:var(--amber);">Risk Assessment</div>
+          <div class="explain-narrative-text">${exp.risk_assessment || '\u2014'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title" style="margin-bottom:14px;">Contender Projection</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+        ${[
+          ['xG Gain / Match',    (cs.xg_gain_per_match||0) >= 0 ? '+' : '', cs.xg_gain_per_match, false],
+          ['Season xG Gain',     (cs.season_xg_gain||0)   >= 0 ? '+' : '', cs.season_xg_gain,    false],
+          ['Projected Goals',    (cs.goal_gain||0)         >= 0 ? '+' : '', cs.goal_gain,         false],
+          ['Points Gain',        ptSign,                    cs.points_gain,                        true],
+          ['Title Prob. Shift',  (cs.title_probability_shift||0) >= 0 ? '+' : '', (cs.title_probability_shift * 100 || 0), false],
+        ].map(([label, sign, val, isPts]) => {
+          const v   = Number(val || 0);
+          const col = v > 0 ? 'var(--green)' : v < 0 ? 'var(--red)' : 'var(--text2)';
+          const str = isPts ? (sign + v.toFixed(1) + ' pts') : (sign + v.toFixed(2));
+          return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;text-align:center;">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">${label}</div>
+            <div style="font-family:'BasementGrotesque',sans-serif;font-weight:900;font-size:18px;color:${col};">${str}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  exEl.style.display = 'block';
+}
+
+// ── Download CSV ──────────────────────────────────────────────────────────────
+function downloadClubFitCSV() {
+  const role = document.getElementById('role-select').value;
+  if (!state.player.path || !state.club.path || !role) return;
+  const url = '/api/export_club_fit_csv'
+    + '?player=' + encodeURIComponent(state.player.path)
+    + '&role='   + encodeURIComponent(role)
+    + '&club='   + encodeURIComponent(state.club.path);
+  window.location.href = url;
+}
+
+// ── Download PDF ──────────────────────────────────────────────────────────────
+async function downloadClubFitPDF() {
+  const role = document.getElementById('role-select').value;
+  if (!state.player.path || !state.club.path || !role) return;
+  const btn = document.getElementById('btn-download-pdf');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Generating PDF…';
+  try {
+    const res = await fetch('/api/export_club_fit_pdf', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        player: state.player.path,
+        role:   role,
+        club:   state.club.path,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert('PDF error: ' + (err.error || res.statusText));
+      return;
+    }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const cd   = res.headers.get('Content-Disposition') || '';
+    const fnMatch = cd.match(/filename="?([^"]+)"?/);
+    a.download = fnMatch ? fnMatch[1] : 'ScoutingReport.pdf';
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '📄 Download PDF Report';
+  }
+}
+
+// ── Pre-fill from URL ?prefill= ───────────────────────────────────────────────
+(function () {
+  const params  = new URLSearchParams(window.location.search);
+  const prefill = params.get('prefill');
+  if (!prefill) return;
+  fetch('/api/player_search?q=' + encodeURIComponent(
+        prefill.split('/').slice(-1)[0].replace('.json','').replace(/_/g,' ')))
+    .then(r => r.json())
+    .then(results => {
+      const match = results.find(p => p.path === prefill) || results[0];
+      if (!match) return;
+      selectItem('player', match);
+    })
+    .catch(() => {});
+})();
+</script>
+{% endblock %}

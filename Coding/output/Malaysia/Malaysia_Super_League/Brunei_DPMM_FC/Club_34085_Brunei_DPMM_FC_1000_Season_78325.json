@@ -1,0 +1,278 @@
+{
+    "team_id": "34085",
+    "team_name": "Brunei DPMM FC",
+    "tournament_id": "1000",
+    "season_id": "78325",
+    "competition_name": "Malaysia_Super_League",
+    "competition_country": "Malaysia",
+    "profile": {
+        "team": {
+            "name": "Brunei DPMM FC",
+            "slug": "brunei-dpmm-fc",
+            "shortName": "DPMM",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Singapore",
+                "slug": "singapore",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "SG",
+                    "alpha3": "SGP",
+                    "name": "Singapore",
+                    "slug": "singapore"
+                },
+                "id": 45,
+                "flag": "singapore",
+                "alpha2": "SG",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Super League",
+                "slug": "super-league",
+                "category": {
+                    "name": "Brunei",
+                    "slug": "brunei",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "BN",
+                        "alpha3": "BRN",
+                        "name": "Brunei",
+                        "slug": "brunei"
+                    },
+                    "id": 1617,
+                    "flag": "brunei",
+                    "alpha2": "BN",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "Super League",
+                    "slug": "super-league",
+                    "primaryColorHex": "#020708",
+                    "secondaryColorHex": "#a1783d",
+                    "category": {
+                        "name": "Brunei",
+                        "slug": "brunei",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "BN",
+                            "alpha3": "BRN",
+                            "name": "Brunei",
+                            "slug": "brunei"
+                        },
+                        "id": 1617,
+                        "flag": "brunei",
+                        "alpha2": "BN",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 290,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 17017,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 93609
+            },
+            "primaryUniqueTournament": {
+                "name": "Malaysia Super League",
+                "slug": "malaysia-super-league",
+                "primaryColorHex": "#0164bd",
+                "secondaryColorHex": "#293793",
+                "category": {
+                    "name": "Malaysia",
+                    "slug": "malaysia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "MY",
+                        "alpha3": "MYS",
+                        "name": "Malaysia",
+                        "slug": "malaysia"
+                    },
+                    "id": 85,
+                    "flag": "malaysia",
+                    "alpha2": "MY",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 5274,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1000,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 4227,
+            "manager": {
+                "name": "Jamie McAllister",
+                "slug": "mcallister-jamie",
+                "shortName": "J. McAllister",
+                "country": {
+                    "alpha2": "SX",
+                    "alpha3": "SCO",
+                    "name": "Scotland",
+                    "slug": "scotland"
+                },
+                "id": 806294
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 4.929182,
+                    "longitude": 114.945085
+                },
+                "hidden": true,
+                "slug": "hassanal-bolkiah-national-stadium",
+                "name": "Hassanal Bolkiah National Stadium",
+                "capacity": 30000,
+                "country": {
+                    "alpha2": "BN",
+                    "alpha3": "BRN",
+                    "name": "Brunei",
+                    "slug": "brunei"
+                },
+                "id": 4280,
+                "city": {
+                    "name": "Bandar Seri Begawan"
+                },
+                "stadium": {
+                    "name": "Hassanal Bolkiah National Stadium",
+                    "capacity": 30000
+                }
+            },
+            "nameCode": "BRU",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "BN",
+                "alpha3": "BRN",
+                "name": "Brunei",
+                "slug": "brunei"
+            },
+            "id": 34085,
+            "fullName": "Brunei DPMM FC",
+            "teamColors": {
+                "primary": "#000000",
+                "secondary": "#ff0000",
+                "text": "#ff0000"
+            },
+            "foundationDateTimestamp": 962841600,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 8,
+            "value": "21",
+            "form": [
+                "L",
+                "L",
+                "D",
+                "L",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 24,
+            "goalsConceded": 47,
+            "assists": 13,
+            "shots": 198,
+            "penaltyGoals": 3,
+            "penaltiesTaken": 4,
+            "successfulDribbles": 187,
+            "dribbleAttempts": 257,
+            "corners": 73,
+            "averageBallPossession": 41.4,
+            "totalPasses": 4892,
+            "accuratePasses": 3686,
+            "accuratePassesPercentage": 75.35,
+            "totalLongBalls": 811,
+            "accurateLongBalls": 421,
+            "accurateLongBallsPercentage": 51.91,
+            "totalCrosses": 214,
+            "accurateCrosses": 73,
+            "accurateCrossesPercentage": 34.11,
+            "cleanSheets": 3,
+            "interceptions": 716,
+            "saves": 102,
+            "errorsLeadingToShot": 173,
+            "totalDuels": 3019,
+            "duelsWon": 1086,
+            "duelsWonPercentage": 35.97,
+            "totalAerialDuels": 622,
+            "aerialDuelsWon": 275,
+            "aerialDuelsWonPercentage": 44.21,
+            "offsides": 32,
+            "fouls": 216,
+            "yellowCards": 32,
+            "yellowRedCards": 5,
+            "redCards": 3,
+            "shotsAgainst": 382,
+            "goalKicks": 186,
+            "ballRecovery": 1253,
+            "freeKicks": 48,
+            "id": 47468,
+            "matches": 19,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

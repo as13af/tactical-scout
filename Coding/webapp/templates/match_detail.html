@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+{% block title %}{{ match.match.home_team }} vs {{ match.match.away_team }} — Scout{% endblock %}
+
+{% block head %}
+<style>
+/* ── Banner ── */
+.match-banner {
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border:1px solid var(--border); border-radius:var(--radius);
+  padding:24px 32px; margin-bottom:24px;
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px;
+}
+.banner-team { font-size:20px; font-weight:800; color:var(--text1); }
+.banner-team.home { text-align:right; }
+.banner-team.away { text-align:left; }
+.banner-score {
+  font-family:'BasementGrotesque',sans-serif; font-size:42px; font-weight:900;
+  color:#80DEEA; text-align:center; line-height:1;
+}
+.banner-meta { text-align:center; font-size:12px; color:var(--text3); margin-top:6px; }
+.banner-formations { text-align:center; font-size:12px; color:var(--text3); margin-top:4px; }
+.banner-formation-tag {
+  display:inline-block; background:var(--bg3); border:1px solid var(--border);
+  border-radius:20px; padding:2px 10px; font-size:11px;
+}
+
+/* ── Tabs ── */
+.tab-bar { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--border); }
+.tab-btn {
+  padding:8px 18px; font-size:13px; font-weight:600; color:var(--text3);
+  background:transparent; border:none; border-bottom:2px solid transparent;
+  cursor:pointer; transition:color .15s, border-color .15s;
+}
+.tab-btn:hover { color:var(--text2); }
+.tab-btn.active { color:var(--text1); border-bottom-color:var(--accent); }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
+
+/* ── Period toggle ── */
+.period-bar { display:flex; gap:6px; margin-bottom:16px; }
+.period-btn {
+  padding:5px 14px; font-size:12px; font-weight:600; color:var(--text3);
+  background:var(--bg3); border:1px solid var(--border); border-radius:20px;
+  cursor:pointer; transition:all .15s;
+}
+.period-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* ── Stats table ── */
+.stats-group-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); padding:10px 0 4px; }
+.stats-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+.stats-table td { padding:8px 10px; font-size:13px; border-bottom:1px solid var(--border); }
+.stats-table tr:last-child td { border-bottom:none; }
+.stats-table .stat-name { color:var(--text2); width:40%; text-align:center; }
+.stats-table .stat-home { font-weight:700; color:var(--text1); width:30%; text-align:right; }
+.stats-table .stat-away { font-weight:700; color:var(--text1); width:30%; text-align:left; padding-left:16px; }
+.stats-table .col-header { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); padding:4px 10px 8px; }
+/* Bar visualisation */
+.stat-bar-row { display:flex; gap:4px; align-items:center; }
+.stat-bar { height:4px; border-radius:2px; min-width:4px; }
+.bar-home { background:var(--accent); justify-self:flex-end; }
+.bar-away { background:#FF8A65; }
+
+/* ── Player table ── */
+.side-bar { display:flex; gap:6px; margin-bottom:16px; }
+.side-btn { padding:5px 14px; font-size:12px; font-weight:600; color:var(--text3); background:var(--bg3); border:1px solid var(--border); border-radius:20px; cursor:pointer; transition:all .15s; }
+.side-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+.player-table-wrap { overflow-x:auto; }
+.player-table { border-collapse:collapse; font-size:12px; min-width:900px; width:100%; }
+.player-table th {
+  font-size:10px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--text3); padding:7px 8px; text-align:center;
+  border-bottom:1px solid var(--border); white-space:nowrap; position:sticky; top:0; background:var(--bg2);
+}
+.player-table th:nth-child(2) { text-align:left; }
+.player-table td { padding:7px 8px; text-align:center; border-bottom:1px solid var(--border); color:var(--text1); }
+.player-table td.name-cell { text-align:left; font-weight:600; white-space:nowrap; padding-left:4px; }
+.player-table td.sub-cell { color:var(--text3); font-size:11px; }
+.player-table tr.row-sub td { color:var(--text3); }
+.player-table tr.row-summary-sep td { border:none; height:4px; background:var(--bg1); }
+.player-table tr.row-summary-total td { background:#0d2118; color:#a5d6a7; font-weight:700; }
+.player-table tr.row-summary-avg   td { background:#0d1828; color:#90caf9; font-weight:700; }
+.player-table tr.row-summary-max   td { background:#281a0d; color:#ffcc80; font-weight:700; }
+.player-table tr.row-summary-top   td { background:#1a1228; color:#ce93d8; font-weight:700; }
+.player-table tr.row-even td { background:var(--bg3); }
+
+.rating-chip {
+  display:inline-block; border-radius:6px; padding:2px 7px;
+  font-size:12px; font-weight:700;
+}
+.r-good { background:#1b3a20; color:#66BB6A; }
+.r-mid  { background:#3a2e0a; color:#FFD54F; }
+.r-low  { background:#3a1b1b; color:#EF5350; }
+.cap-badge { font-size:10px; color:#FFD54F; margin-left:4px; }
+.player-link { color:var(--accent); text-decoration:none; }
+.player-link:hover { text-decoration:underline; }
+.back-link { font-size:13px; color:var(--text3); text-decoration:none; margin-bottom:16px; display:inline-block; }
+.back-link:hover { color:var(--text1); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<a href="/matches" class="back-link">← All Matches</a>
+
+{% set m    = match.match %}
+{% set home = m.home_team %}
+{% set away = m.away_team %}
+
+<!-- ── Banner ── -->
+<div class="match-banner">
+  <div>
+    <div class="banner-team home">{{ home }}</div>
+  </div>
+  <div>
+    <div class="banner-score">{{ m.home_score }} : {{ m.away_score }}</div>
+    <div class="banner-meta">
+      {{ m.date }} · {{ m.competition }} · {{ m.season }}
+      {% if m.winner and m.winner != 'Unknown' %}
+        · <strong>Winner: {{ m.winner }}</strong>
+      {% endif %}
+    </div>
+    <div class="banner-formations">
+      <span class="banner-formation-tag">{{ home }}: {{ m.home_formation or '—' }}</span>&nbsp;
+      <span class="banner-formation-tag">{{ away }}: {{ m.away_formation or '—' }}</span>
+    </div>
+  </div>
+  <div>
+    <div class="banner-team away">{{ away }}</div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('team-stats', this)">Team Statistics</button>
+  <button class="tab-btn"       onclick="switchTab('players',    this)">Players</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 1: Team Statistics
+══════════════════════════════════════════════════════ -->
+<div class="tab-pane active" id="tab-team-stats">
+
+  <div class="period-bar">
+    <button class="period-btn active" onclick="setPeriod('ALL', this)">All</button>
+    <button class="period-btn"        onclick="setPeriod('1ST', this)">1st Half</button>
+    <button class="period-btn"        onclick="setPeriod('2ND', this)">2nd Half</button>
+  </div>
+
+  {% set stats_data = match.get('statistics', {}) %}
+
+  {% for period_key in ['ALL', '1ST', '2ND'] %}
+  <div class="period-pane" id="period-{{ period_key }}"
+       style="{{ '' if loop.first else 'display:none;' }}">
+    {% set groups = stats_data.get(period_key, []) %}
+    {% if groups %}
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <td class="col-header" style="text-align:right;">{{ home }}</td>
+            <td class="col-header stat-name">Statistic</td>
+            <td class="col-header">{{ away }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for group in groups %}
+            <tr>
+              <td colspan="3">
+                <div class="stats-group-label">{{ group.group }}</div>
+              </td>
+            </tr>
+            {% for item in group.items %}
+            {% set hv = item.homeValue | default(0) %}
+            {% set av = item.awayValue | default(0) %}
+            {% set total = (hv + av) | float %}
+            <tr>
+              <td class="stat-home">
+                <div class="stat-bar-row" style="justify-content:flex-end;">
+                  <span>{{ item.home }}</span>
+                  {% if total > 0 %}
+                  <div class="stat-bar bar-home" style="width:{{ [(hv / total * 60)|round|int, 4]|max }}px;"></div>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="stat-name">{{ item.name }}</td>
+              <td class="stat-away">
+                <div class="stat-bar-row" style="justify-content:flex-start;">
+                  {% if total > 0 %}
+                  <div class="stat-bar bar-away" style="width:{{ [(av / total * 60)|round|int, 4]|max }}px;"></div>
+                  {% endif %}
+                  <span>{{ item.away }}</span>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="color:var(--text3); font-size:13px;">No statistics available for this period.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 2: Players
+══════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-players">
+
+  <div class="side-bar">
+    <button class="side-btn active" onclick="setSide('home', this)">{{ home }}</button>
+    <button class="side-btn"        onclick="setSide('away', this)">{{ away }}</button>
+  </div>
+
+  {% for side in ['home', 'away'] %}
+  {% set players = match.get('player_statistics', {}).get(side, []) %}
+  <div class="side-pane" id="side-{{ side }}" style="{{ '' if side == 'home' else 'display:none;' }}">
+    {% if players %}
+    <div class="player-table-wrap">
+      <table class="player-table" id="ptable-{{ side }}">
+        <thead>
+          <tr>
+            <th>#</th><th style="text-align:left;">Name</th><th>Pos</th><th>Sub</th>
+            <th>Mins</th><th>Rating</th><th>Goals</th><th>Ast</th>
+            <th>xG</th><th>xA</th><th>KP</th>
+            <th>Shots</th><th>Pass Acc</th><th>Pass Tot</th><th>Pass%</th>
+            <th>Touch</th><th>Duel W</th><th>Tkl</th><th>Int</th>
+            <th>Clr</th><th>BR</th><th>Saves</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- set ns = namespace(row=0) -%}
+          {%- set numeric_totals = namespace(
+            goals=0, assists=0, xG=0.0, xA=0.0, key_passes=0, shots_total=0,
+            passes_accurate=0, passes_total=0, touches=0,
+            duels_won=0, tackles_total=0, interceptions=0,
+            clearances=0, ball_recoveries=0, saves=0,
+            minutes_played=0, rating_sum=0.0, rating_count=0
+          ) -%}
+          {%- set stat_lists = namespace(
+            goals=[], assists=[], xG=[], xA=[], key_passes=[], shots_total=[],
+            passes_accurate=[], passes_total=[], touches=[],
+            duels_won=[], tackles_total=[], interceptions=[],
+            clearances=[], ball_recoveries=[], saves=[]
+          ) -%}
+
+          {% for p in players %}
+          {%- set s = p.stats -%}
+          {%- set mins  = s.get('minutes_played', 0) | default(0) -%}
+          {%- set rat   = s.get('rating', 0)         | default(0) | float -%}
+          {%- set pa    = s.get('passes_accurate', 0) | default(0) | int -%}
+          {%- set pt    = s.get('passes_total', 0)    | default(0) | int -%}
+          {%- set pct   = ((pa / pt * 100) | round(1)) if pt > 0 else '' -%}
+          {%- set rc    = 'r-good' if rat >= 7.0 else ('r-mid' if rat >= 6.0 else 'r-low') -%}
+          {%- set is_sub = p.substitute -%}
+          {%- set even  = (ns.row % 2 == 0) -%}
+
+          {# Accumulate totals #}
+          {%- set ns.row = ns.row + 1 -%}
+          {%- set ns.minutes_played       = ns.minutes_played       + (mins | int) -%}
+          {%- set ns.goals                = ns.goals                + (s.get('goals',0)|default(0)|int) -%}
+          {%- set ns.assists              = ns.assists              + (s.get('assists',0)|default(0)|int) -%}
+          {%- set ns.xG                   = ns.xG                   + (s.get('xG',0)|default(0)|float) -%}
+          {%- set ns.xA                   = ns.xA                   + (s.get('xA',0)|default(0)|float) -%}
+          {%- set ns.key_passes           = ns.key_passes           + (s.get('key_passes',0)|default(0)|int) -%}
+          {%- set ns.shots_total          = ns.shots_total          + (s.get('shots_total',0)|default(0)|int) -%}
+          {%- set ns.passes_accurate      = ns.passes_accurate      + pa -%}
+          {%- set ns.passes_total         = ns.passes_total         + pt -%}
+          {%- set ns.touches              = ns.touches              + (s.get('touches',0)|default(0)|int) -%}
+          {%- set ns.duels_won            = ns.duels_won            + (s.get('duels_won',0)|default(0)|int) -%}
+          {%- set ns.tackles_total        = ns.tackles_total        + (s.get('tackles_total',0)|default(0)|int) -%}
+          {%- set ns.interceptions        = ns.interceptions        + (s.get('interceptions',0)|default(0)|int) -%}
+          {%- set ns.clearances           = ns.clearances           + (s.get('clearances',0)|default(0)|int) -%}
+          {%- set ns.ball_recoveries      = ns.ball_recoveries      + (s.get('ball_recoveries',0)|default(0)|int) -%}
+          {%- set ns.saves                = ns.saves                + (s.get('saves',0)|default(0)|int) -%}
+          {%- if rat > 0 -%}{%- set ns.rating_sum = ns.rating_sum + rat -%}{%- set ns.rating_count = ns.rating_count + 1 -%}{%- endif -%}
+
+          <tr class="{{ 'row-sub' if is_sub else '' }} {{ 'row-even' if even else '' }}">
+            <td>{{ p.jersey_number }}</td>
+            <td class="name-cell">
+              {{ p.name }}{% if p.captain %}<span class="cap-badge" title="Captain">(C)</span>{% endif %}
+            </td>
+            <td>{{ p.position }}</td>
+            <td class="sub-cell">{{ '↑' if is_sub else '—' }}</td>
+            <td>{{ mins or '—' }}</td>
+            <td>
+              {% if rat > 0 %}
+                <span class="rating-chip {{ rc }}">{{ "%.1f"|format(rat) }}</span>
+              {% else %}—{% endif %}
+            </td>
+            <td>{{ s.get('goals','') or '—' }}</td>
+            <td>{{ s.get('assists','') or '—' }}</td>
+            <td>{{ "%.2f"|format(s.get('xG',0)|float) if s.get('xG') else '—' }}</td>
+            <td>{{ "%.2f"|format(s.get('xA',0)|float) if s.get('xA') else '—' }}</td>
+            <td>{{ s.get('key_passes','') or '—' }}</td>
+            <td>{{ s.get('shots_total','') or '—' }}</td>
+            <td>{{ pa or '—' }}</td>
+            <td>{{ pt or '—' }}</td>
+            <td>{{ pct ~ '%' if pct else '—' }}</td>
+            <td>{{ s.get('touches','') or '—' }}</td>
+            <td>{{ s.get('duels_won','') or '—' }}</td>
+            <td>{{ s.get('tackles_total','') or '—' }}</td>
+            <td>{{ s.get('interceptions','') or '—' }}</td>
+            <td>{{ s.get('clearances','') or '—' }}</td>
+            <td>{{ s.get('ball_recoveries','') or '—' }}</td>
+            <td>{{ s.get('saves','') or '—' }}</td>
+          </tr>
+          {% endfor %}
+
+          {# Summary rows #}
+          {%- set n = players|length -%}
+          {%- set avg_rat = (ns.rating_sum / ns.rating_count)|round(2) if ns.rating_count > 0 else 0 -%}
+          {%- set tot_pct = ((ns.passes_accurate / ns.passes_total * 100)|round(1)) if ns.passes_total > 0 else '' -%}
+          <tr class="row-summary-sep"><td colspan="22"></td></tr>
+          <!-- TOTAL -->
+          <tr class="row-summary-total">
+            <td colspan="4" style="text-align:left; padding-left:8px;">▶ TOTAL</td>
+            <td>{{ ns.minutes_played }}</td>
+            <td>—</td>
+            <td>{{ ns.goals }}</td>
+            <td>{{ ns.assists }}</td>
+            <td>{{ "%.2f"|format(ns.xG) }}</td>
+            <td>{{ "%.2f"|format(ns.xA) }}</td>
+            <td>{{ ns.key_passes }}</td>
+            <td>{{ ns.shots_total }}</td>
+            <td>{{ ns.passes_accurate }}</td>
+            <td>{{ ns.passes_total }}</td>
+            <td>{{ tot_pct ~ '%' if tot_pct else '—' }}</td>
+            <td>{{ ns.touches }}</td>
+            <td>{{ ns.duels_won }}</td>
+            <td>{{ ns.tackles_total }}</td>
+            <td>{{ ns.interceptions }}</td>
+            <td>{{ ns.clearances }}</td>
+            <td>{{ ns.ball_recoveries }}</td>
+            <td>{{ ns.saves }}</td>
+          </tr>
+          <!-- AVERAGE -->
+          <tr class="row-summary-avg">
+            <td colspan="4" style="text-align:left; padding-left:8px;">▶ AVERAGE</td>
+            <td>{{ (ns.minutes_played / n)|round(1) if n else '—' }}</td>
+            <td>{% if avg_rat > 0 %}{{ "%.2f"|format(avg_rat) }}{% else %}—{% endif %}</td>
+            <td>{{ (ns.goals / n)|round(2) if n else '—' }}</td>
+            <td>{{ (ns.assists / n)|round(2) if n else '—' }}</td>
+            <td>{{ "%.2f"|format(ns.xG / n) if n else '—' }}</td>
+            <td>{{ "%.2f"|format(ns.xA / n) if n else '—' }}</td>
+            <td>{{ (ns.key_passes / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.shots_total / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.passes_accurate / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.passes_total / n)|round(1) if n else '—' }}</td>
+            <td>{{ tot_pct ~ '%' if tot_pct else '—' }}</td>
+            <td>{{ (ns.touches / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.duels_won / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.tackles_total / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.interceptions / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.clearances / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.ball_recoveries / n)|round(1) if n else '—' }}</td>
+            <td>{{ (ns.saves / n)|round(1) if n else '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p style="color:var(--text3);font-size:13px;">No player data for this side.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+function setPeriod(key, btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.period-pane').forEach(p => p.style.display = 'none');
+  btn.classList.add('active');
+  document.getElementById('period-' + key).style.display = '';
+}
+function setSide(side, btn) {
+  document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.side-pane').forEach(p => p.style.display = 'none');
+  btn.classList.add('active');
+  document.getElementById('side-' + side).style.display = '';
+}
+</script>
+{% endblock %}

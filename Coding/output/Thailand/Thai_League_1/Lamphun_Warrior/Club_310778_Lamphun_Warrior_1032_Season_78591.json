@@ -1,0 +1,307 @@
+{
+    "team_id": "310778",
+    "team_name": "Lamphun Warrior",
+    "tournament_id": "1032",
+    "season_id": "78591",
+    "competition_name": "Thai_League_1",
+    "competition_country": "Thailand",
+    "profile": {
+        "team": {
+            "name": "Lamphun Warrior",
+            "slug": "lamphun-warrior",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Thailand",
+                "slug": "thailand",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "TH",
+                    "alpha3": "THA",
+                    "name": "Thailand",
+                    "slug": "thailand"
+                },
+                "id": 485,
+                "flag": "thailand",
+                "alpha2": "TH",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Thai League 3",
+                "slug": "thai-league-3",
+                "category": {
+                    "name": "Thailand",
+                    "slug": "thailand",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "TH",
+                        "alpha3": "THA",
+                        "name": "Thailand",
+                        "slug": "thailand"
+                    },
+                    "id": 485,
+                    "flag": "thailand",
+                    "alpha2": "TH",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 40335
+            },
+            "primaryUniqueTournament": {
+                "name": "Thai League 1",
+                "slug": "thai-league-1",
+                "primaryColorHex": "#b72026",
+                "secondaryColorHex": "#e19b23",
+                "category": {
+                    "name": "Thailand",
+                    "slug": "thailand",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "TH",
+                        "alpha3": "THA",
+                        "name": "Thailand",
+                        "slug": "thailand"
+                    },
+                    "id": 485,
+                    "flag": "thailand",
+                    "alpha2": "TH",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 4807,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1032,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 2984,
+            "manager": {
+                "name": "Dennis Amato",
+                "slug": "dennis-amato",
+                "shortName": "D. Amato",
+                "country": {
+                    "alpha2": "DE",
+                    "alpha3": "DEU",
+                    "name": "Germany",
+                    "slug": "germany"
+                },
+                "id": 806958
+            },
+            "venue": {
+                "hidden": true,
+                "slug": "lamphun-pao",
+                "name": "Lamphun PAO",
+                "capacity": 4000,
+                "country": {
+                    "alpha2": "TH",
+                    "alpha3": "THA",
+                    "name": "Thailand",
+                    "slug": "thailand"
+                },
+                "id": 32865,
+                "city": {
+                    "name": "Nai Mueang"
+                },
+                "stadium": {
+                    "name": "Lamphun PAO",
+                    "capacity": 4000
+                }
+            },
+            "nameCode": "LAM",
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "TH",
+                "alpha3": "THA",
+                "name": "Thailand",
+                "slug": "thailand"
+            },
+            "id": 310778,
+            "fullName": "Lamphun Warrior",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1312156800,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.72",
+            "position": 13,
+            "value": "22",
+            "form": [
+                "D",
+                "D",
+                "D",
+                "L",
+                "D"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 30,
+            "goalsConceded": 43,
+            "ownGoals": 1,
+            "assists": 22,
+            "shots": 310,
+            "penaltyGoals": 2,
+            "penaltiesTaken": 2,
+            "freeKickGoals": 1,
+            "freeKickShots": 16,
+            "goalsFromInsideTheBox": 21,
+            "goalsFromOutsideTheBox": 8,
+            "shotsFromInsideTheBox": 164,
+            "shotsFromOutsideTheBox": 146,
+            "headedGoals": 3,
+            "leftFootGoals": 4,
+            "rightFootGoals": 22,
+            "bigChances": 12,
+            "bigChancesCreated": 9,
+            "bigChancesMissed": 6,
+            "shotsOnTarget": 97,
+            "shotsOffTarget": 125,
+            "blockedScoringAttempt": 88,
+            "successfulDribbles": 117,
+            "dribbleAttempts": 303,
+            "corners": 104,
+            "hitWoodwork": 7,
+            "fastBreaks": 12,
+            "fastBreakGoals": 1,
+            "fastBreakShots": 11,
+            "averageBallPossession": 47.458333333333,
+            "totalPasses": 7975,
+            "accuratePasses": 6196,
+            "accuratePassesPercentage": 77.692789968652,
+            "totalOwnHalfPasses": 3360,
+            "accurateOwnHalfPasses": 2975,
+            "accurateOwnHalfPassesPercentage": 88.541666666667,
+            "totalOppositionHalfPasses": 4615,
+            "accurateOppositionHalfPasses": 3221,
+            "accurateOppositionHalfPassesPercentage": 69.794149512459,
+            "totalLongBalls": 1025,
+            "accurateLongBalls": 495,
+            "accurateLongBallsPercentage": 48.292682926829,
+            "totalCrosses": 369,
+            "accurateCrosses": 95,
+            "accurateCrossesPercentage": 25.745257452575,
+            "cleanSheets": 2,
+            "tackles": 319,
+            "interceptions": 196,
+            "saves": 64,
+            "errorsLeadingToGoal": 1,
+            "errorsLeadingToShot": 2,
+            "penaltiesCommited": 4,
+            "penaltyGoalsConceded": 4,
+            "clearances": 611,
+            "clearancesOffLine": 2,
+            "lastManTackles": 0,
+            "totalDuels": 1967,
+            "duelsWon": 984,
+            "duelsWonPercentage": 50.025419420437,
+            "totalGroundDuels": 1460,
+            "groundDuelsWon": 736,
+            "groundDuelsWonPercentage": 50.41095890411,
+            "totalAerialDuels": 507,
+            "aerialDuelsWon": 248,
+            "aerialDuelsWonPercentage": 48.915187376726,
+            "possessionLost": 2897,
+            "offsides": 54,
+            "fouls": 292,
+            "yellowCards": 58,
+            "yellowRedCards": 1,
+            "redCards": 2,
+            "avgRating": 6.716713091922,
+            "accurateFinalThirdPassesAgainst": 1837,
+            "accurateOppositionHalfPassesAgainst": 3562,
+            "accurateOwnHalfPassesAgainst": 3432,
+            "accuratePassesAgainst": 6994,
+            "bigChancesAgainst": 29,
+            "bigChancesCreatedAgainst": 19,
+            "bigChancesMissedAgainst": 10,
+            "clearancesAgainst": 474,
+            "cornersAgainst": 112,
+            "crossesSuccessfulAgainst": 106,
+            "crossesTotalAgainst": 466,
+            "dribbleAttemptsTotalAgainst": 267,
+            "dribbleAttemptsWonAgainst": 102,
+            "errorsLeadingToGoalAgainst": 2,
+            "errorsLeadingToShotAgainst": 0,
+            "hitWoodworkAgainst": 7,
+            "interceptionsAgainst": 177,
+            "keyPassesAgainst": 233,
+            "longBallsSuccessfulAgainst": 599,
+            "longBallsTotalAgainst": 1271,
+            "offsidesAgainst": 19,
+            "redCardsAgainst": 1,
+            "shotsAgainst": 327,
+            "shotsBlockedAgainst": 96,
+            "shotsFromInsideTheBoxAgainst": 206,
+            "shotsFromOutsideTheBoxAgainst": 121,
+            "shotsOffTargetAgainst": 126,
+            "shotsOnTargetAgainst": 107,
+            "blockedScoringAttemptAgainst": 94,
+            "tacklesAgainst": 334,
+            "totalFinalThirdPassesAgainst": 2725,
+            "oppositionHalfPassesTotalAgainst": 4910,
+            "ownHalfPassesTotalAgainst": 3861,
+            "totalPassesAgainst": 8771,
+            "yellowCardsAgainst": 44,
+            "throwIns": 476,
+            "goalKicks": 198,
+            "ballRecovery": 996,
+            "freeKicks": 302,
+            "id": 48156,
+            "matches": 24,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

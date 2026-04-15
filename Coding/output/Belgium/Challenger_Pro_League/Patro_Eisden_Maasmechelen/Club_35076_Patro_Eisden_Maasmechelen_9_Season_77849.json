@@ -1,0 +1,323 @@
+{
+    "team_id": "35076",
+    "team_name": "Patro Eisden Maasmechelen",
+    "tournament_id": "9",
+    "season_id": "77849",
+    "competition_name": "Challenger_Pro_League",
+    "competition_country": "Belgium",
+    "profile": {
+        "team": {
+            "name": "Patro Eisden Maasmechelen",
+            "slug": "patro-eisden-maasmechelen",
+            "shortName": "Patro",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Belgium",
+                "slug": "belgium",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 33,
+                "flag": "belgium",
+                "alpha2": "BE",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Club Friendly Games",
+                "slug": "club-friendly-games",
+                "category": {
+                    "name": "World",
+                    "slug": "world",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 20,
+                    "country": {},
+                    "id": 1468,
+                    "flag": "international"
+                },
+                "uniqueTournament": {
+                    "name": "Club Friendly Games",
+                    "slug": "club-friendly-games",
+                    "primaryColorHex": "#25497d",
+                    "secondaryColorHex": "#d38f1d",
+                    "category": {
+                        "name": "World",
+                        "slug": "world",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 20,
+                        "country": {},
+                        "id": 1468,
+                        "flag": "international"
+                    },
+                    "userCount": 26501,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 853,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 86
+            },
+            "primaryUniqueTournament": {
+                "name": "Challenger Pro League",
+                "slug": "challenger-pro-league",
+                "primaryColorHex": "#0E0027",
+                "secondaryColorHex": "#a9ee17",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 6809,
+                "hasPerformanceGraphFeature": false,
+                "country": {},
+                "id": 9,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 4102,
+            "manager": {
+                "name": "Stijn Stijnen",
+                "slug": "stijn-stijnen",
+                "shortName": "S. Stijnen",
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 801113
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 50.96545,
+                    "longitude": 5.69452
+                },
+                "hidden": true,
+                "slug": "patrostadion",
+                "name": "Patrostadion",
+                "capacity": 5500,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 14752,
+                "city": {
+                    "name": "Maasmechelen"
+                },
+                "stadium": {
+                    "name": "Patrostadion",
+                    "capacity": 5500
+                }
+            },
+            "nameCode": "PMA",
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "BE",
+                "alpha3": "BEL",
+                "name": "Belgium",
+                "slug": "belgium"
+            },
+            "id": 35076,
+            "fullName": "Patro Eisden Maasmechelen",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1525910400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.79",
+            "position": 6,
+            "value": "48",
+            "form": [
+                "D",
+                "D",
+                "W",
+                "L",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 40,
+            "goalsConceded": 40,
+            "ownGoals": 4,
+            "assists": 23,
+            "shots": 468,
+            "penaltyGoals": 4,
+            "penaltiesTaken": 5,
+            "freeKickGoals": 1,
+            "freeKickShots": 14,
+            "goalsFromInsideTheBox": 36,
+            "goalsFromOutsideTheBox": 4,
+            "shotsFromInsideTheBox": 309,
+            "shotsFromOutsideTheBox": 159,
+            "headedGoals": 8,
+            "leftFootGoals": 11,
+            "rightFootGoals": 21,
+            "bigChances": 65,
+            "bigChancesCreated": 43,
+            "bigChancesMissed": 39,
+            "shotsOnTarget": 162,
+            "shotsOffTarget": 187,
+            "blockedScoringAttempt": 119,
+            "successfulDribbles": 186,
+            "dribbleAttempts": 439,
+            "corners": 128,
+            "hitWoodwork": 10,
+            "fastBreaks": 38,
+            "fastBreakGoals": 4,
+            "fastBreakShots": 36,
+            "averageBallPossession": 37.870967741935,
+            "totalPasses": 8191,
+            "accuratePasses": 5707,
+            "accuratePassesPercentage": 69.674032474667,
+            "totalOwnHalfPasses": 3244,
+            "accurateOwnHalfPasses": 2710,
+            "accurateOwnHalfPassesPercentage": 83.538840937115,
+            "totalOppositionHalfPasses": 4947,
+            "accurateOppositionHalfPasses": 2997,
+            "accurateOppositionHalfPassesPercentage": 60.582171012735,
+            "totalLongBalls": 1435,
+            "accurateLongBalls": 635,
+            "accurateLongBallsPercentage": 44.250871080139,
+            "totalCrosses": 579,
+            "accurateCrosses": 155,
+            "accurateCrossesPercentage": 26.770293609672,
+            "cleanSheets": 9,
+            "tackles": 561,
+            "interceptions": 285,
+            "saves": 54,
+            "errorsLeadingToGoal": 6,
+            "errorsLeadingToShot": 3,
+            "penaltiesCommited": 4,
+            "penaltyGoalsConceded": 4,
+            "clearances": 815,
+            "clearancesOffLine": 2,
+            "lastManTackles": 4,
+            "totalDuels": 3558,
+            "duelsWon": 1816,
+            "duelsWonPercentage": 51.039910061832,
+            "totalGroundDuels": 2322,
+            "groundDuelsWon": 1155,
+            "groundDuelsWonPercentage": 49.741602067183,
+            "totalAerialDuels": 1236,
+            "aerialDuelsWon": 661,
+            "aerialDuelsWonPercentage": 53.478964401294,
+            "possessionLost": 4358,
+            "offsides": 58,
+            "fouls": 499,
+            "yellowCards": 90,
+            "yellowRedCards": 2,
+            "redCards": 3,
+            "avgRating": 6.7887323943662,
+            "accurateFinalThirdPassesAgainst": 2195,
+            "accurateOppositionHalfPassesAgainst": 5110,
+            "accurateOwnHalfPassesAgainst": 6241,
+            "accuratePassesAgainst": 11351,
+            "bigChancesAgainst": 53,
+            "bigChancesCreatedAgainst": 34,
+            "bigChancesMissedAgainst": 28,
+            "clearancesAgainst": 1023,
+            "cornersAgainst": 112,
+            "crossesSuccessfulAgainst": 117,
+            "crossesTotalAgainst": 489,
+            "dribbleAttemptsTotalAgainst": 511,
+            "dribbleAttemptsWonAgainst": 221,
+            "errorsLeadingToGoalAgainst": 4,
+            "errorsLeadingToShotAgainst": 13,
+            "hitWoodworkAgainst": 6,
+            "interceptionsAgainst": 218,
+            "keyPassesAgainst": 197,
+            "longBallsSuccessfulAgainst": 751,
+            "longBallsTotalAgainst": 1693,
+            "offsidesAgainst": 102,
+            "redCardsAgainst": 10,
+            "shotsAgainst": 274,
+            "shotsBlockedAgainst": 63,
+            "shotsFromInsideTheBoxAgainst": 175,
+            "shotsFromOutsideTheBoxAgainst": 99,
+            "shotsOffTargetAgainst": 119,
+            "shotsOnTargetAgainst": 92,
+            "blockedScoringAttemptAgainst": 63,
+            "tacklesAgainst": 472,
+            "totalFinalThirdPassesAgainst": 3419,
+            "oppositionHalfPassesTotalAgainst": 6956,
+            "ownHalfPassesTotalAgainst": 6931,
+            "totalPassesAgainst": 13887,
+            "yellowCardsAgainst": 77,
+            "throwIns": 690,
+            "goalKicks": 208,
+            "ballRecovery": 1411,
+            "freeKicks": 408,
+            "id": 47428,
+            "matches": 31,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

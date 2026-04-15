@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SofaScore Analytics{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">
+    <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="nav-logo">
+  </a>
+  <div class="nav-links">
+    <a href="/"              {% if request.endpoint == 'home'              %}class="active"{% endif %}>Home</a>
+    <a href="/competitions"  {% if request.endpoint == 'index'             %}class="active"{% endif %}>Competitions</a>
+    <a href="/players"       {% if request.endpoint == 'players'           %}class="active"{% endif %}>Players</a>
+    <a href="/matches"       {% if request.endpoint in ['matches','match_detail','player_matches'] %}class="active"{% endif %}>Matches</a>
+    <a href="/compare"           {% if request.endpoint == 'compare'           %}class="active"{% endif %}>Compare</a>
+    <a href="/compatibility"     {% if request.endpoint == 'compatibility'     %}class="active"{% endif %}>Compatibility</a>
+    <a href="/club_compatibility"{% if request.endpoint == 'club_compatibility'%}class="active"{% endif %}>Club Fit</a>
+    <a href="/batch_compare"     {% if request.endpoint == 'batch_compare'     %}class="active"{% endif %}>Shortlist</a>
+    <a href="/scatter"           {% if request.endpoint == 'scatter'            %}class="active"{% endif %}>Scatter</a>
+    <a href="/player_scatter"    {% if request.endpoint == 'player_scatter'    %}class="active"{% endif %}>Player Scatter</a>
+    <a href="/export"            {% if request.endpoint == 'export_page'       %}class="active"{% endif %}>Export</a>
+    <a href="/league_rankings"   {% if request.endpoint == 'league_rankings'   %}class="active"{% endif %}>Rankings</a>
+  </div>
+</nav>
+
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

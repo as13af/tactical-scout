@@ -1,0 +1,50 @@
+@startuml
+title PLAYER MODELING ENGINE
+
+start
+
+:Load Raw Player Stats;
+
+:Standardize Features;
+note right
+Z-score normalization:
+Z = (X - μ) / σ
+Where:
+X = player metric
+μ = league average
+σ = standard deviation
+end note
+
+:Encode Tactical Role;
+
+note right
+Role Vector Dimensions:
+[Progression, Risk, Defensive Intensity,
+ Verticality, Retention]
+
+Each dimension scaled 0–1
+
+Example:
+Progression Index =
+(ProgPass + ProgCarry) / MaxValue
+end note
+
+:Compute Physical Index;
+
+note right
+Physical Index =
+(HighIntensityRuns + Sprints) / LeagueMax
+end note
+
+:Create Player Feature Vector;
+
+note right
+Player Vector =
+[Tactical Role Vector
+ + Statistical Vector
+ + Physical Index
+ + Age Factor]
+end note
+
+stop
+@enduml

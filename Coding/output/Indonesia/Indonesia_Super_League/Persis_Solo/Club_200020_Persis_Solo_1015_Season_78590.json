@@ -1,0 +1,251 @@
+{
+    "team_id": "200020",
+    "team_name": "Persis Solo",
+    "tournament_id": "1015",
+    "season_id": "78590",
+    "competition_name": "Indonesia_Super_League",
+    "competition_country": "Indonesia",
+    "profile": {
+        "team": {
+            "name": "Persis Solo",
+            "slug": "persis-solo",
+            "shortName": "Persis",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Indonesia",
+                "slug": "indonesia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 368,
+                "flag": "indonesia",
+                "alpha2": "ID",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Club Friendly Games",
+                "slug": "club-friendly-games",
+                "category": {
+                    "name": "World",
+                    "slug": "world",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 20,
+                    "country": {},
+                    "id": 1468,
+                    "flag": "international"
+                },
+                "uniqueTournament": {
+                    "name": "Club Friendly Games",
+                    "slug": "club-friendly-games",
+                    "primaryColorHex": "#25497d",
+                    "secondaryColorHex": "#d38f1d",
+                    "category": {
+                        "name": "World",
+                        "slug": "world",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 20,
+                        "country": {},
+                        "id": 1468,
+                        "flag": "international"
+                    },
+                    "userCount": 26501,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 853,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 86
+            },
+            "primaryUniqueTournament": {
+                "name": "Indonesia Super League",
+                "slug": "liga-1",
+                "primaryColorHex": "#e04b2d",
+                "secondaryColorHex": "#2b4e95",
+                "category": {
+                    "name": "Indonesia",
+                    "slug": "indonesia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "ID",
+                        "alpha3": "IDN",
+                        "name": "Indonesia",
+                        "slug": "indonesia"
+                    },
+                    "id": 368,
+                    "flag": "indonesia",
+                    "alpha2": "ID",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 17583,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1015,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 7018,
+            "manager": {
+                "name": "Milomir Seslija",
+                "slug": "milomir-seslija",
+                "shortName": "M. Seslija",
+                "country": {
+                    "alpha2": "BA",
+                    "alpha3": "BIH",
+                    "name": "Bosnia & Herzegovina",
+                    "slug": "bosnia-and-herzegovina"
+                },
+                "id": 793318
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 110.83167,
+                    "longitude": -7.55611
+                },
+                "hidden": true,
+                "slug": "manahan-stadium",
+                "name": "Manahan Stadium",
+                "capacity": 20000,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 42499,
+                "city": {
+                    "name": "Surakarta"
+                },
+                "stadium": {
+                    "name": "Manahan Stadium",
+                    "capacity": 20000
+                }
+            },
+            "nameCode": "PSO",
+            "class": 1,
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "ID",
+                "alpha3": "IDN",
+                "name": "Indonesia",
+                "slug": "indonesia"
+            },
+            "id": 200020,
+            "fullName": "Persis Solo",
+            "teamColors": {
+                "primary": "#ff0000",
+                "secondary": "#222226",
+                "text": "#222226"
+            },
+            "foundationDateTimestamp": -1456358400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 15,
+            "value": "24",
+            "form": [
+                "W",
+                "D",
+                "W",
+                "D",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 31,
+            "goalsConceded": 46,
+            "assists": 17,
+            "shots": 279,
+            "penaltyGoals": 1,
+            "penaltiesTaken": 3,
+            "successfulDribbles": 369,
+            "dribbleAttempts": 504,
+            "corners": 121,
+            "averageBallPossession": 49.5,
+            "totalPasses": 9255,
+            "accuratePasses": 7635,
+            "accuratePassesPercentage": 82.5,
+            "totalLongBalls": 1048,
+            "accurateLongBalls": 556,
+            "accurateLongBallsPercentage": 53.05,
+            "totalCrosses": 383,
+            "accurateCrosses": 117,
+            "accurateCrossesPercentage": 30.55,
+            "cleanSheets": 4,
+            "interceptions": 962,
+            "saves": 89,
+            "errorsLeadingToShot": 172,
+            "totalDuels": 4552,
+            "duelsWon": 1759,
+            "duelsWonPercentage": 38.64,
+            "totalAerialDuels": 846,
+            "aerialDuelsWon": 391,
+            "aerialDuelsWonPercentage": 46.22,
+            "offsides": 57,
+            "fouls": 271,
+            "yellowCards": 41,
+            "yellowRedCards": 3,
+            "redCards": 3,
+            "shotsAgainst": 376,
+            "goalKicks": 179,
+            "ballRecovery": 1825,
+            "freeKicks": 85,
+            "id": 47496,
+            "matches": 27,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

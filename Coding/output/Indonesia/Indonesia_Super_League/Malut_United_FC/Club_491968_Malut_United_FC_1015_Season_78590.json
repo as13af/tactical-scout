@@ -1,0 +1,202 @@
+{
+    "team_id": "491968",
+    "team_name": "Malut United FC",
+    "tournament_id": "1015",
+    "season_id": "78590",
+    "competition_name": "Indonesia_Super_League",
+    "competition_country": "Indonesia",
+    "profile": {
+        "team": {
+            "name": "Malut United FC",
+            "slug": "malut-united",
+            "shortName": "Malut Utd",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Indonesia",
+                "slug": "indonesia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 368,
+                "flag": "indonesia",
+                "alpha2": "ID",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "primaryUniqueTournament": {
+                "name": "Indonesia Super League",
+                "slug": "liga-1",
+                "primaryColorHex": "#e04b2d",
+                "secondaryColorHex": "#2b4e95",
+                "category": {
+                    "name": "Indonesia",
+                    "slug": "indonesia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "ID",
+                        "alpha3": "IDN",
+                        "name": "Indonesia",
+                        "slug": "indonesia"
+                    },
+                    "id": 368,
+                    "flag": "indonesia",
+                    "alpha2": "ID",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 17583,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1015,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 8349,
+            "manager": {
+                "name": "Hendri Susilo",
+                "slug": "hendri-susilo",
+                "shortName": "H. Susilo",
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 806056
+            },
+            "venue": {
+                "hidden": true,
+                "slug": "gelora-kie-raha",
+                "name": "Gelora Kie Raha",
+                "capacity": 15000,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 48756,
+                "city": {
+                    "name": "Ternate City"
+                },
+                "stadium": {
+                    "name": "Gelora Kie Raha",
+                    "capacity": 15000
+                }
+            },
+            "nameCode": "MUN",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "ID",
+                "alpha3": "IDN",
+                "name": "Indonesia",
+                "slug": "indonesia"
+            },
+            "id": 491968,
+            "fullName": "Malut United FC",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1451606400,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 4,
+            "value": "46",
+            "form": [
+                "L",
+                "W",
+                "D",
+                "D",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 53,
+            "goalsConceded": 35,
+            "assists": 28,
+            "shots": 350,
+            "penaltyGoals": 6,
+            "penaltiesTaken": 7,
+            "successfulDribbles": 364,
+            "dribbleAttempts": 496,
+            "corners": 126,
+            "averageBallPossession": 52.8,
+            "totalPasses": 9611,
+            "accuratePasses": 8101,
+            "accuratePassesPercentage": 84.29,
+            "totalLongBalls": 1046,
+            "accurateLongBalls": 569,
+            "accurateLongBallsPercentage": 54.4,
+            "totalCrosses": 387,
+            "accurateCrosses": 132,
+            "accurateCrossesPercentage": 34.11,
+            "cleanSheets": 7,
+            "interceptions": 906,
+            "saves": 74,
+            "errorsLeadingToShot": 118,
+            "totalDuels": 4118,
+            "duelsWon": 1593,
+            "duelsWonPercentage": 38.68,
+            "totalAerialDuels": 714,
+            "aerialDuelsWon": 330,
+            "aerialDuelsWonPercentage": 46.22,
+            "offsides": 38,
+            "fouls": 291,
+            "yellowCards": 61,
+            "yellowRedCards": 1,
+            "redCards": 1,
+            "shotsAgainst": 286,
+            "goalKicks": 152,
+            "ballRecovery": 1701,
+            "freeKicks": 57,
+            "id": 47498,
+            "matches": 27,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

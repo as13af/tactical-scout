@@ -1,0 +1,47 @@
+@startuml
+title TEAM TACTICAL MODELING
+
+start
+
+:Load Team Match Data;
+
+:Calculate Possession Model;
+
+note right
+Possession % =
+Total Possession Time / Match Time
+
+Build-up Speed =
+Total Passes / Build-up Sequence Duration
+end note
+
+:Compute Pressing Intensity;
+
+note right
+PPDA =
+Opponent Passes / Defensive Actions
+
+Lower PPDA = Higher Pressing
+end note
+
+:Calculate Verticality Index;
+
+note right
+Verticality =
+Forward Pass Distance / Total Pass Distance
+end note
+
+:Generate Team Demand Vector;
+
+note right
+Team Demand Vector =
+[Required Progression,
+ Required Risk,
+ Required Defensive Intensity,
+ Required Verticality,
+ Required Retention]
+Scaled 0–1
+end note
+
+stop
+@enduml

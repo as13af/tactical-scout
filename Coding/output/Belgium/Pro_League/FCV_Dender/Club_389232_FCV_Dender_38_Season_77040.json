@@ -1,0 +1,278 @@
+{
+    "team_id": "389232",
+    "team_name": "FCV Dender",
+    "tournament_id": "38",
+    "season_id": "77040",
+    "competition_name": "Pro_League",
+    "competition_country": "Belgium",
+    "profile": {
+        "team": {
+            "name": "FCV Dender",
+            "slug": "fcv-dender-eh",
+            "shortName": "Dender ",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Belgium",
+                "slug": "belgium",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 33,
+                "flag": "belgium",
+                "alpha2": "BE",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "primaryUniqueTournament": {
+                "name": "Pro League",
+                "slug": "pro-league",
+                "primaryColorHex": "#16002b",
+                "secondaryColorHex": "#ff1740",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 69514,
+                "hasPerformanceGraphFeature": false,
+                "country": {},
+                "id": 38,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 12951,
+            "manager": {
+                "name": "Yannick Ferrera",
+                "slug": "yannick-ferrera",
+                "shortName": "Y. Ferrera",
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 246959
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 50.88506,
+                    "longitude": 4.07601
+                },
+                "hidden": true,
+                "slug": "dender-football-complex",
+                "name": "Dender Football Complex",
+                "capacity": 6430,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 3006,
+                "city": {
+                    "name": "Denderleeuw"
+                },
+                "stadium": {
+                    "name": "Dender Football Complex",
+                    "capacity": 6430
+                }
+            },
+            "nameCode": "DEN",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "BE",
+                "alpha3": "BEL",
+                "name": "Belgium",
+                "slug": "belgium"
+            },
+            "id": 389232,
+            "fullName": "FCV Dender",
+            "teamColors": {
+                "primary": "#0055ff",
+                "secondary": "#222226",
+                "text": "#222226"
+            },
+            "foundationDateTimestamp": 1120176000,
+            "createdByEditor": true,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.72",
+            "position": 4,
+            "value": "22",
+            "form": [
+                "W",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 26,
+            "goalsConceded": 53,
+            "ownGoals": 0,
+            "assists": 17,
+            "shots": 349,
+            "penaltyGoals": 4,
+            "penaltiesTaken": 4,
+            "freeKickGoals": 0,
+            "freeKickShots": 7,
+            "goalsFromInsideTheBox": 23,
+            "goalsFromOutsideTheBox": 3,
+            "shotsFromInsideTheBox": 247,
+            "shotsFromOutsideTheBox": 102,
+            "headedGoals": 5,
+            "leftFootGoals": 5,
+            "rightFootGoals": 16,
+            "bigChances": 61,
+            "bigChancesCreated": 45,
+            "bigChancesMissed": 44,
+            "shotsOnTarget": 124,
+            "shotsOffTarget": 136,
+            "blockedScoringAttempt": 89,
+            "successfulDribbles": 217,
+            "dribbleAttempts": 463,
+            "corners": 117,
+            "hitWoodwork": 10,
+            "fastBreaks": 19,
+            "fastBreakGoals": 1,
+            "fastBreakShots": 17,
+            "averageBallPossession": 47.4375,
+            "totalPasses": 12419,
+            "accuratePasses": 9466,
+            "accuratePassesPercentage": 76.221918028827,
+            "totalOwnHalfPasses": 6082,
+            "accurateOwnHalfPasses": 5243,
+            "accurateOwnHalfPassesPercentage": 86.205195659323,
+            "totalOppositionHalfPasses": 6337,
+            "accurateOppositionHalfPasses": 4223,
+            "accurateOppositionHalfPassesPercentage": 66.640366103835,
+            "totalLongBalls": 1353,
+            "accurateLongBalls": 612,
+            "accurateLongBallsPercentage": 45.232815964523,
+            "totalCrosses": 617,
+            "accurateCrosses": 170,
+            "accurateCrossesPercentage": 27.552674230146,
+            "cleanSheets": 6,
+            "tackles": 580,
+            "interceptions": 292,
+            "saves": 100,
+            "errorsLeadingToGoal": 6,
+            "errorsLeadingToShot": 11,
+            "penaltiesCommited": 7,
+            "penaltyGoalsConceded": 4,
+            "clearances": 999,
+            "clearancesOffLine": 4,
+            "lastManTackles": 8,
+            "totalDuels": 3362,
+            "duelsWon": 1693,
+            "duelsWonPercentage": 50.356930398572,
+            "totalGroundDuels": 2173,
+            "groundDuelsWon": 1118,
+            "groundDuelsWonPercentage": 51.449608835711,
+            "totalAerialDuels": 1189,
+            "aerialDuelsWon": 575,
+            "aerialDuelsWonPercentage": 48.359966358284,
+            "possessionLost": 4736,
+            "offsides": 58,
+            "fouls": 357,
+            "yellowCards": 65,
+            "yellowRedCards": 2,
+            "redCards": 4,
+            "avgRating": 6.7238289205703,
+            "accurateFinalThirdPassesAgainst": 3292,
+            "accurateOppositionHalfPassesAgainst": 6236,
+            "accurateOwnHalfPassesAgainst": 5062,
+            "accuratePassesAgainst": 11298,
+            "bigChancesAgainst": 79,
+            "bigChancesCreatedAgainst": 58,
+            "bigChancesMissedAgainst": 52,
+            "clearancesAgainst": 870,
+            "cornersAgainst": 179,
+            "crossesSuccessfulAgainst": 178,
+            "crossesTotalAgainst": 710,
+            "dribbleAttemptsTotalAgainst": 478,
+            "dribbleAttemptsWonAgainst": 209,
+            "errorsLeadingToGoalAgainst": 3,
+            "errorsLeadingToShotAgainst": 9,
+            "hitWoodworkAgainst": 16,
+            "interceptionsAgainst": 314,
+            "keyPassesAgainst": 359,
+            "longBallsSuccessfulAgainst": 907,
+            "longBallsTotalAgainst": 1837,
+            "offsidesAgainst": 67,
+            "redCardsAgainst": 0,
+            "shotsAgainst": 493,
+            "shotsBlockedAgainst": 123,
+            "shotsFromInsideTheBoxAgainst": 337,
+            "shotsFromOutsideTheBoxAgainst": 156,
+            "shotsOffTargetAgainst": 213,
+            "shotsOnTargetAgainst": 157,
+            "blockedScoringAttemptAgainst": 123,
+            "tacklesAgainst": 514,
+            "totalFinalThirdPassesAgainst": 4710,
+            "oppositionHalfPassesTotalAgainst": 8311,
+            "ownHalfPassesTotalAgainst": 5679,
+            "totalPassesAgainst": 13990,
+            "yellowCardsAgainst": 42,
+            "throwIns": 708,
+            "goalKicks": 326,
+            "ballRecovery": 1608,
+            "freeKicks": 329,
+            "id": 45492,
+            "matches": 32,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

@@ -1,0 +1,68 @@
+@startuml
+title COMPATIBILITY ENGINE
+
+start
+
+:Tactical Similarity;
+
+note right
+Cosine Similarity:
+
+Similarity =
+(P · T) / (||P|| × ||T||)
+
+Where:
+P = Player Role Vector
+T = Team Demand Vector
+
+Dot Product:
+Σ (Pi × Ti)
+
+Norm:
+||P|| = sqrt(Σ Pi²)
+end note
+
+:Statistical Match Score;
+
+note right
+Step 1:
+Z Distance per metric
+
+Step 2:
+Euclidean Distance =
+sqrt(Σ (Zi)²)
+
+Step 3:
+Score Conversion:
+StatScore = 1 / (1 + Distance)
+end note
+
+:Physical Adaptation;
+
+note right
+Adaptation Score =
+1 - |LeagueIntensity_Player
+      - LeagueIntensity_Team|
+end note
+
+:Development Fit;
+
+note right
+Age Fit =
+1 - |PlayerAge - IdealAge| / Range
+
+Market Growth Potential Factor added
+end note
+
+:Weighted Aggregation;
+
+note right
+Final Score =
+(0.35 × Tactical)
++ (0.30 × Statistical)
++ (0.20 × Physical)
++ (0.15 × Development)
+end note
+
+stop
+@enduml

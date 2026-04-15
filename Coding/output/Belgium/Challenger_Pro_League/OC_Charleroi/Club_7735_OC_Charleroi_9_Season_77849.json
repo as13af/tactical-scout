@@ -1,0 +1,347 @@
+{
+    "team_id": "7735",
+    "team_name": "OC Charleroi",
+    "tournament_id": "9",
+    "season_id": "77849",
+    "competition_name": "Challenger_Pro_League",
+    "competition_country": "Belgium",
+    "profile": {
+        "team": {
+            "name": "OC Charleroi",
+            "slug": "oc-charleroi",
+            "shortName": "Olympic Charleroi",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Belgium Amateur",
+                "slug": "belgium-amateur",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 1620,
+                "flag": "belgium",
+                "alpha2": "BE",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Beker van Belgie",
+                "slug": "beker-van-belgie",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "Belgian Cup",
+                    "slug": "belgian-cup",
+                    "primaryColorHex": "#da2e34",
+                    "secondaryColorHex": "#e0ad0b",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 10494,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 326,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 206
+            },
+            "primaryUniqueTournament": {
+                "name": "Challenger Pro League",
+                "slug": "challenger-pro-league",
+                "primaryColorHex": "#0E0027",
+                "secondaryColorHex": "#a9ee17",
+                "category": {
+                    "name": "Belgium",
+                    "slug": "belgium",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "BE",
+                        "alpha3": "BEL",
+                        "name": "Belgium",
+                        "slug": "belgium"
+                    },
+                    "id": 33,
+                    "flag": "belgium",
+                    "alpha2": "BE",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 6809,
+                "hasPerformanceGraphFeature": false,
+                "country": {},
+                "id": 9,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 2400,
+            "manager": {
+                "name": "Frederic Balan",
+                "slug": "frederic-balan",
+                "shortName": "F. Balan",
+                "country": {},
+                "id": 819309
+            },
+            "venue": {
+                "hidden": true,
+                "slug": "stade-de-la-neuville",
+                "name": "Stade de la Neuville",
+                "capacity": 8000,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 43081,
+                "city": {
+                    "name": "Charleroi"
+                },
+                "stadium": {
+                    "name": "Stade de la Neuville",
+                    "capacity": 8000
+                }
+            },
+            "nameCode": "ROC",
+            "class": 0,
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "BE",
+                "alpha3": "BEL",
+                "name": "Belgium",
+                "slug": "belgium"
+            },
+            "id": 7735,
+            "fullName": "OC Charleroi",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "timeActive": []
+        },
+        "pregameForm": {
+            "avgRating": "6.62",
+            "position": 17,
+            "value": "16",
+            "form": [
+                "L",
+                "L",
+                "L",
+                "L",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 26,
+            "goalsConceded": 63,
+            "ownGoals": 1,
+            "assists": 17,
+            "shots": 375,
+            "penaltyGoals": 1,
+            "penaltiesTaken": 1,
+            "freeKickGoals": 1,
+            "freeKickShots": 14,
+            "goalsFromInsideTheBox": 24,
+            "goalsFromOutsideTheBox": 2,
+            "shotsFromInsideTheBox": 208,
+            "shotsFromOutsideTheBox": 167,
+            "headedGoals": 6,
+            "leftFootGoals": 6,
+            "rightFootGoals": 14,
+            "bigChances": 60,
+            "bigChancesCreated": 41,
+            "bigChancesMissed": 45,
+            "shotsOnTarget": 132,
+            "shotsOffTarget": 154,
+            "blockedScoringAttempt": 89,
+            "successfulDribbles": 204,
+            "dribbleAttempts": 446,
+            "corners": 124,
+            "hitWoodwork": 11,
+            "fastBreaks": 37,
+            "fastBreakGoals": 2,
+            "fastBreakShots": 35,
+            "averageBallPossession": 46.935483870968,
+            "totalPasses": 12044,
+            "accuratePasses": 9555,
+            "accuratePassesPercentage": 79.334108269678,
+            "totalOwnHalfPasses": 6038,
+            "accurateOwnHalfPasses": 5328,
+            "accurateOwnHalfPassesPercentage": 88.241139450149,
+            "totalOppositionHalfPasses": 6006,
+            "accurateOppositionHalfPasses": 4227,
+            "accurateOppositionHalfPassesPercentage": 70.37962037962,
+            "totalLongBalls": 1206,
+            "accurateLongBalls": 515,
+            "accurateLongBallsPercentage": 42.703150912106,
+            "totalCrosses": 555,
+            "accurateCrosses": 123,
+            "accurateCrossesPercentage": 22.162162162162,
+            "cleanSheets": 3,
+            "tackles": 526,
+            "interceptions": 284,
+            "saves": 88,
+            "errorsLeadingToGoal": 7,
+            "errorsLeadingToShot": 14,
+            "penaltiesCommited": 7,
+            "penaltyGoalsConceded": 5,
+            "clearances": 866,
+            "clearancesOffLine": 3,
+            "lastManTackles": 3,
+            "totalDuels": 3114,
+            "duelsWon": 1517,
+            "duelsWonPercentage": 48.715478484265,
+            "totalGroundDuels": 2222,
+            "groundDuelsWon": 1082,
+            "groundDuelsWonPercentage": 48.694869486949,
+            "totalAerialDuels": 892,
+            "aerialDuelsWon": 435,
+            "aerialDuelsWonPercentage": 48.766816143498,
+            "possessionLost": 4234,
+            "offsides": 61,
+            "fouls": 406,
+            "yellowCards": 68,
+            "yellowRedCards": 1,
+            "redCards": 6,
+            "avgRating": 6.6175475687104,
+            "accurateFinalThirdPassesAgainst": 2643,
+            "accurateOppositionHalfPassesAgainst": 4972,
+            "accurateOwnHalfPassesAgainst": 6303,
+            "accuratePassesAgainst": 11275,
+            "bigChancesAgainst": 78,
+            "bigChancesCreatedAgainst": 59,
+            "bigChancesMissedAgainst": 42,
+            "clearancesAgainst": 710,
+            "cornersAgainst": 166,
+            "crossesSuccessfulAgainst": 137,
+            "crossesTotalAgainst": 611,
+            "dribbleAttemptsTotalAgainst": 530,
+            "dribbleAttemptsWonAgainst": 251,
+            "errorsLeadingToGoalAgainst": 3,
+            "errorsLeadingToShotAgainst": 14,
+            "hitWoodworkAgainst": 7,
+            "interceptionsAgainst": 240,
+            "keyPassesAgainst": 285,
+            "longBallsSuccessfulAgainst": 845,
+            "longBallsTotalAgainst": 1791,
+            "offsidesAgainst": 97,
+            "redCardsAgainst": 3,
+            "shotsAgainst": 391,
+            "shotsBlockedAgainst": 105,
+            "shotsFromInsideTheBoxAgainst": 258,
+            "shotsFromOutsideTheBoxAgainst": 133,
+            "shotsOffTargetAgainst": 133,
+            "shotsOnTargetAgainst": 153,
+            "blockedScoringAttemptAgainst": 105,
+            "tacklesAgainst": 513,
+            "totalFinalThirdPassesAgainst": 3851,
+            "oppositionHalfPassesTotalAgainst": 6788,
+            "ownHalfPassesTotalAgainst": 6971,
+            "totalPassesAgainst": 13759,
+            "yellowCardsAgainst": 51,
+            "throwIns": 695,
+            "goalKicks": 246,
+            "ballRecovery": 1495,
+            "freeKicks": 353,
+            "id": 47123,
+            "matches": 31,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

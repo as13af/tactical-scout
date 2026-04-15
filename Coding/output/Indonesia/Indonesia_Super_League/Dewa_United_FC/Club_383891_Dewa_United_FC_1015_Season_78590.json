@@ -1,0 +1,250 @@
+{
+    "team_id": "383891",
+    "team_name": "Dewa United FC",
+    "tournament_id": "1015",
+    "season_id": "78590",
+    "competition_name": "Indonesia_Super_League",
+    "competition_country": "Indonesia",
+    "profile": {
+        "team": {
+            "name": "Dewa United FC",
+            "slug": "dewa-united-fc",
+            "shortName": "Dewa Utd",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Indonesia",
+                "slug": "indonesia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "priority": 0,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 368,
+                "flag": "indonesia",
+                "alpha2": "ID",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Club Friendly Games",
+                "slug": "club-friendly-games",
+                "category": {
+                    "name": "World",
+                    "slug": "world",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 20,
+                    "country": {},
+                    "id": 1468,
+                    "flag": "international"
+                },
+                "uniqueTournament": {
+                    "name": "Club Friendly Games",
+                    "slug": "club-friendly-games",
+                    "primaryColorHex": "#25497d",
+                    "secondaryColorHex": "#d38f1d",
+                    "category": {
+                        "name": "World",
+                        "slug": "world",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 20,
+                        "country": {},
+                        "id": 1468,
+                        "flag": "international"
+                    },
+                    "userCount": 26501,
+                    "hasPerformanceGraphFeature": false,
+                    "country": {},
+                    "id": 853,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 86
+            },
+            "primaryUniqueTournament": {
+                "name": "Indonesia Super League",
+                "slug": "liga-1",
+                "primaryColorHex": "#e04b2d",
+                "secondaryColorHex": "#2b4e95",
+                "category": {
+                    "name": "Indonesia",
+                    "slug": "indonesia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "priority": 0,
+                    "country": {
+                        "alpha2": "ID",
+                        "alpha3": "IDN",
+                        "name": "Indonesia",
+                        "slug": "indonesia"
+                    },
+                    "id": 368,
+                    "flag": "indonesia",
+                    "alpha2": "ID",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 17583,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1015,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 12675,
+            "manager": {
+                "name": "Jan Olde Riekerink",
+                "slug": "jan-olde-riekerink",
+                "shortName": "J. O. Riekerink",
+                "country": {
+                    "alpha2": "NL",
+                    "alpha3": "NLD",
+                    "name": "Netherlands",
+                    "slug": "netherlands"
+                },
+                "id": 786686
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": -6.258669,
+                    "longitude": 106.604212
+                },
+                "hidden": true,
+                "slug": "indomilk-arena",
+                "name": "Indomilk Arena",
+                "capacity": 15000,
+                "country": {
+                    "alpha2": "ID",
+                    "alpha3": "IDN",
+                    "name": "Indonesia",
+                    "slug": "indonesia"
+                },
+                "id": 32908,
+                "city": {
+                    "name": "Tangerang"
+                },
+                "stadium": {
+                    "name": "Indomilk Arena",
+                    "capacity": 15000
+                }
+            },
+            "nameCode": "DEW",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "ID",
+                "alpha3": "IDN",
+                "name": "Indonesia",
+                "slug": "indonesia"
+            },
+            "id": 383891,
+            "fullName": "Dewa United FC",
+            "teamColors": {
+                "primary": "#ff0000",
+                "secondary": "#ffffff",
+                "text": "#ffffff"
+            },
+            "foundationDateTimestamp": 1230768000,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 9,
+            "value": "37",
+            "form": [
+                "W",
+                "W",
+                "L",
+                "D",
+                "W"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 33,
+            "goalsConceded": 32,
+            "assists": 19,
+            "shots": 303,
+            "penaltyGoals": 4,
+            "penaltiesTaken": 4,
+            "successfulDribbles": 385,
+            "dribbleAttempts": 502,
+            "corners": 140,
+            "averageBallPossession": 55.7,
+            "totalPasses": 12151,
+            "accuratePasses": 10434,
+            "accuratePassesPercentage": 85.87,
+            "totalLongBalls": 1026,
+            "accurateLongBalls": 525,
+            "accurateLongBallsPercentage": 51.17,
+            "totalCrosses": 422,
+            "accurateCrosses": 119,
+            "accurateCrossesPercentage": 28.2,
+            "cleanSheets": 7,
+            "interceptions": 844,
+            "saves": 71,
+            "errorsLeadingToShot": 115,
+            "totalDuels": 4200,
+            "duelsWon": 1584,
+            "duelsWonPercentage": 37.71,
+            "totalAerialDuels": 573,
+            "aerialDuelsWon": 252,
+            "aerialDuelsWonPercentage": 43.98,
+            "offsides": 53,
+            "fouls": 270,
+            "yellowCards": 61,
+            "yellowRedCards": 3,
+            "redCards": 3,
+            "shotsAgainst": 299,
+            "goalKicks": 175,
+            "ballRecovery": 1796,
+            "freeKicks": 44,
+            "id": 47497,
+            "matches": 27,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

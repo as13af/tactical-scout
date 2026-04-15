@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ data.get('team_name', club) }} — Scout{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/competitions">Competitions</a>
+  <span>/</span>
+  <a href="/competition/{{ country }}/{{ competition }}">{{ competition.replace('_',' ') }}</a>
+  <span>/</span>
+  <span>{{ data.get('team_name', club) }}</span>
+</div>
+
+<div class="page-header flex-between">
+  <div>
+    <h1>{{ data.get('team_name', club.replace('_',' ')) }}</h1>
+    <div class="sub">{{ competition.replace('_',' ') }} · {{ country.replace('_',' ') }}</div>
+  </div>
+</div>
+
+<!-- Club season stats -->
+{% set cs = data.get('season_statistics', {}).get('statistics', {}) %}
+{% if cs %}
+  <div class="card mb16">
+    <div class="card-title">Season Statistics</div>
+    <div class="stat-grid">
+      {% set club_stats = [
+        ('Goals',      cs.get('goals','')),
+        ('Conceded',   cs.get('goalsConceded','')),
+        ('Avg Rating', "%.2f"|format(cs.rating) if cs.get('rating') else ''),
+        ('Shots',      cs.get('shots','')),
+        ('Pass Acc %', "%.1f"|format(cs.accuratePassesPercentage) if cs.get('accuratePassesPercentage') else ''),
+        ('Possession', cs.get('possession','')),
+        ('Tackles',    cs.get('tackles','')),
+        ('Clean Sheets', cs.get('cleanSheet','')),
+      ] %}
+      {% for label, val in club_stats %}
+        {% if val != '' and val is not none %}
+          <div class="stat-block">
+            <div class="label">{{ label }}</div>
+            <div class="value">{{ val }}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<!-- Players table -->
+<div class="card">
+  <div class="card-title flex-between" style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Squad — {{ players|length }} players</span>
+    <input type="text" id="squad-search" placeholder="Search player..."
+           style="background:var(--bg3); border:1px solid var(--border); border-radius:4px;
+                  color:var(--text); padding:5px 10px; font-family:'CoFoSans', sans-serif; font-size:11px; width:200px;">
+  </div>
+  <div class="table-wrap mt8">
+    <table id="squad-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Pos</th>
+          <th>Nat</th>
+          <th>Age</th>
+          <th class="td-num">Apps</th>
+          <th class="td-num">Goals</th>
+          <th class="td-num">Assists</th>
+          <th class="td-num">Rating</th>
+          <th class="td-num">Mins</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in players %}
+          {% set s = p.stats %}
+          <tr class="squad-row">
+            <td style="color:var(--text3);">{{ p.shirt_number or '—' }}</td>
+            <td>
+              <a href="/player/{{ country }}/{{ competition }}/{{ club }}/{{ p.file }}">
+                {{ p.name }}
+              </a>
+            </td>
+            <td><span class="pos-badge">{{ p.position or '?' }}</span></td>
+            <td style="color:var(--text2);">{{ p.nationality or '—' }}</td>
+            <td>{{ p.age or '—' }}</td>
+            <td class="td-num">{{ s.get('appearances','—') }}</td>
+            <td class="td-num">{{ s.get('goals','—') }}</td>
+            <td class="td-num">{{ s.get('assists','—') }}</td>
+            <td class="td-num">
+              {% set r = s.get('rating', 0) | float %}
+              {% if r >= 7.0 %}
+                <span class="rating-badge rating-high">{{ "%.2f"|format(r) }}</span>
+              {% elif r >= 6.0 %}
+                <span class="rating-badge rating-mid">{{ "%.2f"|format(r) }}</span>
+              {% elif r > 0 %}
+                <span class="rating-badge rating-low">{{ "%.2f"|format(r) }}</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="td-num">{{ s.get('minutesPlayed','—') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('squad-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.squad-row').forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

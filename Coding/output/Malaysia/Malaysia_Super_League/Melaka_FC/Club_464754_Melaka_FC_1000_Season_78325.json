@@ -1,0 +1,177 @@
+{
+    "team_id": "464754",
+    "team_name": "Melaka FC",
+    "tournament_id": "1000",
+    "season_id": "78325",
+    "competition_name": "Malaysia_Super_League",
+    "competition_country": "Malaysia",
+    "profile": {
+        "team": {
+            "name": "Melaka FC",
+            "slug": "melaka-fc",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Malaysia",
+                "slug": "malaysia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 85,
+                "flag": "malaysia",
+                "alpha2": "MY",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "primaryUniqueTournament": {
+                "name": "Malaysia Super League",
+                "slug": "malaysia-super-league",
+                "primaryColorHex": "#0164bd",
+                "secondaryColorHex": "#293793",
+                "category": {
+                    "name": "Malaysia",
+                    "slug": "malaysia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "MY",
+                        "alpha3": "MYS",
+                        "name": "Malaysia",
+                        "slug": "malaysia"
+                    },
+                    "id": 85,
+                    "flag": "malaysia",
+                    "alpha2": "MY",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 5274,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1000,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 2610,
+            "manager": {
+                "name": "Elangowan a/l Elavarasan",
+                "slug": "elangowan-al-elavarasan",
+                "shortName": "E. a. Elavarasan",
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 812413
+            },
+            "nameCode": "MEL",
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "MY",
+                "alpha3": "MYS",
+                "name": "Malaysia",
+                "slug": "malaysia"
+            },
+            "id": 464754,
+            "fullName": "Melaka FC",
+            "teamColors": {
+                "primary": "#374df5",
+                "secondary": "#374df5",
+                "text": "#ffffff"
+            },
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 12,
+            "value": "11",
+            "form": [
+                "W",
+                "D",
+                "L",
+                "D",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 14,
+            "goalsConceded": 39,
+            "assists": 6,
+            "shots": 208,
+            "penaltyGoals": 1,
+            "penaltiesTaken": 3,
+            "successfulDribbles": 215,
+            "dribbleAttempts": 286,
+            "corners": 84,
+            "averageBallPossession": 43.3,
+            "totalPasses": 5591,
+            "accuratePasses": 4368,
+            "accuratePassesPercentage": 78.13,
+            "totalLongBalls": 786,
+            "accurateLongBalls": 380,
+            "accurateLongBallsPercentage": 48.35,
+            "totalCrosses": 239,
+            "accurateCrosses": 94,
+            "accurateCrossesPercentage": 39.33,
+            "cleanSheets": 4,
+            "interceptions": 707,
+            "saves": 75,
+            "errorsLeadingToShot": 112,
+            "totalDuels": 3196,
+            "duelsWon": 1137,
+            "duelsWonPercentage": 35.58,
+            "totalAerialDuels": 671,
+            "aerialDuelsWon": 280,
+            "aerialDuelsWonPercentage": 41.73,
+            "offsides": 25,
+            "fouls": 212,
+            "yellowCards": 23,
+            "yellowRedCards": 1,
+            "redCards": 1,
+            "shotsAgainst": 272,
+            "goalKicks": 158,
+            "ballRecovery": 1302,
+            "freeKicks": 63,
+            "id": 47875,
+            "matches": 19,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

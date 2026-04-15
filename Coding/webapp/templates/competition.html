@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}{{ competition.replace('_',' ') }} — Scout{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/competitions">Competitions</a>
+  <span>/</span>
+  <span>{{ country.replace('_',' ') }}</span>
+  <span>/</span>
+  <span>{{ competition.replace('_',' ') }}</span>
+</div>
+
+<div class="page-header">
+  <h1>{{ competition.replace('_',' ') }}</h1>
+  <div class="sub">
+    {{ country.replace('_',' ') }} · {{ data.clubs|length }} clubs
+    {% if cvs_score is defined and cvs_score %}
+      &nbsp;·&nbsp;
+      <span title="IFFHS Competitive Value Score — England Premier League = 100" style="
+        display:inline-flex; align-items:center; gap:4px;
+        background:var(--bg3); border:1px solid var(--border); border-radius:4px;
+        padding:1px 8px; font-size:11px; font-family:'CoFoSans',monospace;
+        color:{% if cvs_score >= 70 %}var(--green){% elif cvs_score >= 40 %}var(--amber){% else %}var(--text2){% endif %};">
+        CVS {{ cvs_score }}
+      </span>
+    {% endif %}
+  </div>
+  {% if data.tid and data.uniq_tid and data.season_id %}
+  <button id="update-btn"
+          class="btn-update"
+          data-tid="{{ data.tid }}"
+          data-uniq-tid="{{ data.uniq_tid }}"
+          data-season="{{ data.season_id }}">
+    ↻ Update Data
+  </button>
+  {% endif %}
+</div>
+
+<!-- Scrape progress modal -->
+<div id="scrape-modal" class="scrape-modal" style="display:none;">
+  <div class="scrape-modal-inner">
+    <div class="scrape-modal-header">
+      <span>Scraping SofaScore…</span>
+      <button id="scrape-close" class="scrape-close" disabled>✕</button>
+    </div>
+    <div class="scrape-progress-wrap">
+      <div id="scrape-bar" class="scrape-bar" style="width:0%"></div>
+    </div>
+    <div id="scrape-pct" style="font-size:11px;color:var(--text3);margin-bottom:6px;">0%</div>
+    <textarea id="scrape-log" class="scrape-log" readonly></textarea>
+    <div id="scrape-done-msg" style="display:none; margin-top:10px; font-size:13px;"></div>
+  </div>
+</div>
+
+<div class="grid-2" style="gap:24px; align-items:start;">
+
+  <!-- Standings -->
+  <div class="card">
+    <div class="card-title">Standings</div>
+    {% if data.standings %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th>Club</th>
+              <th class="td-num">P</th>
+              <th class="td-num">W</th>
+              <th class="td-num">D</th>
+              <th class="td-num">L</th>
+              <th class="td-num">GF</th>
+              <th class="td-num">GA</th>
+              <th class="td-num">GD</th>
+              <th class="td-num">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data.standings %}
+              {% set promo = row.get('promotion', {}).get('text', '') %}
+              <tr>
+                <td class="standings-pos">
+                  {% if 'Promotion' == promo and 'Playoff' not in promo %}
+                    <span class="promotion-up">{{ row.position }}</span>
+                  {% elif 'Playoff' in promo %}
+                    <span class="promotion-play">{{ row.position }}</span>
+                  {% elif 'Relegation' in promo %}
+                    <span class="promotion-down">{{ row.position }}</span>
+                  {% else %}
+                    {{ row.position }}
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="/competition/{{ country }}/{{ competition }}/{{ row.team.name | replace(' ','_') }}">
+                    {{ row.team.name }}
+                  </a>
+                </td>
+                <td class="td-num">{{ row.matches }}</td>
+                <td class="td-num">{{ row.wins }}</td>
+                <td class="td-num">{{ row.draws }}</td>
+                <td class="td-num">{{ row.losses }}</td>
+                <td class="td-num">{{ row.scoresFor }}</td>
+                <td class="td-num">{{ row.scoresAgainst }}</td>
+                <td class="td-num">{{ row.scoreDiffFormatted }}</td>
+                <td class="td-num" style="font-weight:600;">{{ row.points }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="color:var(--text3); font-size:12px;">No standings data.</div>
+    {% endif %}
+  </div>
+
+  <!-- Clubs -->
+  <div>
+    <div class="card-title" style="margin-bottom:12px;">Clubs</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      {% for club in data.clubs %}
+        <a href="/competition/{{ country }}/{{ competition }}/{{ club.slug }}" class="competition-card" style="padding:14px 18px;">
+          <div class="flex-between">
+            <div>
+              <div class="name" style="font-size:14px;">{{ club.name }}</div>
+              <div class="meta">{{ club.player_count }} players</div>
+            </div>
+            {% if club.stats %}
+              <div style="text-align:right; font-size:11px; color:var(--text2);">
+                {% if club.stats.get('goals') %}
+                  <div>{{ club.stats.goals }} goals</div>
+                {% endif %}
+                {% if club.stats.get('rating') %}
+                  <div class="text-green">{{ "%.2f"|format(club.stats.rating) }} avg rating</div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const btn       = document.getElementById('update-btn');
+  const modal     = document.getElementById('scrape-modal');
+  const closeBtn  = document.getElementById('scrape-close');
+  const bar       = document.getElementById('scrape-bar');
+  const pctLabel  = document.getElementById('scrape-pct');
+  const log       = document.getElementById('scrape-log');
+  const doneMsg   = document.getElementById('scrape-done-msg');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', function () {
+    const tid      = btn.dataset.tid;
+    const uniqTid  = btn.dataset.uniqTid;
+    const season   = btn.dataset.season;
+
+    // Reset UI
+    bar.style.width = '0%';
+    pctLabel.textContent = '0%';
+    log.value = '';
+    doneMsg.style.display = 'none';
+    doneMsg.textContent = '';
+    closeBtn.disabled = true;
+    btn.disabled = true;
+    modal.style.display = 'flex';
+
+    fetch('/api/scrape', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({tid, uniq_tid: uniqTid, season_id: season, skip: false}),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { showError(data.error); return; }
+      poll(data.job_id, 0);
+    })
+    .catch(e => showError(String(e)));
+  });
+
+  function poll(jobId, offset) {
+    fetch(`/api/scrape/${jobId}?offset=${offset}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) { showError(data.error); return; }
+
+        // Append new lines (filter out PROGRESS: protocol lines)
+        const visible = (data.lines || []).filter(l => !l.startsWith('PROGRESS:'));
+        if (visible.length) {
+          log.value += visible.join('\n') + '\n';
+          log.scrollTop = log.scrollHeight;
+        }
+
+        // Update progress bar
+        const pct = data.progress || 0;
+        bar.style.width = pct + '%';
+        pctLabel.textContent = pct + '%';
+
+        if (data.done) {
+          bar.style.width = '100%';
+          pctLabel.textContent = '100%';
+          closeBtn.disabled = false;
+          btn.disabled = false;
+
+          if (data.error) {
+            doneMsg.style.color = 'var(--red, #e74c3c)';
+            doneMsg.textContent = '✗ Scrape failed — see log above.';
+          } else {
+            doneMsg.style.color = 'var(--green, #27ae60)';
+            doneMsg.textContent = '✓ Scrape complete. Reload the page to see updated data.';
+          }
+          doneMsg.style.display = 'block';
+        } else {
+          setTimeout(() => poll(jobId, data.total), 1500);
+        }
+      })
+      .catch(e => showError(String(e)));
+  }
+
+  function showError(msg) {
+    log.value += '\nERROR: ' + msg + '\n';
+    doneMsg.style.color = 'var(--red, #e74c3c)';
+    doneMsg.textContent = '✗ ' + msg;
+    doneMsg.style.display = 'block';
+    closeBtn.disabled = false;
+    btn.disabled = false;
+  }
+
+  closeBtn.addEventListener('click', function () {
+    modal.style.display = 'none';
+  });
+})();
+</script>
+{% endblock %}

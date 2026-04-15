@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Scout — Home{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="home-hero">
+  <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="home-hero-logo">
+  <div class="home-hero-sub">Football Scouting &amp; Tactical Compatibility Platform</div>
+</div>
+
+<!-- Stats bar -->
+<div class="home-stats-bar">
+  <div class="home-stat">
+    <div class="home-stat-num">{{ stats.competitions }}</div>
+    <div class="home-stat-label">Competitions</div>
+  </div>
+  <div class="home-stat-divider"></div>
+  <div class="home-stat">
+    <div class="home-stat-num">{{ stats.clubs }}</div>
+    <div class="home-stat-label">Clubs</div>
+  </div>
+  <div class="home-stat-divider"></div>
+  <div class="home-stat">
+    <div class="home-stat-num">{{ stats.players }}</div>
+    <div class="home-stat-label">Players</div>
+  </div>
+</div>
+
+<!-- Quick nav cards -->
+<div class="home-nav-grid">
+  <a href="/competitions" class="home-nav-card">
+    <div class="home-nav-icon">🏆</div>
+    <div class="home-nav-title">Competitions</div>
+    <div class="home-nav-desc">Browse leagues and standings by country</div>
+  </a>
+  <a href="/players" class="home-nav-card">
+    <div class="home-nav-icon">👤</div>
+    <div class="home-nav-title">Players</div>
+    <div class="home-nav-desc">Search and filter across all scraped players</div>
+  </a>
+  <a href="/compare" class="home-nav-card">
+    <div class="home-nav-icon">⚖️</div>
+    <div class="home-nav-title">Compare</div>
+    <div class="home-nav-desc">Side-by-side stat comparison of two players</div>
+  </a>
+  <a href="/compatibility" class="home-nav-card">
+    <div class="home-nav-icon">🎯</div>
+    <div class="home-nav-title">Compatibility</div>
+    <div class="home-nav-desc">Score a player against a tactical role profile</div>
+  </a>
+  <a href="/club_compatibility" class="home-nav-card">
+    <div class="home-nav-icon">🏟️</div>
+    <div class="home-nav-title">Club Fit</div>
+    <div class="home-nav-desc">See how a player fits into a specific club's squad</div>
+  </a>
+  <a href="/export" class="home-nav-card">
+    <div class="home-nav-icon">📥</div>
+    <div class="home-nav-title">Export</div>
+    <div class="home-nav-desc">Download filtered player data as CSV</div>
+  </a>
+</div>
+
+<!-- Top rated players -->
+{% if stats.top_players %}
+<div style="margin-top: 40px;">
+  <div class="card-title" style="margin-bottom: 16px;">Top Rated Players</div>
+  <div class="table-wrap card" style="padding: 0;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Club</th>
+          <th>Competition</th>
+          <th class="td-num">Pos</th>
+          <th class="td-num">Apps</th>
+          <th class="td-num">G</th>
+          <th class="td-num">A</th>
+          <th class="td-num">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in stats.top_players %}
+        <tr>
+          <td style="color:var(--text3); font-size:11px;">{{ loop.index }}</td>
+          <td style="font-weight:600;">{{ p.name }}</td>
+          <td style="color:var(--text2);">{{ p.team }}</td>
+          <td style="color:var(--text3); font-size:11px;">{{ p.competition }}</td>
+          <td class="td-num"><span class="tag">{{ p.position }}</span></td>
+          <td class="td-num">{{ p.appearances }}</td>
+          <td class="td-num">{{ p.goals }}</td>
+          <td class="td-num">{{ p.assists }}</td>
+          <td class="td-num">
+            {% set r = p.rating %}
+            {% if r >= 7.5 %}
+              <span style="color:var(--green); font-family:'BasementGrotesque',sans-serif; font-weight:900;">{{ "%.2f"|format(r) }}</span>
+            {% elif r >= 6.5 %}
+              <span style="color:var(--amber); font-family:'BasementGrotesque',sans-serif; font-weight:900;">{{ "%.2f"|format(r) }}</span>
+            {% else %}
+              <span style="font-family:'BasementGrotesque',sans-serif; font-weight:900;">{{ "%.2f"|format(r) }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

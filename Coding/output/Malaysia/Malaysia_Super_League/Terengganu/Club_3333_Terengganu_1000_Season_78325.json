@@ -1,0 +1,278 @@
+{
+    "team_id": "3333",
+    "team_name": "Terengganu",
+    "tournament_id": "1000",
+    "season_id": "78325",
+    "competition_name": "Malaysia_Super_League",
+    "competition_country": "Malaysia",
+    "profile": {
+        "team": {
+            "name": "Terengganu",
+            "slug": "terengganu",
+            "shortName": "TFC",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "category": {
+                "name": "Malaysia",
+                "slug": "malaysia",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 85,
+                "flag": "malaysia",
+                "alpha2": "MY",
+                "transferPeriod": [
+                    {
+                        "activeFrom": "06-01 00:00",
+                        "activeTo": "09-18 00:00"
+                    },
+                    {
+                        "activeFrom": "12-30 00:00",
+                        "activeTo": "02-16 00:00"
+                    }
+                ]
+            },
+            "tournament": {
+                "name": "Super League",
+                "slug": "super-league",
+                "category": {
+                    "name": "Malaysia",
+                    "slug": "malaysia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "MY",
+                        "alpha3": "MYS",
+                        "name": "Malaysia",
+                        "slug": "malaysia"
+                    },
+                    "id": 85,
+                    "flag": "malaysia",
+                    "alpha2": "MY",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "uniqueTournament": {
+                    "name": "Malaysia Super League",
+                    "slug": "malaysia-super-league",
+                    "primaryColorHex": "#0164bd",
+                    "secondaryColorHex": "#293793",
+                    "category": {
+                        "name": "Malaysia",
+                        "slug": "malaysia",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "country": {
+                            "alpha2": "MY",
+                            "alpha3": "MYS",
+                            "name": "Malaysia",
+                            "slug": "malaysia"
+                        },
+                        "id": 85,
+                        "flag": "malaysia",
+                        "alpha2": "MY",
+                        "transferPeriod": [
+                            {
+                                "activeFrom": "06-01 00:00",
+                                "activeTo": "09-18 00:00"
+                            },
+                            {
+                                "activeFrom": "12-30 00:00",
+                                "activeTo": "02-16 00:00"
+                            }
+                        ]
+                    },
+                    "userCount": 5274,
+                    "hasPerformanceGraphFeature": true,
+                    "country": {},
+                    "id": 1000,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isLive": false,
+                "id": 3938
+            },
+            "primaryUniqueTournament": {
+                "name": "Malaysia Super League",
+                "slug": "malaysia-super-league",
+                "primaryColorHex": "#0164bd",
+                "secondaryColorHex": "#293793",
+                "category": {
+                    "name": "Malaysia",
+                    "slug": "malaysia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "country": {
+                        "alpha2": "MY",
+                        "alpha3": "MYS",
+                        "name": "Malaysia",
+                        "slug": "malaysia"
+                    },
+                    "id": 85,
+                    "flag": "malaysia",
+                    "alpha2": "MY",
+                    "transferPeriod": [
+                        {
+                            "activeFrom": "06-01 00:00",
+                            "activeTo": "09-18 00:00"
+                        },
+                        {
+                            "activeFrom": "12-30 00:00",
+                            "activeTo": "02-16 00:00"
+                        }
+                    ]
+                },
+                "userCount": 5274,
+                "hasPerformanceGraphFeature": true,
+                "country": {},
+                "id": 1000,
+                "displayInverseHomeAwayTeams": false
+            },
+            "userCount": 5999,
+            "manager": {
+                "name": "Tengku Hazman",
+                "slug": "tengku-hazman",
+                "shortName": "T. Hazman",
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 817440
+            },
+            "venue": {
+                "venueCoordinates": {
+                    "latitude": 5.369713,
+                    "longitude": 103.105681
+                },
+                "hidden": true,
+                "slug": "sultan-mizan-zainal-abidin-stadium",
+                "name": "Sultan Mizan Zainal Abidin Stadium",
+                "capacity": 50000,
+                "country": {
+                    "alpha2": "MY",
+                    "alpha3": "MYS",
+                    "name": "Malaysia",
+                    "slug": "malaysia"
+                },
+                "id": 31725,
+                "city": {
+                    "name": "Kuala Terengganu"
+                },
+                "stadium": {
+                    "name": "Sultan Mizan Zainal Abidin Stadium",
+                    "capacity": 50000
+                }
+            },
+            "nameCode": "TFC",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "country": {
+                "alpha2": "MY",
+                "alpha3": "MYS",
+                "name": "Malaysia",
+                "slug": "malaysia"
+            },
+            "id": 3333,
+            "fullName": "Terengganu",
+            "teamColors": {
+                "primary": "#ffffff",
+                "secondary": "#000000",
+                "text": "#000000"
+            },
+            "foundationDateTimestamp": -413683200,
+            "timeActive": []
+        },
+        "pregameForm": {
+            "position": 5,
+            "value": "28",
+            "form": [
+                "W",
+                "W",
+                "D",
+                "W",
+                "L"
+            ]
+        }
+    },
+    "season_statistics": {
+        "statistics": {
+            "goalsScored": 33,
+            "goalsConceded": 26,
+            "assists": 22,
+            "shots": 320,
+            "penaltyGoals": 6,
+            "penaltiesTaken": 7,
+            "successfulDribbles": 318,
+            "dribbleAttempts": 425,
+            "corners": 127,
+            "averageBallPossession": 51.1,
+            "totalPasses": 7707,
+            "accuratePasses": 6440,
+            "accuratePassesPercentage": 83.56,
+            "totalLongBalls": 800,
+            "accurateLongBalls": 426,
+            "accurateLongBallsPercentage": 53.25,
+            "totalCrosses": 306,
+            "accurateCrosses": 103,
+            "accurateCrossesPercentage": 33.66,
+            "cleanSheets": 6,
+            "interceptions": 691,
+            "saves": 52,
+            "errorsLeadingToShot": 93,
+            "totalDuels": 3072,
+            "duelsWon": 1222,
+            "duelsWonPercentage": 39.78,
+            "totalAerialDuels": 500,
+            "aerialDuelsWon": 227,
+            "aerialDuelsWonPercentage": 45.4,
+            "offsides": 23,
+            "fouls": 207,
+            "yellowCards": 31,
+            "yellowRedCards": 2,
+            "redCards": 2,
+            "shotsAgainst": 198,
+            "goalKicks": 118,
+            "ballRecovery": 1391,
+            "freeKicks": 44,
+            "id": 47695,
+            "matches": 19,
+            "awardedMatches": 0,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "team"
+            }
+        }
+    }
+}

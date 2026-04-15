@@ -1,0 +1,1185 @@
+{% extends "base.html" %}
+{% block title %}Player Scatter — Scout{% endblock %}
+
+{% block head %}
+<style>
+  .sc-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 220px auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  .sc-field label {
+    display: block;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-country-display {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text2);
+    font-size: 13px;
+    font-family: 'CoFoSans', monospace;
+    height: 38px;
+    display: flex;
+    align-items: center;
+  }
+  .sc-filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+  }
+  .sc-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .sc-axis-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+  }
+  .sc-axis-field label {
+    display: block;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-canvas-wrap {
+    position: relative;
+    height: 520px;
+    width: 100%;
+  }
+  .sc-info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+  }
+  .sc-empty {
+    color: var(--text3);
+    font-size: 13px;
+    text-align: center;
+    padding: 60px 0;
+  }
+  .sc-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  #scatter-canvas {
+    cursor: grab;
+  }
+  #scatter-canvas:active {
+    cursor: grabbing;
+  }
+  /* ── Highlight + Ranking ── */
+  .sc-highlight-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 14px;
+  }
+  .sc-rank-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .sc-rank-label {
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-rank-n-input { width: 68px; }
+  .sc-rank-table-wrap { overflow-x: auto; }
+  .sc-rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .sc-rank-table th {
+    color: var(--text2);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .sc-rank-table th:hover { color: var(--text); }
+  .sc-rank-table th.sort-asc::after  { content: ' \25b2'; color: #3a8dbf; }
+  .sc-rank-table th.sort-desc::after { content: ' \25bc'; color: #3a8dbf; }
+  .sc-rank-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(30,74,100,0.4);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .sc-rank-table tbody tr { cursor: pointer; transition: background .15s; }
+  .sc-rank-table tbody tr:hover { background: var(--bg3); }
+  .sc-rank-table tbody tr.rank-selected {
+    background: rgba(255,215,64,0.07);
+    border-left: 3px solid #ffd740;
+  }
+  .sc-rank-table th.sc-rank-stat { text-align: right; }
+  .sc-rank-num  { color: var(--text3); font-size: 12px; }
+  .sc-rank-name { font-weight: 600; }
+  .sc-rank-stat { text-align: right; font-variant-numeric: tabular-nums; }
+  .sc-rank-pos {
+    font-size: 11px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  /* ── Entity info card ── */
+  .sc-entity-card {
+    display: none;
+    background: var(--bg3);
+    border: 1px solid #ffd740;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .sc-entity-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffd740;
+    margin-bottom: 4px;
+  }
+  .sc-entity-card-meta {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+  .sc-entity-card-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .sc-entity-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sc-entity-stat-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .sc-entity-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .sc-entity-stat-p90 {
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .sc-pct-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 6px;
+  }
+  .sc-pct-bar-track {
+    width: 96px;
+    height: 5px;
+    background: rgba(30,74,100,0.6);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sc-pct-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .3s ease;
+  }
+  .sc-pct-label {
+    font-size: 10px;
+    color: var(--text3);
+    font-variant-numeric: tabular-nums;
+  }
+  .sc-pct-note {
+    font-size: 10px;
+    color: var(--text3);
+    font-style: italic;
+    opacity: .75;
+  }
+  .sc-tier-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .sc-rank-text {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 3px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Player Stats Scatter</h1>
+  <div class="sub">Plot any two statistics across all players in a competition — toggle between season totals and p90. Top 15 by combined score · Min. 450 minutes played.</div>
+</div>
+
+<!-- Setup card -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-title" style="margin-bottom:16px;">Select Competition</div>
+  <div class="sc-setup-grid">
+
+    <div class="sc-field">
+      <label>Competition</label>
+      <select id="sc-competition" class="compat-input" onchange="onCompetitionChange()">
+        <option value="">-- choose a competition --</option>
+        {% for c in competitions %}
+          <option value="{{ c.competition }}" data-country="{{ c.country }}">
+            {{ c.competition.replace('_',' ') }} ({{ c.country.replace('_',' ') }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="sc-field">
+      <label>Country</label>
+      <div class="sc-country-display" id="sc-country-display">&mdash;</div>
+    </div>
+
+    <div class="sc-field">
+      <label>&nbsp;</label>
+      <button class="compat-btn" id="sc-load-btn" onclick="loadScatterData()" disabled
+              style="height:38px; padding:0 20px;">
+        Load Data
+      </button>
+    </div>
+
+  </div>
+
+  <div id="sc-loading" class="sc-loading" style="display:none;">
+    <span class="loading"></span> Loading player statistics&hellip;
+  </div>
+  <div id="sc-info" style="display:none;">
+    <div class="sc-info-chip">
+      <span class="pool-tag" id="sc-chip"></span>
+    </div>
+  </div>
+  <div id="sc-error" class="cf-error" style="display:none;"></div>
+</div>
+
+<!-- Chart area (hidden until data loaded) -->
+<div id="sc-chart-area" style="display:none;">
+
+  <!-- Position filter + p90 toggle -->
+  <div class="sc-filter-row">
+    <div class="sc-axis-field">
+      <label>Position</label>
+      <select id="sc-position-filter" class="compat-input" onchange="renderChart()" style="width:140px;">
+        <option value="All">All</option>
+        <option value="GK">GK</option>
+        <option value="DEF">DEF</option>
+        <option value="MID">MID</option>
+        <option value="FWD">FWD</option>
+      </select>
+    </div>
+    <div class="sc-axis-field">
+      <label>Stat Mode</label>
+      <div style="display:flex; gap:4px;">
+        <button id="mode-totals" class="compat-btn" onclick="setStatMode('totals')"
+                style="height:38px; padding:0 16px;">Totals</button>
+        <button id="mode-p90"    class="btn-ghost"  onclick="setStatMode('p90')"
+                style="height:38px; padding:0 16px;">p90</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc-tabs">
+    <button id="tab-attacking" class="compat-btn" onclick="switchTab('attacking')">Attacking</button>
+    <button id="tab-passing"   class="btn-ghost"  onclick="switchTab('passing')">Passing</button>
+    <button id="tab-defensive" class="btn-ghost"  onclick="switchTab('defensive')">Defensive</button>
+  </div>
+
+  <!-- Axis controls + chart -->
+  <div class="card">
+    <div class="sc-axis-row">
+      <div class="sc-axis-field">
+        <label>X Axis</label>
+        <select id="x-axis-select" class="compat-input"></select>
+      </div>
+      <div class="sc-axis-field">
+        <label>Y Axis</label>
+        <select id="y-axis-select" class="compat-input"></select>
+      </div>
+      <div class="sc-axis-field">
+        <label>&nbsp;</label>
+        <button class="compat-btn" onclick="renderChart()"
+                style="height:38px; padding:0 20px;">Plot</button>
+      </div>
+      <div class="sc-axis-field">
+        <label>&nbsp;</label>
+        <button class="btn-ghost" id="sc-reset-zoom" onclick="resetZoom()"
+                style="height:38px; padding:0 16px;" disabled>
+          Reset Zoom
+        </button>
+      </div>
+    </div>
+
+    <!-- Highlight selector -->
+    <div class="sc-highlight-row">
+      <div class="sc-axis-field">
+        <label>Highlight Player</label>
+        <select id="sc-highlight-select" class="compat-input" onchange="onHighlightSelect()" style="min-width:220px;">
+          <option value="">-- select a player --</option>
+        </select>
+      </div>
+      <div class="sc-axis-field">
+        <button class="btn-ghost" onclick="clearHighlight()" style="height:38px; padding:0 14px;">&#x2715; Clear</button>
+      </div>
+    </div>
+
+    <div class="sc-canvas-wrap">
+      <canvas id="scatter-canvas"></canvas>
+    </div>
+
+    <div id="sc-chart-chip" class="sc-info-chip" style="display:none;">
+      <span class="pool-tag" id="sc-chart-chip-text"></span>
+    </div>
+
+    <!-- Persistent entity info card -->
+    <div class="sc-entity-card" id="sc-entity-card">
+      <div class="sc-entity-card-name" id="sc-ec-name"></div>
+      <div class="sc-entity-card-meta" id="sc-ec-meta"></div>
+      <div class="sc-entity-card-stats" id="sc-ec-stats"></div>
+    </div>
+  </div>
+
+  <!-- Ranking table -->
+  <div id="sc-ranking-area" style="display:none; margin-top:20px;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Ranking</div>
+      <div class="sc-rank-controls">
+        <span class="sc-rank-label">Show top</span>
+        <input type="number" id="sc-rank-n" class="compat-input sc-rank-n-input"
+               value="10" min="1" max="500" oninput="onRankTopNChange()">
+        <span class="sc-rank-label">entries</span>
+      </div>
+      <div class="sc-rank-table-wrap">
+        <table class="sc-rank-table">
+          <thead id="sc-rank-thead"></thead>
+          <tbody id="sc-rank-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<script>
+// ── Stat label map ────────────────────────────────────────────────────────────
+const STAT_LABELS = {
+  // Club-level (shared)
+  goalsScored:                 'Goals Scored',
+  goalsConceded:               'Goals Conceded',
+  assists:                     'Assists',
+  shots:                       'Shots',
+  penaltyGoals:                'Penalty Goals',
+  penaltiesTaken:              'Penalties Taken',
+  successfulDribbles:          'Successful Dribbles',
+  dribbleAttempts:             'Dribble Attempts',
+  corners:                     'Corners',
+  averageBallPossession:       'Avg Possession %',
+  totalPasses:                 'Total Passes',
+  accuratePasses:              'Accurate Passes',
+  accuratePassesPercentage:    'Pass Accuracy %',
+  totalLongBalls:              'Total Long Balls',
+  accurateLongBalls:           'Accurate Long Balls',
+  accurateLongBallsPercentage: 'Long Ball Accuracy %',
+  totalCrosses:                'Total Crosses',
+  totalCross:                  'Total Crosses',
+  accurateCrosses:             'Accurate Crosses',
+  accurateCrossesPercentage:   'Cross Accuracy %',
+  cleanSheets:                 'Clean Sheets',
+  interceptions:               'Interceptions',
+  saves:                       'Saves',
+  errorsLeadingToShot:         'Errors Leading to Shot',
+  totalDuels:                  'Total Duels',
+  duelsWon:                    'Duels Won',
+  duelsWonPercentage:          'Duel Win %',
+  totalAerialDuels:            'Total Aerial Duels',
+  aerialDuelsWon:              'Aerial Duels Won',
+  aerialDuelsWonPercentage:    'Aerial Duel Win %',
+  totalDuelsWon:               'Total Duels Won',
+  totalDuelsWonPercentage:     'Duel Win %',
+  offsides:                    'Offsides',
+  fouls:                       'Fouls',
+  yellowCards:                 'Yellow Cards',
+  yellowRedCards:              'Yellow-Red Cards',
+  redCards:                    'Red Cards',
+  shotsAgainst:                'Shots Against',
+  goalKicks:                   'Goal Kicks',
+  ballRecovery:                'Ball Recoveries',
+  freeKicks:                   'Free Kicks',
+  matches:                     'Matches Played',
+  // Player-specific
+  goals:                       'Goals',
+  shotsOnTarget:               'Shots on Target',
+  totalShots:                  'Total Shots',
+  keyPasses:                   'Key Passes',
+  dribbles:                    'Dribbles',
+  dribblesSuccess:             'Successful Dribbles',
+  successfulDribblesPercentage:'Dribble Success %',
+  tackles:                     'Tackles',
+  tacklesWon:                  'Tackles Won',
+  tacklesWonPercentage:        'Tackle Win %',
+  minutesPlayed:               'Minutes Played',
+  appearances:                 'Appearances',
+  matchesStarted:              'Matches Started',
+  rating:                      'Rating',
+  expectedGoals:               'Expected Goals (xG)',
+  expectedAssists:             'Expected Assists (xA)',
+  goalConversionPercentage:    'Goal Conversion %',
+  penaltyConversion:           'Penalty Conversion %',
+  groundDuelsWon:              'Ground Duels Won',
+  groundDuelsWonPercentage:    'Ground Duel Win %',
+  bigChancesCreated:           'Big Chances Created',
+  bigChancesMissed:            'Big Chances Missed',
+  clearances:                  'Clearances',
+  blockedShots:                'Blocked Shots',
+  wasFouled:                   'Was Fouled',
+  touches:                     'Touches',
+  possessionLost:              'Possession Lost',
+  possessionWonAttThird:       'Poss. Won Att. Third',
+  dispossessed:                'Dispossessed',
+  errorLeadToGoal:             'Errors → Goal',
+  errorLeadToShot:             'Errors → Shot',
+  headedGoals:                 'Headed Goals',
+  freeKickGoal:                'Free Kick Goals',
+  goalsFromInsideTheBox:       'Goals Inside Box',
+  goalsFromOutsideTheBox:      'Goals Outside Box',
+};
+
+// ── P90-eligible set (countable stats that get a p90 variant) ─────────────────
+const P90_ELIGIBLE = new Set([
+  'goals', 'assists', 'shots', 'totalShots', 'shotsOnTarget', 'keyPasses',
+  'successfulDribbles', 'dribbles', 'dribblesSuccess',
+  'tackles', 'tacklesWon', 'interceptions',
+  'totalDuelsWon', 'duelsWon', 'aerialDuelsWon', 'groundDuelsWon',
+  'accuratePasses', 'accurateCrosses', 'accurateLongBalls',
+  'totalPasses', 'totalCross', 'totalLongBalls',
+  'yellowCards', 'redCards',
+  'minutesPlayed', 'appearances', 'matchesStarted',
+  'expectedGoals', 'expectedAssists',
+  'bigChancesCreated', 'bigChancesMissed',
+  'clearances', 'blockedShots', 'ballRecovery', 'saves',
+  'fouls', 'wasFouled', 'offsides', 'touches',
+  'possessionLost', 'possessionWonAttThird', 'dispossessed',
+  'penaltyGoals', 'penaltiesTaken',
+  'errorLeadToGoal', 'errorLeadToShot',
+  'headedGoals', 'freeKickGoal',
+  'goalsFromInsideTheBox', 'goalsFromOutsideTheBox',
+]);
+
+function baseLabelFor(key) {
+  return STAT_LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function labelFor(key) {
+  const base = baseLabelFor(key);
+  if (statMode === 'p90' && P90_ELIGIBLE.has(key)) return base + ' p90';
+  return base;
+}
+
+// ── Position color map ────────────────────────────────────────────────────────
+const POS_COLORS = {
+  GK:  { bg: 'rgba(255,183,77,0.25)',  border: '#ffb74d' },
+  DEF: { bg: 'rgba(77,182,172,0.25)',  border: '#4db6ac' },
+  MID: { bg: 'rgba(58,141,191,0.25)',  border: '#3a8dbf' },
+  FWD: { bg: 'rgba(229,115,115,0.25)', border: '#e57373' },
+};
+
+function posGroup(position) {
+  if (!position) return 'MID';
+  const p = position.toUpperCase();
+  if (p.includes('GK') || p.includes('GOALKEEPER'))  return 'GK';
+  if (p.includes('DEF') || p.includes('BACK'))       return 'DEF';
+  if (p.includes('FWD') || p.includes('FORWARD') || p.includes('STRIKER') || p.includes('ATT')) return 'FWD';
+  if (p.includes('MID'))                              return 'MID';
+  return 'MID';
+}
+
+// ── Tab defaults ──────────────────────────────────────────────────────────────
+const TAB_DEFAULTS = {
+  attacking: { x: 'goals',           y: 'shots'                   },
+  passing:   { x: 'keyPasses',       y: 'accuratePassesPercentage'},
+  defensive: { x: 'interceptions',   y: 'tacklesWon'              },
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let playerData  = null;
+let statKeys    = [];
+let activeTab   = 'attacking';
+let statMode    = 'totals';
+let chartInst   = null;
+let compLabel   = '';
+let isZoomed    = false;
+let currentPoints  = [];
+let selectedSlug   = null;
+let rankSortCol    = 'x';
+let rankSortDir    = 'desc';
+let rankTopN       = 10;
+let rankXKey       = '';
+let rankYKey       = '';
+
+// ── Zoom / pan helpers ────────────────────────────────────────────────────────
+function onZoomOrPan() {
+  isZoomed = true;
+  document.getElementById('sc-reset-zoom').disabled = false;
+}
+
+function resetZoom() {
+  if (chartInst) chartInst.resetZoom();
+  isZoomed = false;
+  document.getElementById('sc-reset-zoom').disabled = true;
+}
+
+// ── Stat value helper ─────────────────────────────────────────────────────────
+function getStatVal(player, key) {
+  if (statMode === 'p90' && player.stats_p90 && player.stats_p90[key] !== undefined) {
+    return player.stats_p90[key];
+  }
+  return player.stats[key];
+}
+
+// ── Setup ─────────────────────────────────────────────────────────────────────
+function onCompetitionChange() {
+  const sel = document.getElementById('sc-competition');
+  const opt = sel.options[sel.selectedIndex];
+  const country = opt.dataset.country || '';
+  document.getElementById('sc-country-display').textContent =
+    country ? country.replace(/_/g, ' ') : '\u2014';
+  document.getElementById('sc-load-btn').disabled = !sel.value;
+  document.getElementById('sc-error').style.display  = 'none';
+  document.getElementById('sc-info').style.display   = 'none';
+  document.getElementById('sc-chart-area').style.display = 'none';
+  playerData = null;
+}
+
+function loadScatterData() {
+  const sel    = document.getElementById('sc-competition');
+  const comp   = sel.value;
+  const opt    = sel.options[sel.selectedIndex];
+  const country = opt.dataset.country || '';
+  if (!comp) return;
+
+  document.getElementById('sc-loading').style.display = 'flex';
+  document.getElementById('sc-error').style.display   = 'none';
+  document.getElementById('sc-info').style.display    = 'none';
+  document.getElementById('sc-chart-area').style.display = 'none';
+  document.getElementById('sc-load-btn').disabled     = true;
+
+  fetch('/api/player_scatter_data?competition=' + encodeURIComponent(comp)
+                               + '&country='    + encodeURIComponent(country))
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('sc-loading').style.display = 'none';
+      document.getElementById('sc-load-btn').disabled     = false;
+      if (data.error) { showScError(data.error); return; }
+      playerData = data.players;
+      statKeys   = data.stat_keys;
+      compLabel  = comp.replace(/_/g, ' ');
+      populateAxisDropdowns();
+      document.getElementById('sc-chip').textContent =
+        playerData.length + ' players loaded \u00b7 ' + compLabel;
+      document.getElementById('sc-info').style.display = 'block';
+      document.getElementById('sc-chart-area').style.display = 'block';
+      document.getElementById('sc-position-filter').value = 'All';
+      statMode = 'totals';
+      document.getElementById('mode-totals').className = 'compat-btn';
+      document.getElementById('mode-p90').className    = 'btn-ghost';
+      switchTab('attacking', false);
+      renderChart();
+    })
+    .catch(() => {
+      document.getElementById('sc-loading').style.display = 'none';
+      document.getElementById('sc-load-btn').disabled     = false;
+      showScError('Network error \u2014 is the server running?');
+    });
+}
+
+function populateAxisDropdowns() {
+  ['x-axis-select', 'y-axis-select'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '';
+    statKeys.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value       = k;
+      opt.textContent = labelFor(k);
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function refreshAxisLabels() {
+  ['x-axis-select', 'y-axis-select'].forEach(id => {
+    const sel = document.getElementById(id);
+    Array.from(sel.options).forEach(opt => {
+      opt.textContent = labelFor(opt.value);
+    });
+  });
+}
+
+// ── Stat mode toggle ──────────────────────────────────────────────────────────
+function setStatMode(mode) {
+  statMode = mode;
+  document.getElementById('mode-totals').className = mode === 'totals' ? 'compat-btn' : 'btn-ghost';
+  document.getElementById('mode-p90').className    = mode === 'p90'    ? 'compat-btn' : 'btn-ghost';
+  refreshAxisLabels();
+  if (playerData) renderChart();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(name, autoRender) {
+  activeTab = name;
+  ['attacking', 'passing', 'defensive'].forEach(t => {
+    const btn = document.getElementById('tab-' + t);
+    btn.className = t === name ? 'compat-btn' : 'btn-ghost';
+  });
+  const def = TAB_DEFAULTS[name];
+  setSelectVal('x-axis-select', def.x);
+  setSelectVal('y-axis-select', def.y);
+  if (autoRender !== false && playerData) renderChart();
+}
+
+function setSelectVal(id, val) {
+  const sel = document.getElementById(id);
+  const opt = Array.from(sel.options).find(o => o.value === val);
+  if (opt) sel.value = val;
+}
+
+// ── Top 15 selection ──────────────────────────────────────────────────────────
+function selectTop15(candidates, xKey, yKey) {
+  const valid = candidates.filter(p => {
+    const x = getStatVal(p, xKey);
+    const y = getStatVal(p, yKey);
+    return x !== undefined && x !== null && y !== undefined && y !== null;
+  });
+  if (valid.length === 0) return [];
+
+  let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+  valid.forEach(p => {
+    const x = getStatVal(p, xKey), y = getStatVal(p, yKey);
+    if (x < xMin) xMin = x; if (x > xMax) xMax = x;
+    if (y < yMin) yMin = y; if (y > yMax) yMax = y;
+  });
+  const xRange = xMax - xMin || 1;
+  const yRange = yMax - yMin || 1;
+
+  const scored = valid.map(p => ({
+    player: p,
+    score: (getStatVal(p, xKey) - xMin) / xRange + (getStatVal(p, yKey) - yMin) / yRange
+  }));
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 15).map(s => s.player);
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+const labelPlugin = {
+  id: 'playerLabels',
+  afterDraw(chart) {
+    const ctx   = chart.ctx;
+    const meta  = chart.getDatasetMeta(0);
+    chart.data.datasets[0].data.forEach((point, i) => {
+      const el = meta.data[i];
+      if (!el) return;
+      let labelOffset = 10;
+      if (selectedSlug === null) {
+        ctx.fillStyle = '#9bb5c3';
+        ctx.font      = '11px "DM Mono", monospace';
+      } else if (point.slug === selectedSlug) {
+        ctx.fillStyle = '#ffd740';
+        ctx.font      = 'bold 13px "DM Mono", monospace';
+        labelOffset   = 18;
+      } else {
+        ctx.fillStyle = 'rgba(155,181,195,0.20)';
+        ctx.font      = '11px "DM Mono", monospace';
+      }
+      ctx.fillText(point.label, el.x + labelOffset, el.y + 4);
+    });
+  }
+};
+Chart.register(labelPlugin);
+
+function renderChart() {
+  if (!playerData || !playerData.length) return;
+
+  isZoomed = false;
+  document.getElementById('sc-reset-zoom').disabled = true;
+
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  if (!xKey || !yKey) return;
+
+  // Position filter
+  const posFilter = document.getElementById('sc-position-filter').value;
+  let candidates = playerData;
+  if (posFilter !== 'All') {
+    candidates = playerData.filter(p => posGroup(p.position) === posFilter);
+  }
+
+  // Top 15
+  const top15 = selectTop15(candidates, xKey, yKey);
+
+  // Build chart data
+  const points = [];
+  top15.forEach(p => {
+    const grp  = posGroup(p.position);
+    points.push({
+      x:              getStatVal(p, xKey),
+      y:              getStatVal(p, yKey),
+      slug:           p.player_slug,
+      posGrp:         grp,
+      label:          p.player + ' \u00b7 ' + p.club,
+      player:         p.player,
+      club:           p.club,
+      position:       p.position,
+      minutesPlayed:  p.minutesPlayed,
+      appearances:    p.appearances,
+      rawX:           p.stats[xKey],
+      rawY:           p.stats[yKey],
+      p90X:           (p.stats_p90 && p.stats_p90[xKey] !== undefined) ? p.stats_p90[xKey] : null,
+      p90Y:           (p.stats_p90 && p.stats_p90[yKey] !== undefined) ? p.stats_p90[yKey] : null,
+    });
+  });
+  currentPoints = points;
+  selectedSlug  = null;
+
+  // Update chip
+  const totalPool = candidates.filter(p => {
+    const x = getStatVal(p, xKey), y = getStatVal(p, yKey);
+    return x !== undefined && x !== null && y !== undefined && y !== null;
+  }).length;
+  let chipText = 'Showing top 15 of ' + totalPool + ' players \u00b7 ' + compLabel;
+  if (statMode === 'p90') chipText += ' \u00b7 Per 90 mins \u00b7 Min. 450 mins played';
+  document.getElementById('sc-chart-chip-text').textContent = chipText;
+  document.getElementById('sc-chart-chip').style.display = 'block';
+
+  if (chartInst) {
+    chartInst.destroy();
+    chartInst = null;
+  }
+
+  const xLabel = labelFor(xKey);
+  const yLabel = labelFor(yKey);
+  const xBase  = baseLabelFor(xKey);
+  const yBase  = baseLabelFor(yKey);
+  const xIsP90Eligible = P90_ELIGIBLE.has(xKey);
+  const yIsP90Eligible = P90_ELIGIBLE.has(yKey);
+
+  const { bgColors, borderColors, radii } = computePointColors(points);
+
+  const canvas = document.getElementById('scatter-canvas');
+  chartInst = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        data:                points,
+        backgroundColor:     bgColors,
+        borderColor:         borderColors,
+        pointRadius:         radii,
+        pointHoverRadius:    10,
+        pointBorderWidth:    1.5,
+        hitRadius:           6,
+      }]
+    },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      onClick: (evt, elements) => {
+        if (!elements.length) { highlightEntity(null); return; }
+        const idx = elements[0].index;
+        highlightEntity(currentPoints[idx].slug);
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const r = ctx.raw;
+              const lines = [r.player + ' \u00b7 ' + r.club + ' \u00b7 ' + (r.position || '')];
+              // X axis
+              if (xIsP90Eligible && r.p90X !== null) {
+                lines.push(xBase + ': ' + r.rawX + ' (tot) / ' + r.p90X + ' p90');
+              } else {
+                lines.push(xBase + ': ' + r.rawX);
+              }
+              // Y axis
+              if (yIsP90Eligible && r.p90Y !== null) {
+                lines.push(yBase + ': ' + r.rawY + ' (tot) / ' + r.p90Y + ' p90');
+              } else {
+                lines.push(yBase + ': ' + r.rawY);
+              }
+              lines.push(r.minutesPlayed + ' mins \u00b7 ' + r.appearances + ' apps');
+              return lines;
+            }
+          }
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'xy',
+            onPan: onZoomOrPan,
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true,
+            },
+            mode: 'xy',
+            onZoom: onZoomOrPan,
+          },
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: xLabel, color: '#9bb5c3',
+                   font: { family: "'CoFoSans', monospace", size: 12 } },
+          grid:  { color: '#1e4a64' },
+          ticks: { color: '#9bb5c3' }
+        },
+        y: {
+          title: { display: true, text: yLabel, color: '#9bb5c3',
+                   font: { family: "'CoFoSans', monospace", size: 12 } },
+          grid:  { color: '#1e4a64' },
+          ticks: { color: '#9bb5c3' }
+        }
+      }
+    }
+  });
+
+  populateHighlightDropdown(points);
+  buildRankingTable(points, xKey, yKey);
+}
+
+// ── Point colors ──────────────────────────────────────────────────────────────
+function computePointColors(pts) {
+  const bgColors     = [];
+  const borderColors = [];
+  const radii        = [];
+  pts.forEach(pt => {
+    const cols = POS_COLORS[pt.posGrp] || POS_COLORS.MID;
+    if (selectedSlug === null) {
+      bgColors.push(cols.bg);
+      borderColors.push(cols.border);
+      radii.push(7);
+    } else if (pt.slug === selectedSlug) {
+      bgColors.push('rgba(255,215,64,0.90)');
+      borderColors.push('#ffd740');
+      radii.push(13);
+    } else {
+      bgColors.push('rgba(58,141,191,0.05)');
+      borderColors.push('rgba(155,181,195,0.15)');
+      radii.push(5);
+    }
+  });
+  return { bgColors, borderColors, radii };
+}
+
+// ── Highlight entity ──────────────────────────────────────────────────────────
+function highlightEntity(slug) {
+  selectedSlug = (slug !== null && slug === selectedSlug) ? null : slug;
+  if (!chartInst) return;
+  const { bgColors, borderColors, radii } = computePointColors(currentPoints);
+  chartInst.data.datasets[0].backgroundColor = bgColors;
+  chartInst.data.datasets[0].borderColor     = borderColors;
+  chartInst.data.datasets[0].pointRadius     = radii;
+  chartInst.update('none');
+  const sel = document.getElementById('sc-highlight-select');
+  if (sel) sel.value = selectedSlug || '';
+  updateEntityCard();
+  renderRankingTable();
+}
+
+function clearHighlight() {
+  selectedSlug = null;
+  if (chartInst) {
+    const { bgColors, borderColors, radii } = computePointColors(currentPoints);
+    chartInst.data.datasets[0].backgroundColor = bgColors;
+    chartInst.data.datasets[0].borderColor     = borderColors;
+    chartInst.data.datasets[0].pointRadius     = radii;
+    chartInst.update('none');
+  }
+  const sel = document.getElementById('sc-highlight-select');
+  if (sel) sel.value = '';
+  updateEntityCard();
+  renderRankingTable();
+}
+
+// ── Entity info card ───────────────────────────────────────────────────────────
+function calcPercentile(val, allVals) {
+  const valid = allVals.filter(v => v !== null && v !== undefined && !isNaN(v));
+  if (valid.length <= 1 || val === null || val === undefined) return null;
+  const below = valid.filter(v => v < val).length;
+  return Math.round(below / (valid.length - 1) * 100);
+}
+
+function pctColor(pct) {
+  if (pct >= 75) return '#4db6ac';
+  if (pct >= 50) return '#3a8dbf';
+  return '#4e606a';
+}
+
+function ordinal(n) {
+  const v = n % 100;
+  const sfx = v === 11 || v === 12 || v === 13 ? 'th'
+    : n % 10 === 1 ? 'st'
+    : n % 10 === 2 ? 'nd'
+    : n % 10 === 3 ? 'rd' : 'th';
+  return n + sfx;
+}
+
+function calcRank(val, allVals) {
+  const valid = allVals.filter(v => v !== null && v !== undefined && !isNaN(v));
+  if (!valid.length || val === null || val === undefined) return null;
+  const rank = valid.filter(v => v > val).length + 1;
+  return { rank, total: valid.length };
+}
+
+function tierInfo(pct) {
+  if (pct >= 90) return { label: 'Elite',        bg: 'rgba(77,182,172,0.20)',  color: '#4db6ac' };
+  if (pct >= 75) return { label: 'Strong',        bg: 'rgba(58,141,191,0.20)',  color: '#3a8dbf' };
+  if (pct >= 50) return { label: 'Above Average', bg: 'rgba(100,140,170,0.15)', color: '#7baabf' };
+  if (pct >= 25) return { label: 'Average',        bg: 'rgba(78,96,106,0.20)',   color: '#7a9aaa' };
+  return               { label: 'Below Average',  bg: 'rgba(78,96,106,0.15)',   color: '#4e606a' };
+}
+
+function updateEntityCard() {
+  const card = document.getElementById('sc-entity-card');
+  if (!card) return;
+  if (!selectedSlug) {
+    card.style.display = 'none';
+    return;
+  }
+  const pt = currentPoints.find(p => p.slug === selectedSlug);
+  if (!pt) { card.style.display = 'none'; return; }
+
+  const xKey          = document.getElementById('x-axis-select').value;
+  const yKey          = document.getElementById('y-axis-select').value;
+  const xBase         = baseLabelFor(xKey);
+  const yBase         = baseLabelFor(yKey);
+  const xIsP90Elig    = P90_ELIGIBLE.has(xKey);
+  const yIsP90Elig    = P90_ELIGIBLE.has(yKey);
+
+  const bc   = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+  const badge = '<span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span>';
+
+  document.getElementById('sc-ec-name').innerHTML = escHtml(pt.player) + '&nbsp;&nbsp;' + badge;
+  document.getElementById('sc-ec-meta').textContent =
+    escHtml(pt.club) + '  \u00b7  ' + pt.minutesPlayed + ' mins  \u00b7  ' + pt.appearances + ' apps' +
+    (pt.position ? '  \u00b7  ' + pt.position : '');
+
+  const allXVals = currentPoints.map(p => p.rawX);
+  const allYVals = currentPoints.map(p => p.rawY);
+  const xPct  = calcPercentile(pt.rawX, allXVals);
+  const yPct  = calcPercentile(pt.rawY, allYVals);
+  const xRank = calcRank(pt.rawX, allXVals);
+  const yRank = calcRank(pt.rawY, allYVals);
+
+  function statBlock(label, raw, p90, isP90Eligible, pct, rankObj) {
+    const valStr = (raw !== undefined && raw !== null) ? raw : '\u2014';
+    const p90Str = (isP90Eligible && p90 !== null) ? p90 + ' p90' : '';
+    let rankHtml = '';
+    if (pct !== null && pct !== undefined && rankObj) {
+      const tier     = tierInfo(pct);
+      const barColor = pctColor(pct);
+      rankHtml =
+        '<div class="sc-pct-wrap">'
+        + '<div class="sc-pct-bar-track"><div class="sc-pct-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>'
+        + '<span class="sc-tier-badge" style="background:' + tier.bg + ';color:' + tier.color + ';">' + tier.label + '</span>'
+        + '<span class="sc-rank-text">Ranked ' + rankObj.rank + ' of ' + rankObj.total + ' players</span>'
+        + '</div>';
+    }
+    return '<div class="sc-entity-stat">'
+      + '<span class="sc-entity-stat-label">' + escHtml(label) + '</span>'
+      + '<span class="sc-entity-stat-value">' + escHtml(String(valStr)) + '</span>'
+      + (p90Str ? '<span class="sc-entity-stat-p90">' + escHtml(p90Str) + '</span>' : '')
+      + rankHtml
+      + '</div>';
+  }
+
+  document.getElementById('sc-ec-stats').innerHTML =
+    statBlock(xBase, pt.rawX, pt.p90X, xIsP90Elig, xPct, xRank) +
+    statBlock(yBase, pt.rawY, pt.p90Y, yIsP90Elig, yPct, yRank);
+
+  card.style.display = 'block';
+}
+
+// ── Highlight dropdown ────────────────────────────────────────────────────────
+function populateHighlightDropdown(pts) {
+  const sel = document.getElementById('sc-highlight-select');
+  if (!sel) return;
+  const sorted = pts.slice().sort((a, b) => a.player.localeCompare(b.player));
+  sel.innerHTML = '<option value="">-- select a player --</option>';
+  sorted.forEach(pt => {
+    const opt = document.createElement('option');
+    opt.value       = pt.slug;
+    opt.textContent = pt.player + ' \u00b7 ' + pt.club;
+    sel.appendChild(opt);
+  });
+  sel.value = selectedSlug || '';
+}
+
+function onHighlightSelect() {
+  const val = document.getElementById('sc-highlight-select').value;
+  highlightEntity(val || null);
+}
+
+// ── Ranking table ─────────────────────────────────────────────────────────────
+const POS_BADGE_COLORS = {
+  GK:  { bg: 'rgba(255,183,77,0.20)',  color: '#ffb74d' },
+  DEF: { bg: 'rgba(77,182,172,0.20)',  color: '#4db6ac' },
+  MID: { bg: 'rgba(58,141,191,0.20)',  color: '#3a8dbf' },
+  FWD: { bg: 'rgba(229,115,115,0.20)', color: '#e57373' },
+};
+
+function buildRankingTable(pts, xKey, yKey) {
+  rankXKey    = xKey;
+  rankYKey    = yKey;
+  rankSortCol = 'x';
+  rankSortDir = 'desc';
+  const nInput = document.getElementById('sc-rank-n');
+  rankTopN = nInput ? Math.max(1, parseInt(nInput.value) || 10) : 10;
+
+  const thead = document.getElementById('sc-rank-thead');
+  thead.innerHTML =
+    '<tr>' +
+    '<th style="width:40px;">#</th>' +
+    '<th id="sc-th-name" onclick="onRankHeaderClick(\'name\')">Player</th>' +
+    '<th id="sc-th-club" style="width:180px;" onclick="onRankHeaderClick(\'club\')">Club</th>' +
+    '<th style="width:55px;">Pos</th>' +
+    '<th id="sc-th-x" class="sc-rank-stat sort-desc" style="width:150px;" onclick="onRankHeaderClick(\'x\')"> ' + labelFor(xKey) + '</th>' +
+    '<th id="sc-th-y" class="sc-rank-stat" style="width:150px;" onclick="onRankHeaderClick(\'y\')"> ' + labelFor(yKey) + '</th>' +
+    '</tr>';
+
+  document.getElementById('sc-ranking-area').style.display = 'block';
+  renderRankingTable();
+}
+
+function renderRankingTable() {
+  const tbody = document.getElementById('sc-rank-tbody');
+  if (!tbody || !currentPoints.length) return;
+
+  const pts = currentPoints.slice().sort((a, b) => {
+    if (rankSortCol === 'name') {
+      return rankSortDir === 'asc'
+        ? a.player.localeCompare(b.player)
+        : b.player.localeCompare(a.player);
+    }
+    if (rankSortCol === 'club') {
+      return rankSortDir === 'asc'
+        ? a.club.localeCompare(b.club)
+        : b.club.localeCompare(a.club);
+    }
+    const va = rankSortCol === 'x' ? a.x : a.y;
+    const vb = rankSortCol === 'x' ? b.x : b.y;
+    return rankSortDir === 'desc' ? vb - va : va - vb;
+  });
+  const visible = pts.slice(0, rankTopN);
+
+  ['sc-th-name', 'sc-th-club', 'sc-th-x', 'sc-th-y'].forEach(id => {
+    const th = document.getElementById(id);
+    if (!th) return;
+    const col  = id === 'sc-th-name' ? 'name' : id === 'sc-th-club' ? 'club' : id === 'sc-th-x' ? 'x' : 'y';
+    const base = (col === 'x' || col === 'y') ? 'sc-rank-stat' : '';
+    th.className = (base + (rankSortCol === col ? ' sort-' + rankSortDir : '')).trim();
+  });
+
+  tbody.innerHTML = visible.map((pt, i) => {
+    const isSelected = pt.slug === selectedSlug;
+    const xVal = typeof pt.x === 'number' ? pt.x : '\u2014';
+    const yVal = typeof pt.y === 'number' ? pt.y : '\u2014';
+    const bc   = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+    const badge = '<span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span>';
+    return '<tr class="' + (isSelected ? 'rank-selected' : '') + '" data-slug="' + escHtml(pt.slug) + '" onclick="onRankRowClick(this.dataset.slug)">' +
+      '<td class="sc-rank-num">' + (i + 1) + '</td>' +
+      '<td class="sc-rank-name">' + escHtml(pt.player) + '</td>' +
+      '<td style="color:var(--text2);">' + escHtml(pt.club) + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td class="sc-rank-stat">' + xVal + '</td>' +
+      '<td class="sc-rank-stat">' + yVal + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function onRankHeaderClick(col) {
+  if (col === rankSortCol) {
+    rankSortDir = rankSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    rankSortCol = col;
+    rankSortDir = (col === 'name' || col === 'club') ? 'asc' : 'desc';
+  }
+  renderRankingTable();
+}
+
+function onRankTopNChange() {
+  const nInput = document.getElementById('sc-rank-n');
+  rankTopN = nInput ? Math.max(1, parseInt(nInput.value) || 10) : 10;
+  renderRankingTable();
+}
+
+function onRankRowClick(slug) {
+  highlightEntity(slug);
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showScError(msg) {
+  const el = document.getElementById('sc-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+{% endblock %}

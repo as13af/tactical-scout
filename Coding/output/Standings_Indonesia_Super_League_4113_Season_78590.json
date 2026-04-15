@@ -1,0 +1,725 @@
+{
+    "standings": [
+        {
+            "type": "total",
+            "descriptions": [],
+            "tieBreakingRule": {
+                "text": "In the event that two (or more) teams have an equal number of points, the following rules break the tie: 1. Head-to-Head 2. Goal difference 3. Goals scored",
+                "id": 2605
+            },
+            "rows": [
+                {
+                    "team": {
+                        "name": "Persib Bandung",
+                        "slug": "persib-bandung",
+                        "shortName": "Persib",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 65362,
+                        "nameCode": "PBA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 64289,
+                        "teamColors": {
+                            "primary": "#0000ff",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Champions League 2",
+                        "id": 2061
+                    },
+                    "position": 1,
+                    "matches": 23,
+                    "wins": 17,
+                    "scoresFor": 39,
+                    "scoresAgainst": 13,
+                    "id": 1727408,
+                    "losses": 3,
+                    "draws": 3,
+                    "points": 54,
+                    "scoreDiffFormatted": "+26",
+                    "team_id": 64289
+                },
+                {
+                    "team": {
+                        "name": "Persija Jakarta",
+                        "slug": "persija-jakarta",
+                        "shortName": "Persija",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 26249,
+                        "nameCode": "PEJ",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 64295,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Challenge League",
+                        "id": 2057
+                    },
+                    "position": 2,
+                    "matches": 24,
+                    "wins": 16,
+                    "scoresFor": 44,
+                    "scoresAgainst": 21,
+                    "id": 1727409,
+                    "losses": 5,
+                    "draws": 3,
+                    "points": 51,
+                    "scoreDiffFormatted": "+23",
+                    "team_id": 64295
+                },
+                {
+                    "team": {
+                        "name": "Borneo FC Samarinda",
+                        "slug": "borneo-fc-samarinda",
+                        "shortName": "Borneo",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 13325,
+                        "nameCode": "SAM",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 189945,
+                        "teamColors": {
+                            "primary": "#ff6000",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 3,
+                    "matches": 23,
+                    "wins": 16,
+                    "scoresFor": 42,
+                    "scoresAgainst": 23,
+                    "id": 1727403,
+                    "losses": 5,
+                    "draws": 2,
+                    "points": 50,
+                    "scoreDiffFormatted": "+19",
+                    "team_id": 189945
+                },
+                {
+                    "team": {
+                        "name": "Malut United FC",
+                        "slug": "malut-united",
+                        "shortName": "Malut Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 8357,
+                        "nameCode": "MUN",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 491968,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 4,
+                    "matches": 24,
+                    "wins": 13,
+                    "scoresFor": 48,
+                    "scoresAgainst": 29,
+                    "id": 1727406,
+                    "losses": 6,
+                    "draws": 5,
+                    "points": 44,
+                    "scoreDiffFormatted": "+19",
+                    "team_id": 491968
+                },
+                {
+                    "team": {
+                        "name": "Persebaya Surabaya",
+                        "slug": "persebaya-surabaya",
+                        "shortName": "Persebaya",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 15477,
+                        "nameCode": "PER",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 76319,
+                        "teamColors": {
+                            "primary": "#008000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 5,
+                    "matches": 24,
+                    "wins": 10,
+                    "scoresFor": 36,
+                    "scoresAgainst": 25,
+                    "id": 1727407,
+                    "losses": 5,
+                    "draws": 9,
+                    "points": 39,
+                    "scoreDiffFormatted": "+11",
+                    "team_id": 76319
+                },
+                {
+                    "team": {
+                        "name": "Persita Tangerang",
+                        "slug": "persita-tangerang",
+                        "shortName": "Persita",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 6608,
+                        "nameCode": "PER",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 86576,
+                        "teamColors": {
+                            "primary": "#4b0082",
+                            "secondary": "#f01421",
+                            "text": "#f01421"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 6,
+                    "matches": 24,
+                    "wins": 11,
+                    "scoresFor": 31,
+                    "scoresAgainst": 23,
+                    "id": 1727413,
+                    "losses": 8,
+                    "draws": 5,
+                    "points": 38,
+                    "scoreDiffFormatted": "+8",
+                    "team_id": 86576
+                },
+                {
+                    "team": {
+                        "name": "Bhayangkara Presisi Lampung FC",
+                        "slug": "bhayangkara-presisi-indonesia-fc",
+                        "shortName": "Bhayangkara",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 5272,
+                        "nameCode": "BHA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 220867,
+                        "teamColors": {
+                            "primary": "#ffdf00",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 7,
+                    "matches": 24,
+                    "wins": 11,
+                    "scoresFor": 30,
+                    "scoresAgainst": 26,
+                    "id": 1727402,
+                    "losses": 8,
+                    "draws": 5,
+                    "points": 38,
+                    "scoreDiffFormatted": "+4",
+                    "team_id": 220867
+                },
+                {
+                    "team": {
+                        "name": "PSIM Yogyakarta",
+                        "slug": "psim-yogyakarta",
+                        "shortName": "PSIM",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 5378,
+                        "nameCode": "YOG",
+                        "national": false,
+                        "type": 0,
+                        "id": 75653,
+                        "teamColors": {
+                            "primary": "#374df5",
+                            "secondary": "#374df5",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 8,
+                    "matches": 24,
+                    "wins": 9,
+                    "scoresFor": 33,
+                    "scoresAgainst": 30,
+                    "id": 1727416,
+                    "losses": 5,
+                    "draws": 10,
+                    "points": 37,
+                    "scoreDiffFormatted": "+3",
+                    "team_id": 75653
+                },
+                {
+                    "team": {
+                        "name": "Dewa United FC",
+                        "slug": "dewa-united-fc",
+                        "shortName": "Dewa Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12460,
+                        "nameCode": "DEW",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 383891,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 9,
+                    "matches": 24,
+                    "wins": 10,
+                    "scoresFor": 29,
+                    "scoresAgainst": 30,
+                    "id": 1727404,
+                    "losses": 11,
+                    "draws": 3,
+                    "points": 33,
+                    "scoreDiffFormatted": "-1",
+                    "team_id": 383891
+                },
+                {
+                    "team": {
+                        "name": "Arema FC",
+                        "slug": "arema-fc",
+                        "shortName": "Arema",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 11455,
+                        "nameCode": "ARE",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 47465,
+                        "teamColors": {
+                            "primary": "#0000aa",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 10,
+                    "matches": 23,
+                    "wins": 8,
+                    "scoresFor": 32,
+                    "scoresAgainst": 30,
+                    "id": 1727400,
+                    "losses": 8,
+                    "draws": 7,
+                    "points": 31,
+                    "scoreDiffFormatted": "+2",
+                    "team_id": 47465
+                },
+                {
+                    "team": {
+                        "name": "Bali United FC",
+                        "slug": "bali-united-fc",
+                        "shortName": "Bali Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12129,
+                        "nameCode": "BAU",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 64299,
+                        "teamColors": {
+                            "primary": "#af1b22",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 11,
+                    "matches": 23,
+                    "wins": 7,
+                    "scoresFor": 31,
+                    "scoresAgainst": 31,
+                    "id": 1727401,
+                    "losses": 7,
+                    "draws": 9,
+                    "points": 30,
+                    "scoreDiffFormatted": "0",
+                    "team_id": 64299
+                },
+                {
+                    "team": {
+                        "name": "Persik Kediri",
+                        "slug": "persik-kediri",
+                        "shortName": "Persik",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 7228,
+                        "nameCode": "PKE",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 135866,
+                        "teamColors": {
+                            "primary": "#4b0082",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 12,
+                    "matches": 24,
+                    "wins": 8,
+                    "scoresFor": 32,
+                    "scoresAgainst": 42,
+                    "id": 1727411,
+                    "losses": 11,
+                    "draws": 5,
+                    "points": 29,
+                    "scoreDiffFormatted": "-10",
+                    "team_id": 135866
+                },
+                {
+                    "team": {
+                        "name": "PSM Makassar",
+                        "slug": "psm-makassar",
+                        "shortName": "PSM",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 12435,
+                        "nameCode": "MAK",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 135864,
+                        "teamColors": {
+                            "primary": "#b03060",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 13,
+                    "matches": 24,
+                    "wins": 5,
+                    "scoresFor": 26,
+                    "scoresAgainst": 31,
+                    "id": 1727417,
+                    "losses": 11,
+                    "draws": 8,
+                    "points": 23,
+                    "scoreDiffFormatted": "-5",
+                    "team_id": 135864
+                },
+                {
+                    "team": {
+                        "name": "Madura United FC",
+                        "slug": "madura-united",
+                        "shortName": "Madura Utd",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 7594,
+                        "nameCode": "MAU",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 86578,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 14,
+                    "matches": 24,
+                    "wins": 4,
+                    "scoresFor": 23,
+                    "scoresAgainst": 38,
+                    "id": 1727405,
+                    "losses": 12,
+                    "draws": 8,
+                    "points": 20,
+                    "scoreDiffFormatted": "-15",
+                    "team_id": 86578
+                },
+                {
+                    "team": {
+                        "name": "Persijap Jepara",
+                        "slug": "persijap-jepara",
+                        "shortName": "Persijap",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 3966,
+                        "nameCode": "PJE",
+                        "national": false,
+                        "type": 0,
+                        "id": 135868,
+                        "teamColors": {
+                            "primary": "#dc143c",
+                            "secondary": "#ffffff",
+                            "text": "#ffffff"
+                        }
+                    },
+                    "descriptions": [],
+                    "position": 15,
+                    "matches": 24,
+                    "wins": 5,
+                    "scoresFor": 20,
+                    "scoresAgainst": 39,
+                    "id": 1727410,
+                    "losses": 14,
+                    "draws": 5,
+                    "points": 20,
+                    "scoreDiffFormatted": "-19",
+                    "team_id": 135868
+                },
+                {
+                    "team": {
+                        "name": "PSBS Biak",
+                        "slug": "psbs-biak",
+                        "shortName": "PSBS",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 4949,
+                        "nameCode": "BIA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 266861,
+                        "teamColors": {
+                            "primary": "#ffff00",
+                            "secondary": "#00a100",
+                            "text": "#00a100"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 16,
+                    "matches": 24,
+                    "wins": 4,
+                    "scoresFor": 27,
+                    "scoresAgainst": 51,
+                    "id": 1727415,
+                    "losses": 14,
+                    "draws": 6,
+                    "points": 18,
+                    "scoreDiffFormatted": "-24",
+                    "team_id": 266861
+                },
+                {
+                    "team": {
+                        "name": "Persis Solo",
+                        "slug": "persis-solo",
+                        "shortName": "Persis",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 6788,
+                        "nameCode": "PSO",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 200020,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#222226",
+                            "text": "#222226"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 17,
+                    "matches": 24,
+                    "wins": 3,
+                    "scoresFor": 25,
+                    "scoresAgainst": 44,
+                    "id": 1727412,
+                    "losses": 13,
+                    "draws": 8,
+                    "points": 17,
+                    "scoreDiffFormatted": "-19",
+                    "team_id": 200020
+                },
+                {
+                    "team": {
+                        "name": "Semen Padang FC",
+                        "slug": "semen-padang",
+                        "shortName": "Semen Padang",
+                        "gender": "M",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "userCount": 6807,
+                        "nameCode": "SPA",
+                        "disabled": false,
+                        "national": false,
+                        "type": 0,
+                        "id": 86066,
+                        "teamColors": {
+                            "primary": "#ff0000",
+                            "secondary": "#000000",
+                            "text": "#000000"
+                        }
+                    },
+                    "descriptions": [],
+                    "promotion": {
+                        "text": "Relegation",
+                        "id": 3
+                    },
+                    "position": 18,
+                    "matches": 24,
+                    "wins": 4,
+                    "scoresFor": 19,
+                    "scoresAgainst": 41,
+                    "id": 1727418,
+                    "losses": 15,
+                    "draws": 5,
+                    "points": 17,
+                    "scoreDiffFormatted": "-22",
+                    "team_id": 86066
+                }
+            ],
+            "id": 185957,
+            "tournament": {
+                "name": "Indonesia Super League",
+                "slug": "liga-1",
+                "category": {
+                    "name": "Indonesia",
+                    "slug": "indonesia",
+                    "sport": {
+                        "name": "Football",
+                        "slug": "football",
+                        "id": 1
+                    },
+                    "id": 368,
+                    "flag": "indonesia",
+                    "alpha2": "ID"
+                },
+                "uniqueTournament": {
+                    "name": "Indonesia Super League",
+                    "slug": "liga-1",
+                    "primaryColorHex": "#e04b2d",
+                    "secondaryColorHex": "#2b4e95",
+                    "category": {
+                        "name": "Indonesia",
+                        "slug": "indonesia",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "id": 368,
+                        "flag": "indonesia",
+                        "alpha2": "ID"
+                    },
+                    "userCount": 17255,
+                    "hasPerformanceGraphFeature": true,
+                    "id": 1015,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "priority": 0,
+                "isGroup": false,
+                "isLive": false,
+                "id": 4113
+            },
+            "name": "Indonesia Super League 25/26",
+            "updatedAtTimestamp": 1772726167
+        }
+    ]
+}

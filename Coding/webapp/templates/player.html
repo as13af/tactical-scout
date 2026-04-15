@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+{% block title %}{{ data.get('player_name','Player') }} — Scout{% endblock %}
+
+{% block content %}
+{% set profile = data.get('profile', {}).get('player', {}) %}
+{% set stats   = data.get('statistics', {}).get('statistics', {}) %}
+{% set pos     = data.get('positions', []) %}
+
+<div class="breadcrumb">
+  <a href="/competitions">Competitions</a>
+  <span>/</span>
+  <a href="/competition/{{ country }}/{{ competition }}">{{ competition.replace('_',' ') }}</a>
+  <span>/</span>
+  <a href="/competition/{{ country }}/{{ competition }}/{{ club }}">{{ data.get('team', club) }}</a>
+  <span>/</span>
+  <span>{{ data.get('player_name','') }}</span>
+</div>
+
+<!-- Player header -->
+<div class="player-header">
+  <div class="player-meta" style="flex:1;">
+    <h1>{{ data.get('player_name','') }}</h1>
+    <div class="team-line">
+      {{ data.get('team','') }} · {{ competition.replace('_',' ') }} · {{ country.replace('_',' ') }}
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">
+      {% for p in pos %}
+        <span class="tag">{{ p }}</span>
+      {% endfor %}
+    </div>
+    <div class="player-bio">
+      {% if profile.get('age') %}
+        <div class="bio-item"><span class="bio-label">Age</span><span class="bio-val">{{ profile.age }}</span></div>
+      {% endif %}
+      {% if profile.get('height') %}
+        <div class="bio-item"><span class="bio-label">Height</span><span class="bio-val">{{ profile.height }} cm</span></div>
+      {% endif %}
+      {% if profile.get('preferredFoot') %}
+        <div class="bio-item"><span class="bio-label">Foot</span><span class="bio-val">{{ profile.preferredFoot | capitalize }}</span></div>
+      {% endif %}
+      {% if profile.get('shirtNumber') %}
+        <div class="bio-item"><span class="bio-label">Shirt</span><span class="bio-val">#{{ profile.shirtNumber }}</span></div>
+      {% endif %}
+      {% if profile.get('nationality') %}
+        <div class="bio-item"><span class="bio-label">Nationality</span><span class="bio-val">{{ profile.nationality }}</span></div>
+      {% endif %}
+      {% if profile.get('contract', {}).get('contractUntil') %}
+        <div class="bio-item"><span class="bio-label">Contract</span><span class="bio-val">Until {{ profile.contract.contractUntil }}</span></div>
+      {% endif %}
+      {% if cvs_score is defined and cvs_score %}
+        <div class="bio-item">
+          <span class="bio-label" title="IFFHS Competitive Value Score">League CVS</span>
+          <span class="bio-val" style="color:{% if cvs_score >= 70 %}var(--green){% elif cvs_score >= 40 %}var(--amber){% else %}var(--text2){% endif %};">{{ cvs_score }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick-action buttons -->
+    {% if player_path is defined %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
+      <a href="/compatibility?prefill={{ player_path | urlencode }}"
+         class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
+        🎯 Tactical Compatibility
+      </a>
+      <a href="/club_compatibility?prefill={{ player_path | urlencode }}"
+         class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
+        🏟️ Club Fit Analysis
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if stats.get('rating') %}
+    {% set rc = 'rc-good' if stats.rating|float >= 7.0 else ('rc-mid' if stats.rating|float >= 6.0 else 'rc-low') %}
+    <div style="text-align:center; padding:20px 32px; background:var(--bg3); border-radius:var(--radius); border:1px solid var(--border);">
+      <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Avg Rating</div>
+      <div class="rating-val {{ rc }}" style="font-family:'BasementGrotesque', sans-serif; font-size:48px; font-weight:800;">
+        {{ "%.2f"|format(stats.rating|float) }}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Stats + Heatmap grid -->
+<div class="grid-2" style="gap:20px; align-items:start;">
+
+  <!-- Stats -->
+  <div>
+    <!-- League Percentile Panel -->
+    {% if player_path is defined %}
+    <div class="card mb16" id="percentile-card" style="display:none;">
+      <div class="card-title" style="margin-bottom:2px;">League Percentile Rank</div>
+      <div style="font-size:11px; color:var(--text3); margin-bottom:10px;" id="pct-label">Loading…</div>
+      <div id="pct-bars"></div>
+    </div>
+    {% endif %}
+
+    <!-- Core stats -->
+    <div class="card mb16">
+      <div class="card-title">Core Statistics</div>
+      <div class="stat-grid">
+        {% set core = [
+          ('Appearances',  stats.get('appearances','')),
+          ('Goals',        stats.get('goals','')),
+          ('Assists',      stats.get('assists','')),
+          ('Minutes',      stats.get('minutesPlayed','')),
+          ('Yellow Cards', stats.get('yellowCards','')),
+          ('Red Cards',    stats.get('redCards','')),
+        ] %}
+        {% for label, val in core %}
+          {% if val != '' and val is not none %}
+            <div class="stat-block">
+              <div class="label">{{ label }}</div>
+              <div class="value">{{ val }}</div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Per-90 toggle -->
+    {% set mins = stats.get('minutesPlayed', 0)|int %}
+    {% if mins > 0 %}
+    <div class="p90-toggle-wrap" data-mins="{{ mins }}">
+      <span class="p90-label">Raw</span>
+      <label class="p90-switch">
+        <input type="checkbox" id="p90Toggle" onchange="toggleP90(this.checked)">
+        <span class="p90-slider"></span>
+      </label>
+      <span class="p90-label">Per 90</span>
+    </div>
+    {% endif %}
+
+    <!-- Attacking -->
+    {% set atk = [
+      ('Shots', stats.get('shots','')),
+      ('Shots on Target', stats.get('shotsOnTarget','')),
+      ('Big Chances', stats.get('bigChances','')),
+      ('Big Chances Missed', stats.get('bigChancesMissed','')),
+      ('Successful Dribbles', stats.get('successfulDribbles','')),
+      ('Dribble Attempts', stats.get('totalDribbleAttempts','')),
+      ('Key Passes', stats.get('keyPasses','')),
+    ] %}
+    {% if atk | selectattr(1, 'ne', '') | list %}
+      <div class="card mb16">
+        <div class="card-title">Attacking</div>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              {% for label, val in atk %}{% if val != '' and val is not none %}
+                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num p90-cell" data-raw="{{ val }}">{{ val }}</td></tr>
+              {% endif %}{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Passing -->
+    {% set pass_stats = [
+      ('Total Passes', stats.get('totalPasses','')),
+      ('Accurate Passes', stats.get('accuratePasses','')),
+      ('Pass Accuracy %', "%.1f"|format(stats.accuratePassesPercentage|float) if stats.get('accuratePassesPercentage') else ''),
+      ('Long Balls', stats.get('totalLongBalls','')),
+      ('Accurate Long Balls', stats.get('accurateLongBalls','')),
+      ('Crosses', stats.get('totalCross','')),
+    ] %}
+    {% if pass_stats | selectattr(1, 'ne', '') | list %}
+      <div class="card mb16">
+        <div class="card-title">Passing</div>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              {% for label, val in pass_stats %}{% if val != '' and val is not none %}
+                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num{% if '%' not in label %} p90-cell{% endif %}"{% if '%' not in label %} data-raw="{{ val }}"{% endif %}>{{ val }}</td></tr>
+              {% endif %}{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Defensive -->
+    {% set def_stats = [
+      ('Tackles', stats.get('tackles','')),
+      ('Interceptions', stats.get('interceptions','')),
+      ('Clearances', stats.get('clearances','')),
+      ('Aerial Duels Won', stats.get('aerialDuelsWon','')),
+      ('Aerial Duels', stats.get('totalAerialDuels','')),
+      ('Total Duels Won', stats.get('totalDuelsWon','')),
+      ('Total Duels', stats.get('totalDuels','')),
+    ] %}
+    {% if def_stats | selectattr(1, 'ne', '') | list %}
+      <div class="card">
+        <div class="card-title">Defensive</div>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              {% for label, val in def_stats %}{% if val != '' and val is not none %}
+                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num p90-cell" data-raw="{{ val }}">{{ val }}</td></tr>
+              {% endif %}{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Heatmap + Career -->
+  <div>
+    {% if heatmap %}
+      <div class="heatmap-wrap mb16">
+        <div class="card-title" style="margin-bottom:12px;">Position Heatmap</div>
+        <img src="/heatmap/{{ heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
+      </div>
+    {% endif %}
+
+    <!-- Career -->
+    {% set career = data.get('career_statistics', {}) %}
+    {% if career %}
+      <div class="card">
+        <div class="card-title">Career Seasons</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Season</th>
+                <th>Club</th>
+                <th class="td-num">Apps</th>
+                <th class="td-num">Goals</th>
+                <th class="td-num">Ast</th>
+                <th class="td-num">Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for season_key, season_data in career.items() %}
+                {% set ss = season_data.get('statistics_full', season_data) %}
+                <tr>
+                  <td style="color:var(--text2);">{{ season_key }}</td>
+                  <td>{{ season_data.get('team','') }}</td>
+                  <td class="td-num">{{ ss.get('appearances','—') }}</td>
+                  <td class="td-num">{{ ss.get('goals','—') }}</td>
+                  <td class="td-num">{{ ss.get('assists','—') }}</td>
+                  <td class="td-num">
+                    {% set r = ss.get('rating', 0)|float %}
+                    {% if r > 0 %}{{ "%.2f"|format(r) }}{% else %}—{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- ── Match Data Insights ─────────────────────────────── -->
+{% if match_per90 and match_count > 0 %}
+<div class="card" style="margin-top:20px; border-color:#1a2744;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div class="card-title" style="margin:0;">Per-90 from Match Data</div>
+      <span style="display:inline-block; font-size:9px; font-weight:700; letter-spacing:.06em; background:#1a2744; color:#80DEEA; border-radius:4px; padding:2px 6px; text-transform:uppercase;">{{ match_count }} match{% if match_count > 1 %}es{% endif %}</span>
+    </div>
+    {% if data.get('player_id') %}
+    <a href="/player_matches/{{ data.player_id }}" class="btn btn-ghost" style="font-size:12px; padding:5px 12px;">
+      📋 Full Match History →
+    </a>
+    {% endif %}
+  </div>
+  <div class="grid-2" style="gap:16px;">
+    <!-- Match-Only Stats -->
+    <div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#80DEEA; margin-bottom:10px;">Match-Only Insights</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tbody>
+          {% set ns2 = namespace(shown=0) %}
+          {% for key, label, is_mo in [
+            ('xA','xA',true), ('shots_blocked','Shots Blocked',true),
+            ('long_balls_total','Long Balls',true), ('long_balls_accurate','Long Balls Acc.',true),
+            ('crosses_total','Crosses',true), ('touches','Touches',true),
+            ('tackles_total','Tackles',true), ('tackles_won','Tackles Won',true),
+            ('ball_recoveries','Ball Recoveries',true), ('fouls_committed','Fouls Committed',true),
+            ('fouls_suffered','Fouls Suffered',true), ('errors_led_to_shot','Errors→Shot',true),
+            ('possession_lost','Possession Lost',true), ('blocks','Blocks',true),
+            ('dribbles_attempted','Dribble Att.',true), ('dispossessed','Dispossessed',true)
+          ] %}
+          {% set p90v = match_per90.per90.get(key) %}
+          {% if p90v is not none and p90v != 0 %}
+          {% set ns2.shown = ns2.shown + 1 %}
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 6px; color:var(--text2);">{{ label }}</td>
+            <td style="padding:5px 6px; text-align:right; font-weight:700; color:#80DEEA;">{{ p90v }}<small style="color:var(--text3); font-weight:400; margin-left:3px;">/90</small></td>
+            <td style="padding:5px 6px; text-align:right; color:var(--text3); font-size:11px;">{{ match_per90.totals.get(key, '') }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          {% if ns2.shown == 0 %}
+          <tr><td colspan="3" style="color:var(--text3);padding:8px 6px;font-size:12px;">No data — scrape matches with this player.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    <!-- Derived % Stats -->
+    <div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); margin-bottom:10px;">Accuracy Percentages</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tbody>
+          {% for key, label in [
+            ('pass_accuracy_pct','Pass Accuracy'),
+            ('long_ball_accuracy_pct','Long Ball Acc.'),
+            ('cross_accuracy_pct','Cross Acc.'),
+            ('dribble_success_pct','Dribble Success'),
+            ('aerial_win_pct','Aerial Win'),
+            ('duel_win_pct','Duel Win'),
+            ('tackle_success_pct','Tackle Success')
+          ] %}
+          {% set dv = match_per90.derived.get(key) %}
+          {% if dv is not none %}
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 6px; color:var(--text2);">{{ label }}</td>
+            <td style="padding:5px 6px; text-align:right; font-weight:700; color:var(--text1);">{{ dv }}%</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      <div style="margin-top:14px; font-size:11px; color:var(--text3);">
+        Based on {{ match_per90.total_minutes }} min across {{ match_count }} match{% if match_count > 1 %}es{% endif %}.
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+.rc-good { color: var(--green); }
+.rc-mid  { color: var(--amber); }
+.rc-low  { color: var(--red); }
+.p90-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.p90-label {
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.p90-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+.p90-switch input { display: none; }
+.p90-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  transition: .2s;
+}
+.p90-slider:before {
+  content: "";
+  position: absolute;
+  width: 16px; height: 16px;
+  left: 2px; bottom: 2px;
+  background: var(--text2);
+  border-radius: 50%;
+  transition: .2s;
+}
+.p90-switch input:checked + .p90-slider {
+  background: var(--green);
+  border-color: var(--green);
+}
+.p90-switch input:checked + .p90-slider:before {
+  transform: translateX(18px);
+  background: #fff;
+}
+</style>
+<script>
+function toggleP90(on) {
+  var wrap = document.querySelector('.p90-toggle-wrap');
+  var minutes = wrap ? parseInt(wrap.dataset.mins, 10) : 0;
+  document.querySelectorAll('.p90-cell').forEach(function(td) {
+    var raw = parseFloat(td.dataset.raw);
+    if (on && minutes > 0 && !isNaN(raw)) {
+      td.textContent = (raw / minutes * 90).toFixed(2);
+    } else {
+      td.textContent = td.dataset.raw;
+    }
+  });
+}
+
+// ── Percentile panel ──────────────────────────────────────────────────────────
+(function () {
+  const PLAYER_PATH = "{{ player_path | default('') }}";
+  if (!PLAYER_PATH) return;
+
+  const PCT_DISPLAY = {
+    'goals':               'Goals',
+    'assists':             'Assists',
+    'rating':              'Rating',
+    'appearances':         'Appearances',
+    'shots':               'Shots',
+    'keyPasses':           'Key Passes',
+    'successfulDribbles':  'Dribbles',
+    'tackles':             'Tackles',
+    'interceptions':       'Interceptions',
+    'totalPasses':         'Total Passes',
+    'accuratePasses':      'Accurate Passes',
+    'aerialDuelsWon':      'Aerial Won',
+    'totalDuelsWon':       'Duels Won',
+    'bigChances':          'Big Chances',
+    'minutesPlayed':       'Minutes',
+  };
+
+  const card = document.getElementById('percentile-card');
+  if (!card) return;
+
+  fetch('/api/player_percentiles?player=' + encodeURIComponent(PLAYER_PATH))
+    .then(r => r.json())
+    .then(data => {
+      if (data.error || !data.percentiles) return;
+      const pool = data.pool_size;
+      const comp = data.competition;
+      document.getElementById('pct-label').textContent =
+        data.position_line + ' in ' + comp + ' (pool: ' + pool + ' players)';
+
+      const pcts = data.percentiles;
+      const ordered = Object.entries(PCT_DISPLAY)
+        .filter(([k]) => pcts[k] !== undefined)
+        .sort((a, b) => pcts[b[0]] - pcts[a[0]]);
+
+      if (!ordered.length) return;
+
+      const wrap = document.getElementById('pct-bars');
+      ordered.forEach(([key, label]) => {
+        const pct = pcts[key];
+        const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+        const tier = pct >= 75 ? 'Top ' + (100 - Math.round(pct)) + '%'
+                   : pct >= 50 ? 'Average' : 'Below avg';
+        const bar = document.createElement('div');
+        bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:7px;';
+        bar.innerHTML = `
+          <span style="min-width:110px;font-size:11px;color:var(--text2);font-family:'CoFoSans',monospace;">${label}</span>
+          <div style="flex:1;height:4px;background:var(--bg);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${col};transition:width 0.6s;"></div>
+          </div>
+          <span style="min-width:32px;text-align:right;font-size:11px;font-family:'BasementGrotesque',sans-serif;font-weight:900;color:${col};">${pct.toFixed(0)}</span>
+          <span style="min-width:60px;font-size:10px;color:var(--text3);">${tier}</span>`;
+        wrap.appendChild(bar);
+      });
+
+      card.style.display = 'block';
+    })
+    .catch(() => {});
+})();
+</script>
+{% endblock %}

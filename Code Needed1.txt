@@ -1,0 +1,278 @@
+PLAYER–CLUB TACTICAL COMPATIBILITY ENGINE
+Project Specification Note for GitHub Copilot
+
+====================================================
+PROJECT OBJECTIVE
+
+Build a modular Python application that:
+
+Loads player data from JSON
+
+Loads club data from JSON
+
+Computes tactical + statistical + physical + development compatibility
+
+Applies tactical familiarity adjustment
+
+Simulates contender impact
+
+Generates explanation report
+
+Exports results to PDF
+
+Provides UI using CustomTkinter
+
+Architecture must be modular, clean, and easily updatable.
+All calculations must be transparent and adjustable.
+
+====================================================
+PROJECT STRUCTURE (MANDATORY)
+
+tactical_match_engine/
+
+main.py
+
+data/
+players/
+player_example.json
+clubs/
+club_example.json
+
+models/
+player_model.py
+club_model.py
+
+engine/
+normalization.py
+role_encoder.py
+tactical_similarity.py
+statistical_match.py
+physical_adaptation.py
+development_fit.py
+familiarity_bonus.py
+aggregation.py
+contender_simulation.py
+explanation_generator.py
+
+services/
+json_loader.py
+pdf_generator.py
+
+ui/
+app.py
+player_view.py
+club_view.py
+result_view.py
+
+utils/
+constants.py
+helpers.py
+
+Each module must be independent and reusable.
+
+====================================================
+PLAYER JSON STRUCTURE
+
+{
+"id": "P001",
+"name": "Example Player",
+"age": 22,
+"position": "CM",
+"preferred_foot": "Right",
+"height_cm": 178,
+"weight_kg": 72,
+"current_league_intensity": 0.74,
+
+"tactical_familiarity": {
+"formation_experience": {
+"4-3-3": 0.9,
+"4-2-3-1": 0.7,
+"3-4-3": 0.4
+},
+"role_familiarity": {
+"BoxToBox": 0.85,
+"DeepLyingPlaymaker": 0.75,
+"Mezzala": 0.65
+}
+},
+
+"stats": {
+"progressive_passes_per90": 5.2,
+"progressive_carries_per90": 6.8,
+"passes_completed_pct": 87,
+"key_passes_per90": 1.9,
+"xg_per90": 0.18,
+"xa_per90": 0.21,
+"pressures_per90": 18,
+"tackles_won_pct": 62,
+"interceptions_per90": 1.4,
+"high_intensity_runs_per90": 21,
+"sprints_per90": 14,
+"distance_covered_km": 11.2,
+"turnovers_per90": 1.8
+}
+}
+
+====================================================
+CLUB JSON STRUCTURE
+
+{
+"id": "C001",
+"name": "Example Club",
+"league_intensity": 0.78,
+"base_formation": "4-3-3",
+
+"tactical_profile": {
+"required_progression": 0.90,
+"required_risk": 0.65,
+"required_defensive_intensity": 0.80,
+"required_verticality": 0.85,
+"required_retention": 0.82
+},
+
+"team_average_stats": {
+"progressive_passes_per90": 6.0,
+"progressive_carries_per90": 7.0,
+"passes_completed_pct": 85,
+"pressures_per90": 20,
+"high_intensity_runs_per90": 23
+},
+
+"development_model": {
+"ideal_age_min": 20,
+"ideal_age_max": 24,
+"sell_model": "develop_and_sell"
+}
+}
+
+====================================================
+CALCULATION LOGIC
+
+Tactical Similarity (Cosine Similarity)
+
+similarity = dot(P, T) / (norm(P) * norm(T))
+
+Where:
+P = player role vector
+T = team tactical demand vector
+
+dot = sum(Pi * Ti)
+norm = sqrt(sum(Pi^2))
+
+Statistical Match
+
+For each stat:
+z = (player_value - team_average) / assumed_std
+
+distance = sqrt(sum(z^2))
+stat_score = 1 / (1 + distance)
+
+Physical Adaptation
+
+adaptation = 1 - abs(player_league_intensity - club_league_intensity)
+
+Development Fit
+
+If age inside ideal range:
+score = 1
+
+Else:
+distance = minimum difference from ideal bounds
+score = 1 - (distance / 10)
+
+Tactical Familiarity Bonus
+
+formation_bonus = player formation familiarity value
+
+final_score = base_score * (1 + formation_bonus * 0.05)
+
+Final Aggregation
+
+final_score =
+0.35 * tactical_similarity +
+0.30 * statistical_score +
+0.20 * physical_adaptation +
+0.15 * development_fit
+
+Contender Simulation
+
+progression_gain =
+player_progression_index - squad_average_progression
+
+xg_gain_per_match =
+progression_gain * 0.08
+
+season_xg_gain =
+xg_gain_per_match * 34
+
+goal_gain ≈ season_xg_gain
+
+points_gain =
+goal_gain * 0.8
+
+====================================================
+UI REQUIREMENTS (CustomTkinter)
+
+Player selector dropdown
+
+Club selector dropdown
+
+Compute button
+
+Radar chart using matplotlib
+
+Score breakdown bars
+
+Tactical familiarity display
+
+Explanation text box
+
+Export PDF button
+
+====================================================
+PDF OUTPUT CONTENT
+
+Player Information
+
+Club Information
+
+Tactical Similarity %
+
+Statistical Match %
+
+Physical Adaptation %
+
+Development Fit %
+
+Tactical Familiarity %
+
+Final Compatibility Score
+
+Contender Simulation Result
+
+Full Explanation Paragraph
+
+====================================================
+CODING RULES
+
+Use OOP
+
+Use type hints
+
+Add docstrings
+
+Keep constants in utils/constants.py
+
+Avoid hardcoded values
+
+Use pure functions when possible
+
+Write clear comments explaining formulas
+
+JSON-driven logic only
+
+Design ready for ANN integration later
+
+====================================================
+
+This document defines the full architecture, data structure, calculation system, UI design, and output specification for the Player–Club Tactical Compatibility Engine.

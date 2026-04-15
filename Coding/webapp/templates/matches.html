@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}Matches — Scout{% endblock %}
+
+{% block head %}
+<style>
+/* ── Scrape card ── */
+.scrape-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:28px; }
+.scrape-card h2 { font-size:16px; font-weight:700; color:var(--text1); margin:0 0 16px; }
+.scrape-inputs { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:start; }
+.scrape-textarea { width:100%; min-height:90px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text1); font-size:13px; font-family:'Geist','Inter',sans-serif; padding:10px 12px; resize:vertical; box-sizing:border-box; }
+.scrape-textarea:focus { outline:none; border-color:var(--accent); }
+.scrape-actions { display:flex; flex-direction:column; gap:8px; }
+.btn-scrape { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; transition:opacity .15s; }
+.btn-scrape:disabled { opacity:.45; cursor:not-allowed; }
+.btn-scrape:not(:disabled):hover { opacity:.85; }
+
+/* ── Log stream ── */
+.log-box { display:none; margin-top:14px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:12px 14px; max-height:180px; overflow-y:auto; }
+.log-box.visible { display:block; }
+.log-line { font-size:12px; font-family:'Consolas','Courier New',monospace; color:var(--text2); line-height:1.7; }
+.log-line.done-line  { color:#66BB6A; }
+.log-line.error-line { color:#EF5350; }
+.log-status { display:flex; align-items:center; gap:10px; margin-top:10px; font-size:13px; }
+.log-spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.status-done-badge  { background:#1b3a20; color:#66BB6A; border-radius:20px; padding:2px 10px; font-size:12px; font-weight:600; }
+.status-error-badge { background:#3a1b1b; color:#EF5350; border-radius:20px; padding:2px 10px; font-size:12px; font-weight:600; }
+
+/* ── Match list ── */
+.section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.section-header h2 { font-size:16px; font-weight:700; margin:0; }
+.match-count { font-size:12px; color:var(--text3); }
+.matches-table { width:100%; border-collapse:collapse; }
+.matches-table th { font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); }
+.matches-table td { padding:10px 12px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
+.matches-table tr:last-child td { border-bottom:none; }
+.matches-table tr:hover td { background:var(--bg3); }
+.score-cell { font-weight:700; font-size:15px; color:var(--text1); text-align:center; font-family:'BasementGrotesque',sans-serif; }
+.team-cell { color:var(--text1); font-weight:500; }
+.comp-badge { background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:2px 9px; font-size:11px; color:var(--text3); display:inline-block; }
+.result-w { color:#66BB6A; font-weight:700; }
+.result-l { color:#EF5350; font-weight:700; }
+.result-d { color:#FFD54F; font-weight:700; }
+.view-link { color:var(--accent); font-size:12px; font-weight:600; text-decoration:none; }
+.view-link:hover { text-decoration:underline; }
+.empty-state { text-align:center; padding:48px 20px; color:var(--text3); }
+.empty-state .icon { font-size:36px; margin-bottom:12px; }
+.error-banner { background:#3a1b1b; border:1px solid #7a2b2b; color:#EF5350; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:13px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if error is defined and error %}
+  <div class="error-banner">{{ error }}</div>
+{% endif %}
+
+<!-- ── Scrape Card ── -->
+<div class="scrape-card">
+  <h2>Scrape Match Statistics</h2>
+  <p style="font-size:12px;color:var(--text3);margin:0 0 14px;">Paste SofaScore event IDs or match URLs — one per line.</p>
+
+  <div class="scrape-inputs">
+    <textarea id="scrapeInput" class="scrape-textarea"
+      placeholder="e.g.&#10;14214854&#10;https://www.sofascore.com/football/match/…#id:14214855"></textarea>
+    <div class="scrape-actions">
+      <button id="scrapeBtn" class="btn-scrape" onclick="startScrape()">▶&nbsp; Scrape</button>
+    </div>
+  </div>
+
+  <div class="log-box" id="logBox">
+    <div id="logLines"></div>
+  </div>
+  <div class="log-status" id="logStatus" style="display:none;">
+    <div class="log-spinner" id="logSpinner"></div>
+    <span id="logStatusText" style="color:var(--text2);">Scraping…</span>
+  </div>
+</div>
+
+<!-- ── Match List ── -->
+<div class="section-header">
+  <h2>Scraped Matches</h2>
+  <span class="match-count">{{ matches|length }} match{% if matches|length != 1 %}es{% endif %}</span>
+</div>
+
+{% if matches %}
+<div class="card" style="padding:0; overflow:hidden;">
+  <table class="matches-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Home</th>
+        <th style="text-align:center;">Score</th>
+        <th>Away</th>
+        <th>Competition</th>
+        <th>Season</th>
+        <th style="text-align:center;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in matches %}
+      <tr>
+        <td style="color:var(--text3); font-size:12px; white-space:nowrap;">{{ m.date }}</td>
+        <td class="team-cell">{{ m.home_team }}</td>
+        <td class="score-cell">{{ m.home_score }} : {{ m.away_score }}</td>
+        <td class="team-cell">{{ m.away_team }}</td>
+        <td><span class="comp-badge">{{ m.competition }}</span></td>
+        <td style="color:var(--text3); font-size:12px;">{{ m.season }}</td>
+        <td style="text-align:center;">
+          {% if m.event_id %}
+            <a class="view-link" href="/match/{{ m.event_id }}">View →</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="icon">📋</div>
+  <div style="font-size:15px; font-weight:600; color:var(--text2); margin-bottom:6px;">No matches scraped yet</div>
+  <div style="font-size:13px;">Use the form above to scrape your first match.</div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let _jobId   = null;
+let _pollInt = null;
+
+function startScrape() {
+  const raw     = document.getElementById('scrapeInput').value.trim();
+  const btn     = document.getElementById('scrapeBtn');
+  const logBox  = document.getElementById('logBox');
+  const logLines   = document.getElementById('logLines');
+  const logStatus  = document.getElementById('logStatus');
+  const logSpinner = document.getElementById('logSpinner');
+  const logStatusText = document.getElementById('logStatusText');
+
+  if (!raw) { alert('Paste at least one event ID or URL.'); return; }
+
+  const inputs = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!inputs.length) { alert('No valid inputs found.'); return; }
+
+  // Reset UI
+  logLines.innerHTML = '';
+  logBox.classList.add('visible');
+  logStatus.style.display = 'flex';
+  logSpinner.style.display = 'block';
+  logStatusText.textContent = 'Scraping…';
+  btn.disabled = true;
+
+  fetch('/api/match_scrape', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({inputs}),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) { _showError(data.error, btn, logSpinner, logStatusText); return; }
+    _jobId = data.job_id;
+    _pollInt = setInterval(() => _poll(btn, logLines, logSpinner, logStatusText), 1200);
+  })
+  .catch(err => _showError(String(err), btn, logSpinner, logStatusText));
+}
+
+function _poll(btn, logLines, logSpinner, logStatusText) {
+  fetch(`/api/match_scrape_status/${_jobId}`)
+    .then(r => r.json())
+    .then(job => {
+      // Render any new log lines
+      const existing = logLines.children.length;
+      const newLines = (job.logs || []).slice(existing);
+      newLines.forEach(msg => {
+        const el = document.createElement('div');
+        el.className = 'log-line' +
+          (msg.startsWith('Done') ? ' done-line' : '') +
+          (msg.startsWith('Error') ? ' error-line' : '');
+        el.textContent = msg;
+        logLines.appendChild(el);
+      });
+      // Auto-scroll
+      const lb = document.getElementById('logBox');
+      lb.scrollTop = lb.scrollHeight;
+
+      if (job.status === 'done') {
+        clearInterval(_pollInt);
+        logSpinner.style.display = 'none';
+        logStatusText.innerHTML = '<span class="status-done-badge">Done</span>';
+        btn.disabled = false;
+        // Refresh the match list after a short delay
+        setTimeout(() => location.reload(), 1800);
+      } else if (job.status === 'error') {
+        clearInterval(_pollInt);
+        _showError(job.error || 'Unknown error', btn, logSpinner, logStatusText);
+      }
+    })
+    .catch(err => {
+      clearInterval(_pollInt);
+      _showError(String(err), btn, logSpinner, logStatusText);
+    });
+}
+
+function _showError(msg, btn, logSpinner, logStatusText) {
+  logSpinner.style.display = 'none';
+  logStatusText.innerHTML = `<span class="status-error-badge">Error</span> ${msg}`;
+  btn.disabled = false;
+}
+</script>
+{% endblock %}

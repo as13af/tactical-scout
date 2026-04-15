@@ -1,0 +1,925 @@
+{
+    "player_id": "1518101",
+    "player_name": "Shandre Campbell",
+    "team": "Club Brugge KV",
+    "team_id": "2888",
+    "tournament_id": "38",
+    "season_id": "77040",
+    "competition_name": "Pro_League",
+    "competition_country": "Belgium",
+    "positions": [
+        "LW"
+    ],
+    "profile": {
+        "player": {
+            "name": "Shandre Campbell",
+            "firstName": "Shandre Campbell",
+            "slug": "campbell-shandre",
+            "shortName": "S. Campbell",
+            "team": {
+                "name": "Club Brugge KV",
+                "slug": "club-brugge-kv",
+                "shortName": "Club Brugge",
+                "gender": "M",
+                "sport": {
+                    "name": "Football",
+                    "slug": "football",
+                    "id": 1
+                },
+                "tournament": {
+                    "name": "Pro League",
+                    "slug": "pro-league",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE"
+                    },
+                    "uniqueTournament": {
+                        "name": "Pro League",
+                        "slug": "pro-league",
+                        "primaryColorHex": "#16002b",
+                        "secondaryColorHex": "#ff1740",
+                        "category": {
+                            "name": "Belgium",
+                            "slug": "belgium",
+                            "sport": {
+                                "name": "Football",
+                                "slug": "football",
+                                "id": 1
+                            },
+                            "priority": 0,
+                            "country": {
+                                "alpha2": "BE",
+                                "alpha3": "BEL",
+                                "name": "Belgium",
+                                "slug": "belgium"
+                            },
+                            "id": 33,
+                            "flag": "belgium",
+                            "alpha2": "BE"
+                        },
+                        "userCount": 69514,
+                        "country": {},
+                        "id": 38,
+                        "displayInverseHomeAwayTeams": false
+                    },
+                    "priority": 498,
+                    "isLive": false,
+                    "id": 38
+                },
+                "primaryUniqueTournament": {
+                    "name": "Pro League",
+                    "slug": "pro-league",
+                    "primaryColorHex": "#16002b",
+                    "secondaryColorHex": "#ff1740",
+                    "category": {
+                        "name": "Belgium",
+                        "slug": "belgium",
+                        "sport": {
+                            "name": "Football",
+                            "slug": "football",
+                            "id": 1
+                        },
+                        "priority": 0,
+                        "country": {
+                            "alpha2": "BE",
+                            "alpha3": "BEL",
+                            "name": "Belgium",
+                            "slug": "belgium"
+                        },
+                        "id": 33,
+                        "flag": "belgium",
+                        "alpha2": "BE"
+                    },
+                    "userCount": 69514,
+                    "country": {},
+                    "id": 38,
+                    "displayInverseHomeAwayTeams": false
+                },
+                "userCount": 298255,
+                "nameCode": "BRU",
+                "disabled": false,
+                "national": false,
+                "type": 0,
+                "country": {
+                    "alpha2": "BE",
+                    "alpha3": "BEL",
+                    "name": "Belgium",
+                    "slug": "belgium"
+                },
+                "id": 2888,
+                "teamColors": {
+                    "primary": "#0080ff",
+                    "secondary": "#000000",
+                    "text": "#000000"
+                }
+            },
+            "position": "M",
+            "positionsDetailed": [
+                "LW"
+            ],
+            "jerseyNumber": "84",
+            "height": 178,
+            "dateOfBirth": "2005-07-15T00:00:00+00:00",
+            "preferredFoot": "Left",
+            "userCount": 2386,
+            "deceased": false,
+            "gender": "M",
+            "country": {
+                "alpha2": "ZA",
+                "alpha3": "ZAF",
+                "name": "South Africa",
+                "slug": "south-africa"
+            },
+            "id": 1518101,
+            "shirtNumber": 84,
+            "dateOfBirthTimestamp": 1121385600,
+            "contractUntilTimestamp": 1814313600,
+            "proposedMarketValue": 960000,
+            "proposedMarketValueRaw": {
+                "value": 960000,
+                "currency": "EUR"
+            }
+        }
+    },
+    "statistics": {
+        "statistics": {
+            "rating": 6.7666666666667,
+            "totalRating": 60.9,
+            "countRating": 9,
+            "goals": 1,
+            "bigChancesCreated": 1,
+            "bigChancesMissed": 0,
+            "assists": 0,
+            "expectedAssists": 0.18527162,
+            "goalsAssistsSum": 1,
+            "accuratePasses": 45,
+            "inaccuratePasses": 12,
+            "totalPasses": 57,
+            "accuratePassesPercentage": 78.947368421053,
+            "accurateOwnHalfPasses": 7,
+            "accurateOppositionHalfPasses": 38,
+            "accurateFinalThirdPasses": 23,
+            "keyPasses": 3,
+            "successfulDribbles": 4,
+            "successfulDribblesPercentage": 36.363636363636,
+            "tackles": 5,
+            "interceptions": 0,
+            "yellowCards": 1,
+            "directRedCards": 0,
+            "redCards": 0,
+            "accurateCrosses": 1,
+            "accurateCrossesPercentage": 20,
+            "totalShots": 5,
+            "shotsOnTarget": 1,
+            "shotsOffTarget": 2,
+            "groundDuelsWon": 12,
+            "groundDuelsWonPercentage": 42.857142857143,
+            "aerialDuelsWon": 0,
+            "aerialDuelsWonPercentage": 0,
+            "totalDuelsWon": 12,
+            "totalDuelsWonPercentage": 42.857142857143,
+            "minutesPlayed": 119,
+            "goalConversionPercentage": 20,
+            "penaltiesTaken": 0,
+            "penaltyGoals": 0,
+            "penaltyWon": 0,
+            "penaltyConceded": 0,
+            "shotFromSetPiece": 0,
+            "freeKickGoal": 0,
+            "goalsFromInsideTheBox": 0,
+            "goalsFromOutsideTheBox": 1,
+            "shotsFromInsideTheBox": 2,
+            "shotsFromOutsideTheBox": 3,
+            "headedGoals": 0,
+            "leftFootGoals": 1,
+            "rightFootGoals": 0,
+            "accurateLongBalls": 5,
+            "accurateLongBallsPercentage": 62.5,
+            "clearances": 2,
+            "errorLeadToGoal": 0,
+            "errorLeadToShot": 0,
+            "dispossessed": 2,
+            "possessionLost": 29,
+            "possessionWonAttThird": 3,
+            "totalChippedPasses": 6,
+            "accurateChippedPasses": 4,
+            "touches": 106,
+            "wasFouled": 3,
+            "fouls": 2,
+            "hitWoodwork": 0,
+            "ownGoals": 0,
+            "dribbledPast": 5,
+            "offsides": 0,
+            "blockedShots": 2,
+            "passToAssist": 0,
+            "saves": 0,
+            "cleanSheet": 0,
+            "penaltyFaced": 0,
+            "penaltySave": 0,
+            "savedShotsFromInsideTheBox": 0,
+            "savedShotsFromOutsideTheBox": 0,
+            "goalsConcededInsideTheBox": 3,
+            "goalsConcededOutsideTheBox": 1,
+            "punches": 0,
+            "runsOut": 0,
+            "successfulRunsOut": 0,
+            "highClaims": 0,
+            "crossesNotClaimed": 0,
+            "matchesStarted": 0,
+            "penaltyConversion": 0,
+            "setPieceConversion": 0,
+            "totalAttemptAssist": 3,
+            "totalContest": 11,
+            "totalCross": 5,
+            "duelLost": 16,
+            "aerialLost": 0,
+            "attemptPenaltyMiss": 0,
+            "attemptPenaltyPost": 0,
+            "attemptPenaltyTarget": 0,
+            "totalLongBalls": 8,
+            "goalsConceded": 4,
+            "tacklesWon": 2,
+            "tacklesWonPercentage": 40,
+            "scoringFrequency": 119,
+            "yellowRedCards": 0,
+            "savesCaught": 0,
+            "savesParried": 0,
+            "totalOwnHalfPasses": 8,
+            "totalOppositionHalfPasses": 49,
+            "totwAppearances": 0,
+            "expectedGoals": 0.2045,
+            "goalKicks": 0,
+            "ballRecovery": 12,
+            "outfielderBlocks": 0,
+            "id": 2136896,
+            "type": "overall",
+            "appearances": 11,
+            "statisticsType": {
+                "sportSlug": "football",
+                "statisticsType": "player"
+            }
+        },
+        "team": {
+            "name": "Club Brugge KV",
+            "slug": "club-brugge-kv",
+            "shortName": "Club Brugge",
+            "gender": "M",
+            "sport": {
+                "name": "Football",
+                "slug": "football",
+                "id": 1
+            },
+            "userCount": 298255,
+            "nameCode": "BRU",
+            "disabled": false,
+            "national": false,
+            "type": 0,
+            "id": 2888,
+            "teamColors": {
+                "primary": "#0080ff",
+                "secondary": "#000000",
+                "text": "#000000"
+            }
+        }
+    },
+    "heatmap": {
+        "points": [
+            {
+                "x": 64,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 64,
+                "y": 21,
+                "count": 1
+            },
+            {
+                "x": 64,
+                "y": 8,
+                "count": 2
+            },
+            {
+                "x": 64,
+                "y": 13,
+                "count": 1
+            },
+            {
+                "x": 5,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 4,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 21,
+                "y": 50,
+                "count": 1
+            },
+            {
+                "x": 29,
+                "y": 56,
+                "count": 1
+            },
+            {
+                "x": 29,
+                "y": 31,
+                "count": 1
+            },
+            {
+                "x": 33,
+                "y": 82,
+                "count": 1
+            },
+            {
+                "x": 33,
+                "y": 41,
+                "count": 1
+            },
+            {
+                "x": 83,
+                "y": 10,
+                "count": 1
+            },
+            {
+                "x": 83,
+                "y": 16,
+                "count": 2
+            },
+            {
+                "x": 83,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 88,
+                "y": 13,
+                "count": 1
+            },
+            {
+                "x": 55,
+                "y": 15,
+                "count": 1
+            },
+            {
+                "x": 71,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 71,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 71,
+                "y": 27,
+                "count": 2
+            },
+            {
+                "x": 69,
+                "y": 22,
+                "count": 1
+            },
+            {
+                "x": 69,
+                "y": 37,
+                "count": 1
+            },
+            {
+                "x": 69,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 69,
+                "y": 45,
+                "count": 1
+            },
+            {
+                "x": 76,
+                "y": 13,
+                "count": 2
+            },
+            {
+                "x": 76,
+                "y": 8,
+                "count": 2
+            },
+            {
+                "x": 76,
+                "y": 26,
+                "count": 1
+            },
+            {
+                "x": 75,
+                "y": 14,
+                "count": 1
+            },
+            {
+                "x": 75,
+                "y": 5,
+                "count": 1
+            },
+            {
+                "x": 75,
+                "y": 3,
+                "count": 1
+            },
+            {
+                "x": 75,
+                "y": 11,
+                "count": 1
+            },
+            {
+                "x": 75,
+                "y": 26,
+                "count": 1
+            },
+            {
+                "x": 74,
+                "y": 26,
+                "count": 1
+            },
+            {
+                "x": 74,
+                "y": 17,
+                "count": 1
+            },
+            {
+                "x": 26,
+                "y": 3,
+                "count": 1
+            },
+            {
+                "x": 26,
+                "y": 30,
+                "count": 1
+            },
+            {
+                "x": 54,
+                "y": 3,
+                "count": 1
+            },
+            {
+                "x": 54,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 54,
+                "y": 14,
+                "count": 1
+            },
+            {
+                "x": 54,
+                "y": 5,
+                "count": 1
+            },
+            {
+                "x": 65,
+                "y": 23,
+                "count": 2
+            },
+            {
+                "x": 65,
+                "y": 4,
+                "count": 1
+            },
+            {
+                "x": 65,
+                "y": 41,
+                "count": 1
+            },
+            {
+                "x": 65,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 72,
+                "y": 13,
+                "count": 1
+            },
+            {
+                "x": 72,
+                "y": 29,
+                "count": 1
+            },
+            {
+                "x": 72,
+                "y": 27,
+                "count": 1
+            },
+            {
+                "x": 80,
+                "y": 9,
+                "count": 1
+            },
+            {
+                "x": 80,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 80,
+                "y": 27,
+                "count": 1
+            },
+            {
+                "x": 90,
+                "y": 19,
+                "count": 1
+            },
+            {
+                "x": 90,
+                "y": 12,
+                "count": 1
+            },
+            {
+                "x": 79,
+                "y": 16,
+                "count": 1
+            },
+            {
+                "x": 79,
+                "y": 44,
+                "count": 1
+            },
+            {
+                "x": 79,
+                "y": 5,
+                "count": 1
+            },
+            {
+                "x": 46,
+                "y": 3,
+                "count": 2
+            },
+            {
+                "x": 46,
+                "y": 4,
+                "count": 1
+            },
+            {
+                "x": 52,
+                "y": 4,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 21,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 9,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 18,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 59,
+                "count": 1
+            },
+            {
+                "x": 77,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 78,
+                "y": 13,
+                "count": 1
+            },
+            {
+                "x": 78,
+                "y": 8,
+                "count": 1
+            },
+            {
+                "x": 78,
+                "y": 40,
+                "count": 1
+            },
+            {
+                "x": 78,
+                "y": 12,
+                "count": 2
+            },
+            {
+                "x": 84,
+                "y": 10,
+                "count": 1
+            },
+            {
+                "x": 84,
+                "y": 29,
+                "count": 1
+            },
+            {
+                "x": 84,
+                "y": 2,
+                "count": 1
+            },
+            {
+                "x": 100,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 27,
+                "y": 0,
+                "count": 1
+            },
+            {
+                "x": 97,
+                "y": 29,
+                "count": 1
+            },
+            {
+                "x": 97,
+                "y": 14,
+                "count": 1
+            },
+            {
+                "x": 66,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 38,
+                "y": 16,
+                "count": 1
+            },
+            {
+                "x": 35,
+                "y": 15,
+                "count": 1
+            },
+            {
+                "x": 58,
+                "y": 16,
+                "count": 1
+            },
+            {
+                "x": 68,
+                "y": 59,
+                "count": 1
+            },
+            {
+                "x": 82,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 82,
+                "y": 31,
+                "count": 1
+            },
+            {
+                "x": 70,
+                "y": 19,
+                "count": 1
+            },
+            {
+                "x": 70,
+                "y": 23,
+                "count": 1
+            },
+            {
+                "x": 70,
+                "y": 9,
+                "count": 1
+            },
+            {
+                "x": 98,
+                "y": 36,
+                "count": 1
+            },
+            {
+                "x": 98,
+                "y": 9,
+                "count": 1
+            },
+            {
+                "x": 87,
+                "y": 51,
+                "count": 1
+            },
+            {
+                "x": 87,
+                "y": 13,
+                "count": 1
+            },
+            {
+                "x": 96,
+                "y": 2,
+                "count": 1
+            },
+            {
+                "x": 96,
+                "y": 1,
+                "count": 1
+            },
+            {
+                "x": 96,
+                "y": 28,
+                "count": 1
+            },
+            {
+                "x": 62,
+                "y": 8,
+                "count": 1
+            },
+            {
+                "x": 62,
+                "y": 6,
+                "count": 1
+            },
+            {
+                "x": 85,
+                "y": 36,
+                "count": 1
+            },
+            {
+                "x": 91,
+                "y": 33,
+                "count": 1
+            },
+            {
+                "x": 49,
+                "y": 17,
+                "count": 1
+            },
+            {
+                "x": 61,
+                "y": 4,
+                "count": 1
+            },
+            {
+                "x": 25,
+                "y": 16,
+                "count": 1
+            },
+            {
+                "x": 9,
+                "y": 16,
+                "count": 1
+            },
+            {
+                "x": 1,
+                "y": 30,
+                "count": 1
+            },
+            {
+                "x": 53,
+                "y": 10,
+                "count": 1
+            },
+            {
+                "x": 53,
+                "y": 0,
+                "count": 1
+            },
+            {
+                "x": 28,
+                "y": 11,
+                "count": 1
+            },
+            {
+                "x": 12,
+                "y": 14,
+                "count": 1
+            },
+            {
+                "x": 12,
+                "y": 33,
+                "count": 1
+            },
+            {
+                "x": 7,
+                "y": 17,
+                "count": 1
+            },
+            {
+                "x": 86,
+                "y": 19,
+                "count": 1
+            },
+            {
+                "x": 45,
+                "y": 8,
+                "count": 1
+            },
+            {
+                "x": 81,
+                "y": 15,
+                "count": 1
+            },
+            {
+                "x": 81,
+                "y": 35,
+                "count": 1
+            },
+            {
+                "x": 89,
+                "y": 34,
+                "count": 1
+            },
+            {
+                "x": 47,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 47,
+                "y": 3,
+                "count": 1
+            },
+            {
+                "x": 47,
+                "y": 4,
+                "count": 1
+            },
+            {
+                "x": 73,
+                "y": 31,
+                "count": 1
+            },
+            {
+                "x": 14,
+                "y": 7,
+                "count": 1
+            },
+            {
+                "x": 94,
+                "y": 19,
+                "count": 1
+            },
+            {
+                "x": 95,
+                "y": 15,
+                "count": 1
+            },
+            {
+                "x": 34,
+                "y": 11,
+                "count": 1
+            },
+            {
+                "x": 40,
+                "y": 9,
+                "count": 1
+            },
+            {
+                "x": 41,
+                "y": 24,
+                "count": 1
+            },
+            {
+                "x": 67,
+                "y": 35,
+                "count": 1
+            },
+            {
+                "x": 63,
+                "y": 41,
+                "count": 1
+            },
+            {
+                "x": 15,
+                "y": 29,
+                "count": 1
+            }
+        ],
+        "matches": 11
+    }
+}

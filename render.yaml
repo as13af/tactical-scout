@@ -1,0 +1,25 @@
+# render.yaml — Render.com deployment configuration
+# Push this repo to GitHub, then on render.com create a new "Web Service"
+# pointing to this repo. Render will pick this file up automatically.
+
+services:
+  - type: web
+    name: tactical-scout
+    runtime: python
+    region: singapore   # closest to Indonesia; change to 'ohio' for US, 'frankfurt' for EU
+    plan: free
+
+    # Run from the repo root so wsgi.py can find everything
+    rootDir: .
+
+    buildCommand: pip install -r requirements.txt
+
+    # Gunicorn starts the Flask app via wsgi.py
+    # --workers 1 keeps memory within Render's free 512 MB limit
+    # --timeout 120 prevents worker kills on heavy club-fit calculations
+    startCommand: gunicorn wsgi:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+
+    envVars:
+      # Render sets PORT automatically; we just need to tell Flask not to be in debug mode
+      - key: FLASK_ENV
+        value: production

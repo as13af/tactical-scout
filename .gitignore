@@ -1,0 +1,35 @@
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── PyInstaller build artefacts ───────────────────────────────────────────────
+build/
+dist/
+*.spec.bak
+build_log.txt
+
+# ── IDE / OS ─────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# ── Selenium driver cache ─────────────────────────────────────────────────────
+.wdm/
+
+# ── pytest / coverage ─────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── NOTE: Coding/output/ and Coding/match_output/ are intentionally NOT
+#    ignored — the scraped data must be committed so the server can serve it.

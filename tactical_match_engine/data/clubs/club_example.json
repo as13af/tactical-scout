@@ -1,0 +1,25 @@
+{
+  "id": "C001",
+  "name": "Example Club",
+  "league_intensity": 0.78,
+  "base_formation": "4-3-3",
+  "tactical_profile": {
+    "required_progression": 0.90,
+    "required_risk": 0.65,
+    "required_defensive_intensity": 0.80,
+    "required_verticality": 0.85,
+    "required_retention": 0.82
+  },
+  "team_average_stats": {
+    "progressive_passes_per90": 6.0,
+    "progressive_carries_per90": 7.0,
+    "passes_completed_pct": 85,
+    "pressures_per90": 20,
+    "high_intensity_runs_per90": 23
+  },
+  "development_model": {
+    "ideal_age_min": 20,
+    "ideal_age_max": 24,
+    "sell_model": "develop_and_sell"
+  }
+}
