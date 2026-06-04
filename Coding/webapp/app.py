@@ -2,6 +2,14 @@ import sys
 import os
 import threading
 import uuid
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+)
+logging.getLogger('werkzeug').setLevel(logging.INFO)
+
 sys.path.insert(0, os.path.dirname(__file__))
 # Coding/ dir — needed for scraper_cli, driver, helpers, heatmap
 _CODING_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
@@ -13,11 +21,21 @@ if _WORKSPACE_ROOT not in sys.path:
     sys.path.insert(0, _WORKSPACE_ROOT)
 
 from flask import Flask, render_template, request, jsonify, send_file
-from data_loader import (
-    get_all_competitions, get_competition, get_club, get_club_players,
-    get_player, search_players, get_all_players_flat, get_all_clubs_flat,
-    get_heatmap_path, get_home_stats
-)
+
+# ── Data layer: file-system only (MongoDB routes commented out) ────────────────
+import data_loader as _loader
+_USING_MONGO = False
+logging.getLogger(__name__).info("Data layer: file-system (JSON)")
+get_all_competitions  = _loader.get_all_competitions
+get_competition       = _loader.get_competition
+get_club              = _loader.get_club
+get_club_players      = _loader.get_club_players
+get_player            = _loader.get_player
+search_players        = _loader.search_players
+get_all_players_flat  = _loader.get_all_players_flat
+get_all_clubs_flat    = _loader.get_all_clubs_flat
+get_heatmap_path      = _loader.get_heatmap_path
+get_home_stats        = _loader.get_home_stats
 import csv
 import io
 import os
@@ -39,6 +57,26 @@ app = Flask(
     template_folder=os.path.join(_WEBAPP_DIR, 'templates'),
     static_folder=os.path.join(_WEBAPP_DIR, 'static'),
 )
+
+
+@app.context_processor
+def _inject_globals():
+    return {'using_mongo': _USING_MONGO}
+
+
+def _load_player_for_engine(country: str, competition: str, club: str, fname: str):
+    """Load a player dict from disk for the tactical engine.
+
+    Always reads from the output/ JSON files — the engine never uses MongoDB.
+    Returns None if the file does not exist.
+    """
+    from tactical_match_engine.services.json_loader import load_sofascore_player
+    full = os.path.join(
+        OUTPUT_DIR, country, competition, club, 'Players',
+        fname if fname.endswith('.json') else fname + '.json'
+    )
+    return load_sofascore_player(full) if os.path.exists(full) else None
+
 
 # ── Home ──────────────────────────────────────────────────────────────────
 @app.route('/')
@@ -153,18 +191,12 @@ def api_compatibility():
     if len(parts) != 4:
         return jsonify({'error': 'invalid player path'}), 400
 
-    full_path = os.path.join(
-        OUTPUT_DIR, parts[0], parts[1], parts[2], 'Players',
-        parts[3] if parts[3].endswith('.json') else parts[3] + '.json'
-    )
-    if not os.path.exists(full_path):
-        return jsonify({'error': 'player file not found'}), 404
-
     try:
-        from tactical_match_engine.services.json_loader import load_sofascore_player
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
 
-        player_data = load_sofascore_player(full_path)
+        player_data = _load_player_for_engine(parts[0], parts[1], parts[2], parts[3])
+        if player_data is None:
+            return jsonify({'error': 'player not found'}), 404
         result = get_role_fitness_vector(
             player_data['raw_stats'],
             player_data['position'],
@@ -226,36 +258,32 @@ def api_compatibility_avg():
     line_codes = _LINE_BROAD_POS.get(role_line, set())
 
     try:
-        import glob as _glob
-        from tactical_match_engine.services.json_loader import load_sofascore_player
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
-
-        comp_dir = os.path.join(OUTPUT_DIR, country, competition)
-        if not os.path.isdir(comp_dir):
-            return jsonify({'error': 'competition directory not found'}), 404
 
         pool_results = []
 
+        def _scan_player(pd):
+            pos = [str(p).upper() for p in pd.get('positions', [pd.get('position', '')])]
+            if line_codes and not any(p in line_codes for p in pos):
+                return
+            res = get_role_fitness_vector(pd['raw_stats'], pd['position'], role_path=role_file)
+            if res is not None:
+                pool_results.append(res)
+
+        import glob as _glob
+        from tactical_match_engine.services.json_loader import load_sofascore_player
+        comp_dir = os.path.join(OUTPUT_DIR, country, competition)
+        if not os.path.isdir(comp_dir):
+            return jsonify({'error': 'competition directory not found'}), 404
         for club_name in sorted(os.listdir(comp_dir)):
-            full_club = os.path.join(comp_dir, club_name)
-            if not os.path.isdir(full_club):
-                continue
-            players_dir = os.path.join(full_club, 'Players')
+            players_dir = os.path.join(comp_dir, club_name, 'Players')
             if not os.path.isdir(players_dir):
                 continue
             for fpath in sorted(_glob.glob(os.path.join(players_dir, '*.json'))):
-                # Exclude the selected player from their own pool
                 if club_name == club_slug and os.path.basename(fpath) == target_file:
                     continue
                 try:
-                    pd  = load_sofascore_player(fpath)
-                    pos = [str(p).upper() for p in pd.get('positions', [pd.get('position', '')])]
-                    if line_codes and not any(p in line_codes for p in pos):
-                        continue
-                    res = get_role_fitness_vector(pd['raw_stats'], pd['position'], role_path=role_file)
-                    if res is None:
-                        continue
-                    pool_results.append(res)
+                    _scan_player(load_sofascore_player(fpath))
                 except Exception:
                     continue
 
@@ -357,48 +385,52 @@ def _get_squad_role_analysis(country, competition, club, role_path, cand_line=No
     """
     Load every player at *club* whose position line matches *cand_line*,
     score each against *role_path*, and return aggregated squad stats.
-    Pass *exclude_path* (the candidate's own file path) to exclude them from the pool.
-    Falls back to role-code matching when *cand_line* is None.
+    Uses MongoDB when available, falls back to file-system scan.
     """
-    import glob as _glob
-    from tactical_match_engine.services.json_loader import load_sofascore_player
     from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
 
-    players_dir = os.path.join(OUTPUT_DIR, country, competition, club, 'Players')
     empty = {'players': [], 'avg_overall': 0.0,
              'avg_category_scores': {}, 'avg_metric_scores': {}, 'avg_metric_raw': {}, 'player_count': 0}
-    if not os.path.isdir(players_dir):
-        return empty
-
     role_codes = None if cand_line else _pos_codes_for_role(role_path)
 
+    def _score_doc(pd):
+        player_positions = [str(p).upper() for p in pd.get('positions', [pd.get('position', '')])]
+        if cand_line:
+            if get_position_line(player_positions) != cand_line:
+                return None
+        else:
+            if role_codes and not any(p in role_codes for p in player_positions):
+                return None
+        res = get_role_fitness_vector(pd['raw_stats'], pd['position'], role_path=role_path, flat_weights=True)
+        if res is None:
+            return None
+        return {
+            'name':            pd['name'],
+            'position':        pd['position'],
+            'positions':       pd.get('positions', []),
+            'age':             pd['age'],
+            'overall_score':   res['overall_score'],
+            'category_scores': res['category_scores'],
+            'metric_details':  res['metric_details'],
+            'rating':          round(float(pd['raw_stats'].get('rating', 0) or 0), 2),
+            'appearances':     int(pd['raw_stats'].get('appearances', 0) or 0),
+        }
+
+    import glob as _glob
+    from tactical_match_engine.services.json_loader import load_sofascore_player
+
     squad = []
+    players_dir = os.path.join(OUTPUT_DIR, country, competition, club, 'Players')
+    if not os.path.isdir(players_dir):
+        return empty
     for fpath in sorted(_glob.glob(os.path.join(players_dir, '*.json'))):
         if exclude_path and os.path.normpath(fpath) == os.path.normpath(exclude_path):
             continue
         try:
-            pd = load_sofascore_player(fpath)
-            player_positions = [str(p).upper() for p in pd.get('positions', [pd.get('position', '')])]
-            if cand_line:
-                if get_position_line(player_positions) != cand_line:
-                    continue
-            else:
-                if role_codes and not any(p in role_codes for p in player_positions):
-                    continue
-            res = get_role_fitness_vector(pd['raw_stats'], pd['position'], role_path=role_path, flat_weights=True)
-            if res is None:
-                continue
-            squad.append({
-                'name':            pd['name'],
-                'position':        pd['position'],
-                'positions':       pd.get('positions', []),
-                'age':             pd['age'],
-                'overall_score':   res['overall_score'],
-                'category_scores': res['category_scores'],
-                'metric_details':  res['metric_details'],
-                'rating':          round(float(pd['raw_stats'].get('rating', 0) or 0), 2),
-                'appearances':     int(pd['raw_stats'].get('appearances', 0) or 0),
-            })
+            pd  = load_sofascore_player(fpath)
+            row = _score_doc(pd)
+            if row:
+                squad.append(row)
         except Exception:
             continue
 
@@ -473,13 +505,13 @@ def api_league_suitability():
     try:
         import glob as _glob
         import json as _json
-        from tactical_match_engine.services.json_loader import (
-            load_sofascore_player, get_league_info
-        )
+        from tactical_match_engine.services.json_loader import get_league_info
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
         from tactical_match_engine.engine.physical_adaptation import calculate_physical_adaptation
 
-        cand        = load_sofascore_player(player_full)
+        cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
         cand_result = get_role_fitness_vector(
             cand['raw_stats'], cand['position'], role_path=role_file, flat_weights=True
         )
@@ -493,33 +525,36 @@ def api_league_suitability():
         role_name             = cand_result.get('role_profile', {}).get('position', role_file)
         cand_positions        = [str(p).upper() for p in cand.get('positions', [cand['position']])]
         cand_line             = get_position_line(cand_positions)
-        age                   = cand.get('age', 26)
 
+        # Build league list from disk
         leagues = []
-        for country_entry in sorted(os.scandir(OUTPUT_DIR), key=lambda e: e.name):
-            if not country_entry.is_dir():
-                continue
-            for comp_entry in sorted(os.scandir(country_entry.path), key=lambda e: e.name):
-                if not comp_entry.is_dir():
-                    continue
+        comp_list_dedup = [
+            (ce1.name, ce2.name)
+            for ce1 in sorted(os.scandir(OUTPUT_DIR), key=lambda e: e.name)
+            if ce1.is_dir()
+            for ce2 in sorted(os.scandir(ce1.path), key=lambda e: e.name)
+            if ce2.is_dir()
+        ]
 
-                t_info           = get_league_info(
-                    country_entry.name.replace('_', ' '),
-                    comp_entry.name.replace('_', ' ')
-                )
-                target_intensity = t_info['intensity']
-                target_rank      = t_info.get('global_rank')
+        for c_name, comp_name in comp_list_dedup:
+            t_info           = get_league_info(
+                c_name.replace('_', ' '),
+                comp_name.replace('_', ' ')
+            )
+            target_intensity = t_info['intensity']
+            target_rank      = t_info.get('global_rank')
 
-                player_count = 0
-                for _pf in _glob.glob(os.path.join(comp_entry.path, '*', 'Players', '*.json')):
-                    try:
-                        with open(_pf, encoding='utf-8') as _f:
-                            _pd = _json.load(_f)
-                        _pos = [str(p).upper() for p in (_pd.get('positions') or [_pd.get('position', '')])]
-                        if get_position_line(_pos) == cand_line:
-                            player_count += 1
-                    except Exception:
-                        pass
+            player_count = 0
+            comp_path = os.path.join(OUTPUT_DIR, c_name, comp_name)
+            for _pf in _glob.glob(os.path.join(comp_path, '*', 'Players', '*.json')):
+                try:
+                    with open(_pf, encoding='utf-8') as _f:
+                        _pd = _json.load(_f)
+                    _pos = [str(p).upper() for p in (_pd.get('positions') or [_pd.get('position', '')])]
+                    if get_position_line(_pos) == cand_line:
+                        player_count += 1
+                except Exception:
+                    pass
 
                 league_adaptation = round(
                     calculate_physical_adaptation(player_intensity, target_intensity) * 100.0, 2
@@ -539,9 +574,9 @@ def api_league_suitability():
                     move_label = ''
 
                 leagues.append({
-                    'league':            comp_entry.name.replace('_', ' '),
-                    'league_key':        f"{country_entry.name}/{comp_entry.name}",
-                    'country':           country_entry.name.replace('_', ' '),
+                    'league':            comp_name.replace('_', ' '),
+                    'league_key':        f"{c_name}/{comp_name}",
+                    'country':           c_name.replace('_', ' '),
                     'suitability_score': suitability,
                     'league_intensity':  round(target_intensity, 4),
                     'global_rank':       target_rank,
@@ -587,9 +622,6 @@ def api_club_suitability():
         return jsonify({'error': 'league must be Country/Competition'}), 400
 
     player_fname = p_parts[3] if p_parts[3].endswith('.json') else p_parts[3] + '.json'
-    player_full  = os.path.join(OUTPUT_DIR, p_parts[0], p_parts[1], p_parts[2], 'Players', player_fname)
-    if not os.path.exists(player_full):
-        return jsonify({'error': 'player file not found'}), 404
 
     tc, tcomp    = l_parts
     league_dir   = os.path.join(OUTPUT_DIR, tc, tcomp)
@@ -598,11 +630,13 @@ def api_club_suitability():
 
     try:
         import json as _json
-        from tactical_match_engine.services.json_loader import load_sofascore_player, get_league_info
+        from tactical_match_engine.services.json_loader import get_league_info
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
         from tactical_match_engine.engine.physical_adaptation import calculate_physical_adaptation
 
-        cand        = load_sofascore_player(player_full)
+        cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
         cand_result = get_role_fitness_vector(
             cand['raw_stats'], cand['position'], role_path=role_file, flat_weights=True
         )
@@ -724,16 +758,16 @@ def api_club_compatibility():
 
     player_fname = p_parts[3] if p_parts[3].endswith('.json') else p_parts[3] + '.json'
     player_full  = os.path.join(OUTPUT_DIR, p_parts[0], p_parts[1], p_parts[2], 'Players', player_fname)
-    if not os.path.exists(player_full):
-        return jsonify({'error': 'player file not found'}), 404
 
     try:
-        from tactical_match_engine.services.json_loader import load_sofascore_player, get_league_intensity, get_league_info
+        from tactical_match_engine.services.json_loader import get_league_info
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
         from tactical_match_engine.engine.physical_adaptation import calculate_physical_adaptation
 
         # ── Candidate ────────────────────────────────────────────────────────
-        cand        = load_sofascore_player(player_full)
+        cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
         cand_result = get_role_fitness_vector(cand['raw_stats'], cand['position'], role_path=role_file, flat_weights=True)
         if cand_result is None:
             return jsonify({'error': 'no role profile available for this position'}), 404
@@ -1000,7 +1034,8 @@ _scrape_jobs: dict = {}  # job_id -> {lines, progress, done, error}
 
 
 def _run_scrape_job(job_id: str, tid: str, uniq_tid: str,
-                    season_id: str, skip: bool) -> None:
+                    season_id: str, skip: bool,
+                    include_form: bool = False) -> None:
     """Run run_scrape() directly in this thread, just like ui/tab_league.py does."""
     job = _scrape_jobs[job_id]
 
@@ -1022,6 +1057,7 @@ def _run_scrape_job(job_id: str, tid: str, uniq_tid: str,
             out_dir=OUTPUT_DIR,
             skip_existing=skip,
             log_fn=_cb,
+            include_form_data=include_form,
         )
         job['done'] = True
     except Exception as e:
@@ -1032,23 +1068,26 @@ def _run_scrape_job(job_id: str, tid: str, uniq_tid: str,
 
 @app.route('/api/scrape', methods=['POST'])
 def api_scrape_start():
-    body      = request.get_json(silent=True) or {}
-    tid       = str(body.get('tid', '')).strip()
-    uniq_tid  = str(body.get('uniq_tid', '')).strip()
-    season_id = str(body.get('season_id', '')).strip()
-    skip      = bool(body.get('skip', False))
+    body         = request.get_json(silent=True) or {}
+    tid          = str(body.get('tid', '')).strip()
+    uniq_tid     = str(body.get('uniq_tid', '')).strip()
+    season_id    = str(body.get('season_id', '')).strip()
+    skip         = bool(body.get('skip', False))
+    include_form = bool(body.get('include_form', False))
 
     if not tid or not uniq_tid or not season_id:
         return jsonify({'error': 'tid, uniq_tid and season_id are required'}), 400
 
-    job_id = str(uuid.uuid4())
+    job_id   = str(uuid.uuid4())
+    stop_ev  = threading.Event()
     _scrape_jobs[job_id] = {
-        'lines': [], 'progress': 0, 'done': False, 'error': False
+        'lines': [], 'progress': 0, 'done': False, 'error': False,
+        'stop_event': stop_ev,
     }
 
     threading.Thread(
         target=_run_scrape_job,
-        args=(job_id, tid, uniq_tid, season_id, skip),
+        args=(job_id, tid, uniq_tid, season_id, skip, include_form),
         daemon=True,
     ).start()
 
@@ -1068,6 +1107,151 @@ def api_scrape_status(job_id):
         'lines':    job['lines'][offset:],
         'total':    len(job['lines']),
     })
+
+
+@app.route('/api/scrape/<job_id>/cancel', methods=['POST'])
+def api_scrape_cancel(job_id):
+    """Gracefully cancel a running scrape job."""
+    job = _scrape_jobs.get(job_id)
+    if job is None:
+        return jsonify({'error': 'unknown job'}), 404
+    stop_ev = job.get('stop_event')
+    if stop_ev:
+        stop_ev.set()
+    job['lines'].append('[Cancelled] Stop requested.')
+    return jsonify({'ok': True})
+
+
+@app.route('/api/scrape/cancel_all', methods=['POST'])
+def api_scrape_cancel_all():
+    """Cancel all running scrape jobs and kill stray browser processes."""
+    import subprocess, platform
+    cancelled = 0
+    for job in _scrape_jobs.values():
+        if not job.get('done'):
+            stop_ev = job.get('stop_event')
+            if stop_ev:
+                stop_ev.set()
+            cancelled += 1
+
+    # Kill lingering chromedriver / chrome processes
+    killed = 0
+    try:
+        if platform.system() == 'Windows':
+            for proc in ('chromedriver.exe', 'chrome.exe'):
+                r = subprocess.run(['taskkill', '/F', '/IM', proc],
+                                   capture_output=True)
+                if r.returncode == 0:
+                    killed += 1
+        else:
+            for proc in ('chromedriver', 'chrome', 'chromium'):
+                r = subprocess.run(['pkill', '-f', proc], capture_output=True)
+                if r.returncode == 0:
+                    killed += 1
+    except Exception:
+        pass
+
+    return jsonify({'jobs_cancelled': cancelled, 'browsers_killed': killed})
+
+
+@app.route('/api/all_competition_ids')
+def api_all_competition_ids():
+    """Return all competitions that have scrape IDs, for the Update All Leagues flow."""
+    result = []
+    import glob as _glob, json as _json
+    for f in _glob.glob(os.path.join(OUTPUT_DIR, '*', '*', 'Standings_*.json')):
+        try:
+            with open(f, encoding='utf-8') as fh:
+                d = _json.load(fh)
+            import re as _re
+            from pathlib import Path as _P
+            m = _re.search(r'_(\d+)_Season_(\d+)$', _P(f).stem)
+            if m:
+                result.append({
+                    'tid':       m.group(1),
+                    'uniq_tid':  m.group(1),
+                    'season_id': m.group(2),
+                    'label':     os.path.basename(os.path.dirname(f)),
+                })
+        except Exception:
+            continue
+    return jsonify(result)
+
+
+@app.route('/api/form_refresh', methods=['POST'])
+def api_form_refresh():
+    """Regenerate team average heatmaps from existing match data (no new scraping). (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # if not _USING_MONGO:
+    #     return jsonify({'error': 'MongoDB required for form refresh'}), 400
+    #
+    # body     = request.get_json(silent=True) or {}
+    # uniq_tid = str(body.get('uniq_tid', '')).strip()
+    # season_id = str(body.get('season_id', '')).strip()
+    # if not uniq_tid or not season_id:
+    #     return jsonify({'error': 'uniq_tid and season_id are required'}), 400
+    #
+    # job_id = str(uuid.uuid4())
+    # _scrape_jobs[job_id] = {
+    #     'lines': [], 'progress': 0, 'done': False, 'error': False, 'stop_event': None
+    # }
+    #
+    # def _worker():
+    #     job = _scrape_jobs[job_id]
+    #     def _cb(msg):
+    #         job['lines'].append(msg)
+    #     try:
+    #         import mongo_loader as _ml
+    #         from team_average_heatmap import run_team_average_batch
+    #         _cb(f'[FormRefresh] Regenerating team heatmaps for uniq_tid={uniq_tid}...')
+    #         result = run_team_average_batch(
+    #             uniq_tid=uniq_tid,
+    #             season_id=season_id,
+    #             output_dir=OUTPUT_DIR,
+    #             log_fn=_cb,
+    #             db=_ml._db(),
+    #             n=5,
+    #         )
+    #         _cb(f'[FormRefresh] Done — {result}')
+    #         job['progress'] = 100
+    #     except Exception as e:
+    #         job['lines'].append(f'ERROR: {e}')
+    #         job['error'] = True
+    #     finally:
+    #         job['done'] = True
+    #
+    # threading.Thread(target=_worker, daemon=True).start()
+    # return jsonify({'job_id': job_id})
+
+
+@app.route('/api/optimize_league', methods=['POST'])
+def api_optimize_league():
+    """Keep only the 5 most recent matches per team for a league. (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # if not _USING_MONGO:
+    #     return jsonify({'error': 'MongoDB required'}), 400
+    # body     = request.get_json(silent=True) or {}
+    # uniq_tid = body.get('uniq_tid')
+    # if not uniq_tid:
+    #     return jsonify({'error': 'uniq_tid required'}), 400
+    # import mongo_loader as _ml
+    # deleted = _ml.optimize_league_storage(uniq_tid, n=5)
+    # return jsonify({'success': True, 'deleted_count': deleted})
+
+
+@app.route('/api/purge_league', methods=['POST'])
+def api_purge_league():
+    """Delete all match data and team heatmaps for a league. (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # if not _USING_MONGO:
+    #     return jsonify({'error': 'MongoDB required'}), 400
+    # body     = request.get_json(silent=True) or {}
+    # uniq_tid = body.get('uniq_tid')
+    # if not uniq_tid:
+    #     return jsonify({'error': 'uniq_tid required'}), 400
+    # import mongo_loader as _ml
+    # deleted = _ml.purge_league_matches(uniq_tid)
+    # return jsonify({'success': True, 'deleted_count': deleted})
 
 
 # ── IFFHS League Rankings ────────────────────────────────────────────────────
@@ -1204,17 +1388,17 @@ def api_export_club_fit_csv():
 
     player_fname = p_parts[3] if p_parts[3].endswith('.json') else p_parts[3] + '.json'
     player_full  = os.path.join(OUTPUT_DIR, p_parts[0], p_parts[1], p_parts[2], 'Players', player_fname)
-    if not os.path.exists(player_full):
-        return jsonify({'error': 'player file not found'}), 404
 
     try:
-        from tactical_match_engine.services.json_loader import load_sofascore_player, get_league_intensity
+        from tactical_match_engine.services.json_loader import get_league_intensity
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
         from tactical_match_engine.engine.physical_adaptation import calculate_physical_adaptation
         from tactical_match_engine.engine.explanation_generator import generate_explanation
         from tactical_match_engine.engine.contender_simulation import simulate_contender_impact
 
-        cand        = load_sofascore_player(player_full)
+        cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
         cand_result = get_role_fitness_vector(cand['raw_stats'], cand['position'], role_path=role_file, flat_weights=True)
         if cand_result is None:
             return jsonify({'error': 'no role profile available for this position'}), 404
@@ -1357,20 +1541,18 @@ def api_export_club_fit_pdf():
 
     player_fname = p_parts[3] if p_parts[3].endswith('.json') else p_parts[3] + '.json'
     player_full  = os.path.join(OUTPUT_DIR, p_parts[0], p_parts[1], p_parts[2], 'Players', player_fname)
-    if not os.path.exists(player_full):
-        return jsonify({'error': 'player file not found'}), 404
 
     try:
-        from tactical_match_engine.services.json_loader import (
-            load_sofascore_player, get_league_intensity, get_league_info,
-        )
+        from tactical_match_engine.services.json_loader import get_league_info
         from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
         from tactical_match_engine.engine.physical_adaptation import calculate_physical_adaptation
         from tactical_match_engine.engine.explanation_generator import generate_explanation
         from tactical_match_engine.engine.contender_simulation import simulate_contender_impact
         from tactical_match_engine.services.pdf_generator import generate_pdf
 
-        cand        = load_sofascore_player(player_full)
+        cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
         cand_result = get_role_fitness_vector(
             cand['raw_stats'], cand['position'], role_path=role_file, flat_weights=True
         )
@@ -1545,13 +1727,10 @@ def api_batch_compare():
             if len(p_parts) != 4:
                 return {'error': 'invalid path', 'player_path': player_path}
             player_fname = p_parts[3] if p_parts[3].endswith('.json') else p_parts[3] + '.json'
-            player_full  = os.path.join(
-                OUTPUT_DIR, p_parts[0], p_parts[1], p_parts[2], 'Players', player_fname
-            )
-            if not os.path.exists(player_full):
-                return {'error': 'file not found', 'player_path': player_path}
             try:
-                cand        = load_sofascore_player(player_full)
+                cand = _load_player_for_engine(p_parts[0], p_parts[1], p_parts[2], player_fname)
+                if cand is None:
+                    return {'error': 'player not found', 'player_path': player_path}
                 cand_result = get_role_fitness_vector(
                     cand['raw_stats'], cand['position'],
                     role_path=role_file, flat_weights=True,
@@ -1942,6 +2121,125 @@ def api_player_scatter_data():
     stat_keys = [k for k in PLAYER_STAT_FIELDS if k in keys_seen]
     return jsonify({'players': players, 'stat_keys': stat_keys})
 
+
+
+# ── Playing Style / Form Fingerprint ─────────────────────────────────────────
+
+@app.route('/api/playing_style_data')
+def api_playing_style_data():
+    """Return form fingerprint + positional data for all clubs in a competition. (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # Code requires form_engine, style_engine, form scraper integrations — commented out
+    # See git history to restore
+
+
+@app.route('/api/passmap/<country>/<competition>/<club>')
+def api_passmap(country, competition, club):
+    """Return a positional passmap PNG for a single club. (Requires MongoDB)"""
+    return '', 503
+    # Code requires form_engine, passmap_engine integrations — commented out
+    # See git history to restore
+
+
+# ── Club average heatmap (from match data) ────────────────────────────────────
+
+@app.route('/api/club_avg_heatmap/<country>/<competition>/<club>/<season>')
+def api_club_avg_heatmap_meta(country, competition, club, season):
+    """Return metadata for the club's average heatmap. (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # Code requires team_last5match_average_heatmap collection — commented out
+    # See git history to restore
+
+
+@app.route('/api/club_avg_heatmap_png/<country>/<competition>/<club>/<season>')
+def api_club_avg_heatmap_png(country, competition, club, season):
+    """Serve the club average heatmap PNG from MongoDB. (Requires MongoDB)"""
+    return '', 503
+    # Code requires team_last5match_average_heatmap collection — commented out
+    # See git history to restore
+
+
+@app.route('/api/club_avg_heatmap_zones_png/<country>/<competition>/<club>/<season>')
+def api_club_avg_heatmap_zones_png(country, competition, club, season):
+    """Serve the 18-zone club average heatmap PNG from MongoDB. (Requires MongoDB)"""
+    return '', 503
+    # Code requires team_last5match_average_heatmap collection — commented out
+    # See git history to restore
+
+
+# ── Heatmap from MongoDB bytes ────────────────────────────────────────────────
+
+@app.route('/heatmap_db/<country>/<competition>/<club>/<stem>')
+def heatmap_db(country, competition, club, stem):
+    """Serve a player heatmap PNG stored as bytes in MongoDB. (Requires MongoDB)"""
+    return '', 503
+    # Code requires mongo_loader.get_heatmap_bytes() — commented out
+    # See git history to restore
+
+
+# ── Team match history reset ──────────────────────────────────────────────────
+
+@app.route('/api/purge_team', methods=['POST'])
+def api_purge_team():
+    """Delete all match history and average heatmap for a team in a league. (Requires MongoDB)"""
+    return jsonify({'error': 'not available'}), 503
+    # body     = request.get_json(silent=True) or {}
+    # team_id  = body.get('team_id')
+    # uniq_tid = body.get('uniq_tid')
+    # if not team_id or not uniq_tid:
+    #     return jsonify({'error': 'team_id and uniq_tid are required'}), 400
+    # import mongo_loader as _ml
+    # deleted = _ml.purge_team_matches(team_id, uniq_tid)
+    # return jsonify({'success': True, 'deleted_count': deleted})
+
+
+# ── Player role profile ───────────────────────────────────────────────────────
+
+@app.route('/api/player_role')
+def api_player_role():
+    """Return FM24 role classification + default role fitness for a player."""
+    player_path = request.args.get('player', '').strip()
+    if not player_path:
+        return jsonify({'error': 'player is required'}), 400
+    parts = player_path.split('/')
+    if len(parts) != 4:
+        return jsonify({'error': 'invalid player path'}), 400
+
+    try:
+        cand = _load_player_for_engine(parts[0], parts[1], parts[2], parts[3])
+        if cand is None:
+            return jsonify({'error': 'player not found'}), 404
+
+        from tactical_match_engine.engine.fm24_role_classifier import classify
+        from tactical_match_engine.engine.role_encoder import get_role_fitness_vector
+
+        raw_stats = cand['raw_stats']
+        position  = cand['position']
+        positions = cand.get('positions', [position])
+        minutes   = int(raw_stats.get('minutesPlayed') or 0)
+
+        fm24_roles = classify(raw_stats, positions)
+
+        # Default role fitness for the primary position (no role_path override)
+        role_result = get_role_fitness_vector(raw_stats, position)
+
+        role_profile_out = None
+        if role_result:
+            role_profile_out = {
+                'overall_score':   role_result['overall_score'],
+                'role_name':       role_result['role_profile']['position'],
+                'category_scores': role_result['category_scores'],
+                'weights':         role_result['weights'],
+            }
+
+        return jsonify({
+            'player_position': position,
+            'player_minutes':  minutes,
+            'fm24_roles':      fm24_roles,
+            'role_profile':    role_profile_out,
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # ── Match Stats ───────────────────────────────────────────────────────────────
