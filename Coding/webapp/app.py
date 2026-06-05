@@ -22,10 +22,21 @@ if _WORKSPACE_ROOT not in sys.path:
 
 from flask import Flask, render_template, request, jsonify, send_file
 
-# ── Data layer: file-system only (MongoDB routes commented out) ────────────────
-import data_loader as _loader
-_USING_MONGO = False
-logging.getLogger(__name__).info("Data layer: file-system (JSON)")
+# ── Data-layer auto-switch: MongoDB first, file-system fallback ───────────────
+def _build_data_loader():
+    try:
+        from pymongo import MongoClient
+        _uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+        MongoClient(_uri, serverSelectionTimeoutMS=800).server_info()
+        import mongo_loader as _dl
+        logging.getLogger(__name__).info("Data layer: MongoDB")
+        return _dl, True
+    except Exception:
+        import data_loader as _dl
+        logging.getLogger(__name__).info("Data layer: file-system (JSON)")
+        return _dl, False
+
+_loader, _USING_MONGO = _build_data_loader()
 get_all_competitions  = _loader.get_all_competitions
 get_competition       = _loader.get_competition
 get_club              = _loader.get_club
@@ -625,7 +636,7 @@ def api_club_suitability():
 
     tc, tcomp    = l_parts
     league_dir   = os.path.join(OUTPUT_DIR, tc, tcomp)
-    if not os.path.isdir(league_dir):
+    if not _USING_MONGO and not os.path.isdir(league_dir):
         return jsonify({'error': 'league directory not found'}), 404
 
     try:
@@ -1158,100 +1169,114 @@ def api_scrape_cancel_all():
 def api_all_competition_ids():
     """Return all competitions that have scrape IDs, for the Update All Leagues flow."""
     result = []
-    import glob as _glob, json as _json
-    for f in _glob.glob(os.path.join(OUTPUT_DIR, '*', '*', 'Standings_*.json')):
-        try:
-            with open(f, encoding='utf-8') as fh:
-                d = _json.load(fh)
-            import re as _re
-            from pathlib import Path as _P
-            m = _re.search(r'_(\d+)_Season_(\d+)$', _P(f).stem)
-            if m:
+    if _USING_MONGO:
+        import mongo_loader as _ml
+        for doc in _ml._db().standings.find(
+                {}, {'_country': 1, '_competition': 1,
+                     'tournament_id': 1, 'unique_tournament_id': 1, 'season_id': 1}):
+            tid      = str(doc.get('tournament_id', '') or '')
+            uniq_tid = str(doc.get('unique_tournament_id', '') or '')
+            season   = str(doc.get('season_id', '') or '')
+            if uniq_tid and season:
                 result.append({
-                    'tid':       m.group(1),
-                    'uniq_tid':  m.group(1),
-                    'season_id': m.group(2),
-                    'label':     os.path.basename(os.path.dirname(f)),
+                    'tid':       tid or uniq_tid,
+                    'uniq_tid':  uniq_tid,
+                    'season_id': season,
+                    'label':     f"{doc.get('_country','').replace('_',' ')} / "
+                                 f"{doc.get('_competition','').replace('_',' ')}",
                 })
-        except Exception:
-            continue
+    else:
+        import glob as _glob, json as _json
+        for f in _glob.glob(os.path.join(OUTPUT_DIR, '*', '*', 'Standings_*.json')):
+            try:
+                with open(f, encoding='utf-8') as fh:
+                    d = _json.load(fh)
+                import re as _re
+                from pathlib import Path as _P
+                m = _re.search(r'_(\d+)_Season_(\d+)$', _P(f).stem)
+                if m:
+                    result.append({
+                        'tid':       m.group(1),
+                        'uniq_tid':  m.group(1),
+                        'season_id': m.group(2),
+                        'label':     os.path.basename(os.path.dirname(f)),
+                    })
+            except Exception:
+                continue
     return jsonify(result)
 
 
 @app.route('/api/form_refresh', methods=['POST'])
 def api_form_refresh():
-    """Regenerate team average heatmaps from existing match data (no new scraping). (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # if not _USING_MONGO:
-    #     return jsonify({'error': 'MongoDB required for form refresh'}), 400
-    #
-    # body     = request.get_json(silent=True) or {}
-    # uniq_tid = str(body.get('uniq_tid', '')).strip()
-    # season_id = str(body.get('season_id', '')).strip()
-    # if not uniq_tid or not season_id:
-    #     return jsonify({'error': 'uniq_tid and season_id are required'}), 400
-    #
-    # job_id = str(uuid.uuid4())
-    # _scrape_jobs[job_id] = {
-    #     'lines': [], 'progress': 0, 'done': False, 'error': False, 'stop_event': None
-    # }
-    #
-    # def _worker():
-    #     job = _scrape_jobs[job_id]
-    #     def _cb(msg):
-    #         job['lines'].append(msg)
-    #     try:
-    #         import mongo_loader as _ml
-    #         from team_average_heatmap import run_team_average_batch
-    #         _cb(f'[FormRefresh] Regenerating team heatmaps for uniq_tid={uniq_tid}...')
-    #         result = run_team_average_batch(
-    #             uniq_tid=uniq_tid,
-    #             season_id=season_id,
-    #             output_dir=OUTPUT_DIR,
-    #             log_fn=_cb,
-    #             db=_ml._db(),
-    #             n=5,
-    #         )
-    #         _cb(f'[FormRefresh] Done — {result}')
-    #         job['progress'] = 100
-    #     except Exception as e:
-    #         job['lines'].append(f'ERROR: {e}')
-    #         job['error'] = True
-    #     finally:
-    #         job['done'] = True
-    #
-    # threading.Thread(target=_worker, daemon=True).start()
-    # return jsonify({'job_id': job_id})
+    """Regenerate team average heatmaps from existing match data (no new scraping)."""
+    if not _USING_MONGO:
+        return jsonify({'error': 'MongoDB required for form refresh'}), 400
+
+    body     = request.get_json(silent=True) or {}
+    uniq_tid = str(body.get('uniq_tid', '')).strip()
+    season_id = str(body.get('season_id', '')).strip()
+    if not uniq_tid or not season_id:
+        return jsonify({'error': 'uniq_tid and season_id are required'}), 400
+
+    job_id = str(uuid.uuid4())
+    _scrape_jobs[job_id] = {
+        'lines': [], 'progress': 0, 'done': False, 'error': False, 'stop_event': None
+    }
+
+    def _worker():
+        job = _scrape_jobs[job_id]
+        def _cb(msg):
+            job['lines'].append(msg)
+        try:
+            import mongo_loader as _ml
+            from team_average_heatmap import run_team_average_batch
+            _cb(f'[FormRefresh] Regenerating team heatmaps for uniq_tid={uniq_tid}...')
+            result = run_team_average_batch(
+                uniq_tid=uniq_tid,
+                season_id=season_id,
+                output_dir=OUTPUT_DIR,
+                log_fn=_cb,
+                db=_ml._db(),
+                n=5,
+            )
+            _cb(f'[FormRefresh] Done — {result}')
+            job['progress'] = 100
+        except Exception as e:
+            job['lines'].append(f'ERROR: {e}')
+            job['error'] = True
+        finally:
+            job['done'] = True
+
+    threading.Thread(target=_worker, daemon=True).start()
+    return jsonify({'job_id': job_id})
 
 
 @app.route('/api/optimize_league', methods=['POST'])
 def api_optimize_league():
-    """Keep only the 5 most recent matches per team for a league. (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # if not _USING_MONGO:
-    #     return jsonify({'error': 'MongoDB required'}), 400
-    # body     = request.get_json(silent=True) or {}
-    # uniq_tid = body.get('uniq_tid')
-    # if not uniq_tid:
-    #     return jsonify({'error': 'uniq_tid required'}), 400
-    # import mongo_loader as _ml
-    # deleted = _ml.optimize_league_storage(uniq_tid, n=5)
-    # return jsonify({'success': True, 'deleted_count': deleted})
+    """Keep only the 5 most recent matches per team for a league."""
+    if not _USING_MONGO:
+        return jsonify({'error': 'MongoDB required'}), 400
+    body     = request.get_json(silent=True) or {}
+    uniq_tid = body.get('uniq_tid')
+    if not uniq_tid:
+        return jsonify({'error': 'uniq_tid required'}), 400
+    import mongo_loader as _ml
+    deleted = _ml.optimize_league_storage(uniq_tid, n=5)
+    return jsonify({'success': True, 'deleted_count': deleted})
 
 
 @app.route('/api/purge_league', methods=['POST'])
 def api_purge_league():
-    """Delete all match data and team heatmaps for a league. (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # if not _USING_MONGO:
-    #     return jsonify({'error': 'MongoDB required'}), 400
-    # body     = request.get_json(silent=True) or {}
-    # uniq_tid = body.get('uniq_tid')
-    # if not uniq_tid:
-    #     return jsonify({'error': 'uniq_tid required'}), 400
-    # import mongo_loader as _ml
-    # deleted = _ml.purge_league_matches(uniq_tid)
-    # return jsonify({'success': True, 'deleted_count': deleted})
+    """Delete all match data and team heatmaps for a league."""
+    if not _USING_MONGO:
+        return jsonify({'error': 'MongoDB required'}), 400
+    body     = request.get_json(silent=True) or {}
+    uniq_tid = body.get('uniq_tid')
+    if not uniq_tid:
+        return jsonify({'error': 'uniq_tid required'}), 400
+    import mongo_loader as _ml
+    deleted = _ml.purge_league_matches(uniq_tid)
+    return jsonify({'success': True, 'deleted_count': deleted})
 
 
 # ── IFFHS League Rankings ────────────────────────────────────────────────────
@@ -2127,70 +2152,251 @@ def api_player_scatter_data():
 
 @app.route('/api/playing_style_data')
 def api_playing_style_data():
-    """Return form fingerprint + positional data for all clubs in a competition. (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # Code requires form_engine, style_engine, form scraper integrations — commented out
-    # See git history to restore
+    """Return form fingerprint + positional data for all clubs in a competition."""
+    country     = request.args.get('country', '').strip()
+    competition = request.args.get('competition', '').strip()
+    if not country or not competition:
+        return jsonify({'error': 'country and competition are required'}), 400
+
+    try:
+        from style_engine import compute_style_scores
+        from form_engine  import compute_form_style_scores, apply_positional_context
+
+        # Build clubs_raw from MongoDB or file
+        clubs_raw = []
+        if _USING_MONGO:
+            import mongo_loader as _ml
+            db = _ml._db()
+            # Get unique_tournament_id from standings for form queries
+            standings_doc = db.standings.find_one(
+                {'_country': country, '_competition': competition}) or {}
+            uniq_tid = None
+            for group in standings_doc.get('standings', []):
+                tourney = group.get('tournament', {}).get('uniqueTournament', {})
+                if tourney.get('id'):
+                    uniq_tid = int(tourney['id'])
+                    break
+            for club_doc in db.clubs.find(
+                    {'_country': country, '_competition': competition},
+                    sort=[('team_name', 1)]):
+                profile     = club_doc.get('profile', {}).get('team', {})
+                season_stats = club_doc.get('season_statistics', {}).get('statistics', {})
+                tc           = profile.get('teamColors', {})
+                tid          = club_doc.get('tournament_id') or standings_doc.get('tournament_id')
+                clubs_raw.append({
+                    'name':                club_doc.get('team_name', club_doc.get('_club', '')),
+                    'slug':                club_doc.get('_club', ''),
+                    'logo_url':            '',
+                    'season_stats':        season_stats,
+                    'matches':             int(season_stats.get('matches') or 0),
+                    'team_colors':         {'primary': tc.get('primary', '#6E6E6E'),
+                                           'secondary': tc.get('secondary', '#D9D9D9')},
+                    'team_id':             club_doc.get('team_id'),
+                    'tournament_id':       tid,
+                    'unique_tournament_id': uniq_tid,
+                })
+            form_results = compute_form_style_scores(clubs_raw, db)
+            pos_results  = apply_positional_context(clubs_raw, db)
+        else:
+            import glob as _glob, json as _json
+            comp_dir = os.path.join(OUTPUT_DIR, country, competition)
+            if not os.path.isdir(comp_dir):
+                return jsonify({'error': 'competition not found'}), 404
+            for club_name in sorted(os.listdir(comp_dir)):
+                club_jsons = _glob.glob(os.path.join(comp_dir, club_name, 'Club_*_Season_*.json'))
+                if not club_jsons:
+                    continue
+                try:
+                    with open(club_jsons[0], encoding='utf-8') as _f:
+                        cd = _json.load(_f)
+                    season_stats = cd.get('season_statistics', {}).get('statistics', {})
+                    clubs_raw.append({
+                        'name':                cd.get('team_name', club_name.replace('_', ' ')),
+                        'slug':                club_name,
+                        'logo_url':            '',
+                        'season_stats':        season_stats,
+                        'matches':             int(season_stats.get('matches') or 0),
+                        'team_colors':         {'primary': '#6E6E6E', 'secondary': '#D9D9D9'},
+                        'team_id':             None,
+                        'tournament_id':       None,
+                        'unique_tournament_id': None,
+                    })
+                except Exception:
+                    continue
+            # No match data available on file-system — form scores will show empty
+            form_results = compute_form_style_scores(clubs_raw, None)
+            pos_results  = [{'slug': c['slug'], 'positional_passing':
+                             {'backline_passes': None, 'mid_passes': None, 'forward_passes': None}}
+                            for c in clubs_raw]
+
+        # Merge form + positional results by slug
+        pos_by_slug  = {r['slug']: r.get('positional_passing', {}) for r in pos_results}
+        style_by_slug = {r['slug']: compute_style_scores([c for c in clubs_raw if c['slug'] == r['slug']])[0]
+                         for r in form_results} if clubs_raw else {}
+
+        teams = []
+        for fr in form_results:
+            slug = fr['slug']
+            teams.append({
+                **fr,
+                'positional_passing': pos_by_slug.get(slug, {}),
+                'style_scores':       style_by_slug.get(slug, {}).get('style_scores', {}),
+                'primary_style':      style_by_slug.get(slug, {}).get('primary_style', ''),
+            })
+
+        return jsonify({'teams': teams, 'competition': competition, 'country': country})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/passmap/<country>/<competition>/<club>')
 def api_passmap(country, competition, club):
-    """Return a positional passmap PNG for a single club. (Requires MongoDB)"""
-    return '', 503
-    # Code requires form_engine, passmap_engine integrations — commented out
-    # See git history to restore
+    """Return a positional passmap PNG for a single club."""
+    n = int(request.args.get('n', 5))
+    try:
+        from form_engine   import apply_positional_context, fetch_last_n_league_matches
+        from passmap_engine import generate_passmap_bytes
+
+        if _USING_MONGO:
+            import mongo_loader as _ml
+            db = _ml._db()
+            standings_doc = db.standings.find_one(
+                {'_country': country, '_competition': competition}) or {}
+            uniq_tid = None
+            for group in standings_doc.get('standings', []):
+                tourney = group.get('tournament', {}).get('uniqueTournament', {})
+                if tourney.get('id'):
+                    uniq_tid = int(tourney['id'])
+                    break
+            club_doc = db.clubs.find_one(
+                {'_country': country, '_competition': competition, '_club': club}) or {}
+            club_raw = [{
+                'name':                club_doc.get('team_name', club.replace('_', ' ')),
+                'slug':                club,
+                'logo_url':            '',
+                'team_id':             club_doc.get('team_id'),
+                'tournament_id':       club_doc.get('tournament_id') or standings_doc.get('tournament_id'),
+                'unique_tournament_id': uniq_tid,
+            }]
+            pos_results = apply_positional_context(club_raw, db, n=n)
+        else:
+            return '', 204  # no match data on file-system
+
+        pos_data = pos_results[0].get('positional_passing') if pos_results else None
+        if not pos_data or not any(v for v in pos_data.values()):
+            return '', 204
+
+        club_display = club_doc.get('team_name', club.replace('_', ' ')) if _USING_MONGO else club.replace('_', ' ')
+        png_bytes = generate_passmap_bytes(pos_data, label=club_display, n=n)
+        return png_bytes, 200, {'Content-Type': 'image/png'}
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # ── Club average heatmap (from match data) ────────────────────────────────────
 
 @app.route('/api/club_avg_heatmap/<country>/<competition>/<club>/<season>')
 def api_club_avg_heatmap_meta(country, competition, club, season):
-    """Return metadata for the club's average heatmap. (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # Code requires team_last5match_average_heatmap collection — commented out
-    # See git history to restore
+    """Return metadata for the club's average heatmap."""
+    if not _USING_MONGO:
+        return jsonify({'error': 'not available without MongoDB'}), 404
+    try:
+        import mongo_loader as _ml
+        db = _ml._db()
+        club_doc = db.clubs.find_one(
+            {'_country': country, '_competition': competition, '_club': club},
+            {'team_id': 1, 'unique_tournament_id': 1}) or {}
+        team_id  = club_doc.get('team_id')
+        uniq_tid = club_doc.get('unique_tournament_id')
+        if not team_id:
+            return jsonify({'error': 'club not found'}), 404
+        doc = db.team_last5match_average_heatmap.find_one(
+            {'team_id': int(team_id)},
+            {'data': 0, 'zones_data': 0})
+        if not doc:
+            return jsonify({'error': 'no heatmap data'}), 404
+        return jsonify({
+            'match_count':  doc.get('match_count', 0),
+            'generated_at': str(doc.get('generated_at', '')),
+            'has_png':      True,
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/club_avg_heatmap_png/<country>/<competition>/<club>/<season>')
 def api_club_avg_heatmap_png(country, competition, club, season):
-    """Serve the club average heatmap PNG from MongoDB. (Requires MongoDB)"""
-    return '', 503
-    # Code requires team_last5match_average_heatmap collection — commented out
-    # See git history to restore
+    """Serve the club average heatmap PNG from MongoDB."""
+    if not _USING_MONGO:
+        return '', 404
+    try:
+        import mongo_loader as _ml
+        db = _ml._db()
+        club_doc = db.clubs.find_one(
+            {'_country': country, '_competition': competition, '_club': club},
+            {'team_id': 1}) or {}
+        team_id = club_doc.get('team_id')
+        if not team_id:
+            return '', 404
+        doc = db.team_last5match_average_heatmap.find_one({'team_id': int(team_id)})
+        if not doc or 'data' not in doc:
+            return '', 404
+        return bytes(doc['data']), 200, {'Content-Type': 'image/png'}
+    except Exception:
+        return '', 404
 
 
 @app.route('/api/club_avg_heatmap_zones_png/<country>/<competition>/<club>/<season>')
 def api_club_avg_heatmap_zones_png(country, competition, club, season):
-    """Serve the 18-zone club average heatmap PNG from MongoDB. (Requires MongoDB)"""
-    return '', 503
-    # Code requires team_last5match_average_heatmap collection — commented out
-    # See git history to restore
+    """Serve the 18-zone club average heatmap PNG from MongoDB."""
+    if not _USING_MONGO:
+        return '', 404
+    try:
+        import mongo_loader as _ml
+        db = _ml._db()
+        club_doc = db.clubs.find_one(
+            {'_country': country, '_competition': competition, '_club': club},
+            {'team_id': 1}) or {}
+        team_id = club_doc.get('team_id')
+        if not team_id:
+            return '', 404
+        doc = db.team_last5match_average_heatmap.find_one({'team_id': int(team_id)})
+        if not doc or 'zones_data' not in doc:
+            return '', 404
+        return bytes(doc['zones_data']), 200, {'Content-Type': 'image/png'}
+    except Exception:
+        return '', 404
 
 
 # ── Heatmap from MongoDB bytes ────────────────────────────────────────────────
 
 @app.route('/heatmap_db/<country>/<competition>/<club>/<stem>')
 def heatmap_db(country, competition, club, stem):
-    """Serve a player heatmap PNG stored as bytes in MongoDB. (Requires MongoDB)"""
-    return '', 503
-    # Code requires mongo_loader.get_heatmap_bytes() — commented out
-    # See git history to restore
+    """Serve a player heatmap PNG stored as bytes in MongoDB."""
+    if not _USING_MONGO:
+        return '', 404
+    import mongo_loader as _ml
+    data = _ml.get_heatmap_bytes(country, competition, club, stem)
+    if data:
+        return data, 200, {'Content-Type': 'image/png'}
+    return '', 404
 
 
 # ── Team match history reset ──────────────────────────────────────────────────
 
 @app.route('/api/purge_team', methods=['POST'])
 def api_purge_team():
-    """Delete all match history and average heatmap for a team in a league. (Requires MongoDB)"""
-    return jsonify({'error': 'not available'}), 503
-    # body     = request.get_json(silent=True) or {}
-    # team_id  = body.get('team_id')
-    # uniq_tid = body.get('uniq_tid')
-    # if not team_id or not uniq_tid:
-    #     return jsonify({'error': 'team_id and uniq_tid are required'}), 400
-    # import mongo_loader as _ml
-    # deleted = _ml.purge_team_matches(team_id, uniq_tid)
-    # return jsonify({'success': True, 'deleted_count': deleted})
+    """Delete all match history and average heatmap for a team in a league."""
+    if not _USING_MONGO:
+        return jsonify({'error': 'not available without MongoDB'}), 404
+    body     = request.get_json(silent=True) or {}
+    team_id  = body.get('team_id')
+    uniq_tid = body.get('uniq_tid')
+    if not team_id or not uniq_tid:
+        return jsonify({'error': 'team_id and uniq_tid are required'}), 400
+    import mongo_loader as _ml
+    deleted = _ml.purge_team_matches(team_id, uniq_tid)
+    return jsonify({'success': True, 'deleted_count': deleted})
 
 
 # ── Player role profile ───────────────────────────────────────────────────────
