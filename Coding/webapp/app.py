@@ -4,11 +4,33 @@ import threading
 import uuid
 import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(name)s %(message)s',
-)
-logging.getLogger('werkzeug').setLevel(logging.INFO)
+# ── Enhanced logging with both console and file output ──────────────────────────
+_LOG_FORMAT = '%(asctime)s [%(levelname)-8s] %(name)s:%(funcName)s:%(lineno)d | %(message)s'
+_LOG_DIR = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(_LOG_DIR, exist_ok=True)
+
+# Root logger configuration
+_root_logger = logging.getLogger()
+_root_logger.setLevel(logging.DEBUG)
+
+# Console handler (INFO level)
+_console_handler = logging.StreamHandler(sys.stdout)
+_console_handler.setLevel(logging.INFO)
+_console_handler.setFormatter(logging.Formatter(_LOG_FORMAT))
+_root_logger.addHandler(_console_handler)
+
+# File handler (DEBUG level - captures everything)
+_file_handler = logging.FileHandler(os.path.join(_LOG_DIR, 'app.log'), encoding='utf-8')
+_file_handler.setLevel(logging.DEBUG)
+_file_handler.setFormatter(logging.Formatter(_LOG_FORMAT))
+_root_logger.addHandler(_file_handler)
+
+# Suppress werkzeug's verbose logging (keep it at WARNING)
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+logging.getLogger('pymongo').setLevel(logging.WARNING)
+
+_logger = logging.getLogger(__name__)
+_logger.info('Logging initialized (console: INFO, file: DEBUG)')
 
 sys.path.insert(0, os.path.dirname(__file__))
 # Coding/ dir — needed for scraper_cli, driver, helpers, heatmap
@@ -27,13 +49,15 @@ def _build_data_loader():
     try:
         from pymongo import MongoClient
         _uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+        _logger.debug(f"Attempting MongoDB connection to {_uri}")
         MongoClient(_uri, serverSelectionTimeoutMS=2000).server_info()
         import mongo_loader as _dl
-        logging.getLogger(__name__).info("Data layer: MongoDB")
+        _logger.info("Data layer: MongoDB (connection successful)")
         return _dl, True
-    except Exception:
+    except Exception as e:
+        _logger.warning(f"MongoDB connection failed: {e} — falling back to file-system JSON")
         import data_loader as _dl
-        logging.getLogger(__name__).info("Data layer: file-system (JSON)")
+        _logger.info("Data layer: file-system (JSON)")
         return _dl, False
 
 _loader, _USING_MONGO = _build_data_loader()
@@ -69,6 +93,31 @@ app = Flask(
     static_folder=os.path.join(_WEBAPP_DIR, 'static'),
 )
 
+# ── HTTP Request/Response Logging ──────────────────────────────────────────────
+import time as _timing
+
+@app.before_request
+def _log_request():
+    request.start_time = _timing.time()
+    _logger.info(f"[REQ] {request.method} {request.path} from {request.remote_addr}")
+    if request.args:
+        _logger.debug(f"  Query params: {dict(request.args)}")
+    if request.method in ('POST', 'PUT', 'PATCH'):
+        try:
+            _logger.debug(f"  Body: {request.get_json(silent=True) or request.form}")
+        except Exception:
+            pass
+
+@app.after_request
+def _log_response(response):
+    elapsed = _timing.time() - getattr(request, 'start_time', _timing.time())
+    _logger.info(f"[RES] {request.method} {request.path} → {response.status_code} ({elapsed:.3f}s)")
+    return response
+
+@app.errorhandler(Exception)
+def _log_error(error):
+    _logger.error(f"[ERR] Unhandled exception: {error}", exc_info=True)
+    return jsonify({'error': 'Internal server error'}), 500
 
 @app.context_processor
 def _inject_globals():
@@ -100,14 +149,21 @@ _player_id_cache: dict = {}  # player_id -> profile_path
 def home():
     now = _time.time()
     if _home_stats_cache['data'] is None or now - _home_stats_cache['ts'] > _HOME_STATS_TTL:
+        _logger.info(f"home_stats_cache MISS — scanning output/ directory")
         _home_stats_cache['data'] = get_home_stats(OUTPUT_DIR)
         _home_stats_cache['ts']   = now
+        _logger.debug(f"home_stats_cache LOADED — {_home_stats_cache['data']}")
+    else:
+        age = now - _home_stats_cache['ts']
+        _logger.debug(f"home_stats_cache HIT (age={age:.1f}s)")
     return render_template('home.html', stats=_home_stats_cache['data'])
 
 # ── Competitions: League Overview ──────────────────────────────────
 @app.route('/competitions')
 def index():
+    _logger.debug("Fetching all competitions")
     competitions = get_all_competitions(OUTPUT_DIR)
+    _logger.debug(f"Loaded {len(competitions)} competitions")
     return render_template('index.html', competitions=competitions)
 
 # ── Competition detail ────────────────────────────────────────────────────────
@@ -2504,7 +2560,9 @@ def player_matches(player_id: int):
     import json as _json2
     if player_id in _player_id_cache:
         profile_path = _player_id_cache[player_id]
+        _logger.debug(f"player_id_cache HIT for player_id={player_id} → {profile_path}")
     else:
+        _logger.debug(f"player_id_cache MISS for player_id={player_id} — scanning output/")
         for root, _dirs, files in os.walk(OUTPUT_DIR):
             for fname in files:
                 if not fname.endswith('.json'):
@@ -2519,11 +2577,12 @@ def player_matches(player_id: int):
                         if len(parts) == 4:
                             profile_path = '/'.join(parts[:3]) + '/' + parts[3].replace('.json', '')
                             _player_id_cache[player_id] = profile_path
+                            _logger.debug(f"player_id_cache STORE for player_id={player_id} → {profile_path}")
                         if not player_name:
                             player_name = _d.get('player_name', '')
                         break
-                except Exception:
-                    pass
+                except Exception as e:
+                    _logger.debug(f"player_id lookup error reading {fpath}: {e}")
             if profile_path:
                 break
 
