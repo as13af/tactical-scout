@@ -27,7 +27,7 @@ def _build_data_loader():
     try:
         from pymongo import MongoClient
         _uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
-        MongoClient(_uri, serverSelectionTimeoutMS=800).server_info()
+        MongoClient(_uri, serverSelectionTimeoutMS=2000).server_info()
         import mongo_loader as _dl
         logging.getLogger(__name__).info("Data layer: MongoDB")
         return _dl, True
@@ -90,10 +90,19 @@ def _load_player_for_engine(country: str, competition: str, club: str, fname: st
 
 
 # ── Home ──────────────────────────────────────────────────────────────────
+import time as _time
+_home_stats_cache = {'data': None, 'ts': 0}
+_HOME_STATS_TTL   = 300  # 5 minutes
+
+_player_id_cache: dict = {}  # player_id -> profile_path
+
 @app.route('/')
 def home():
-    stats = get_home_stats(OUTPUT_DIR)
-    return render_template('home.html', stats=stats)
+    now = _time.time()
+    if _home_stats_cache['data'] is None or now - _home_stats_cache['ts'] > _HOME_STATS_TTL:
+        _home_stats_cache['data'] = get_home_stats(OUTPUT_DIR)
+        _home_stats_cache['ts']   = now
+    return render_template('home.html', stats=_home_stats_cache['data'])
 
 # ── Competitions: League Overview ──────────────────────────────────
 @app.route('/competitions')
@@ -1040,8 +1049,7 @@ def export_csv():
         download_name='players_export.csv'
     )
 
-# ── Scrape jobs ──────────────────────────────────────────────────────────────
-_scrape_jobs: dict = {}  # job_id -> {lines, progress, done, error}
+# ── Scrape jobs (see line ~2464 for the real definition with lock) ─────────────
 
 
 def _run_scrape_job(job_id: str, tid: str, uniq_tid: str,
@@ -2492,28 +2500,32 @@ def player_matches(player_id: int):
     profile_path = None
     if appearances:
         player_name = appearances[0]['player_info'].get('name', '')
-    # Cross-lookup in output/ by player_id (scan JSON filenames for id fragment)
-    for root, _dirs, files in os.walk(OUTPUT_DIR):
-        for fname in files:
-            if not fname.endswith('.json'):
-                continue
-            fpath = os.path.join(root, fname)
-            try:
-                import json as _json2
-                with open(fpath, encoding='utf-8') as _f:
-                    _d = _json2.load(_f)
-                if str(_d.get('player_id', '')) == str(player_id):
-                    rel = os.path.relpath(fpath, OUTPUT_DIR).replace('\\', '/')
-                    parts = rel.split('/')
-                    if len(parts) == 4:
-                        profile_path = '/'.join(parts[:3]) + '/' + parts[3].replace('.json', '')
-                    if not player_name:
-                        player_name = _d.get('player_name', '')
-                    break
-            except Exception:
-                pass
-        if profile_path:
-            break
+    # Cross-lookup in output/ by player_id (cached, exits immediately on hit)
+    import json as _json2
+    if player_id in _player_id_cache:
+        profile_path = _player_id_cache[player_id]
+    else:
+        for root, _dirs, files in os.walk(OUTPUT_DIR):
+            for fname in files:
+                if not fname.endswith('.json'):
+                    continue
+                fpath = os.path.join(root, fname)
+                try:
+                    with open(fpath, encoding='utf-8') as _f:
+                        _d = _json2.load(_f)
+                    if str(_d.get('player_id', '')) == str(player_id):
+                        rel = os.path.relpath(fpath, OUTPUT_DIR).replace('\\', '/')
+                        parts = rel.split('/')
+                        if len(parts) == 4:
+                            profile_path = '/'.join(parts[:3]) + '/' + parts[3].replace('.json', '')
+                            _player_id_cache[player_id] = profile_path
+                        if not player_name:
+                            player_name = _d.get('player_name', '')
+                        break
+                except Exception:
+                    pass
+            if profile_path:
+                break
 
     return render_template(
         'player_match_history.html',
