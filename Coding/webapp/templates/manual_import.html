@@ -1,0 +1,874 @@
+{% extends "base.html" %}
+{% block title %}Manual Import{% endblock %}
+
+{% block head %}
+<style>
+  /* ── Layout ── */
+  .mi-breadcrumb { margin-bottom: 18px; font-size: 12px; color: var(--text3); }
+  .mi-breadcrumb a { color: var(--text3); text-decoration: none; }
+  .mi-breadcrumb a:hover { color: var(--text2); }
+  .mi-breadcrumb span { margin: 0 6px; }
+
+  .mi-header { margin-bottom: 24px; }
+  .mi-header h1 { margin: 0 0 4px; font-size: 22px; }
+  .mi-header p  { margin: 0; font-size: 12px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+
+  /* ── Progress steps ── */
+  .mi-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+    font-family: 'CoFoSans', monospace;
+    font-size: 11px;
+  }
+  .mi-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text3);
+    padding: 6px 12px 6px 0;
+  }
+  .mi-step.active  { color: var(--text); }
+  .mi-step.done    { color: #27AE60; }
+  .mi-step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0;
+  }
+  .mi-step.active .mi-step-num { border-color: var(--text2); color: var(--text); background: var(--bg3); }
+  .mi-step.done   .mi-step-num { border-color: #27AE60; color: #27AE60; }
+  .mi-step-sep { width: 24px; height: 1px; background: var(--border); flex-shrink: 0; margin-right: 12px; }
+
+  /* ── Cards ── */
+  .mi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .mi-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mi-card-badge {
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--bg3);
+    color: var(--text3);
+    border: 1px solid var(--border);
+  }
+  .mi-card-badge.required { border-color: #E74C3C44; color: #E74C3C; }
+  .mi-card-badge.optional { border-color: var(--border); }
+
+  /* ── Config grid ── */
+  .mi-config-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .mi-field { display: flex; flex-direction: column; gap: 5px; }
+  .mi-field label { font-size: 11px; color: var(--text3); font-family: 'CoFoSans', monospace; text-transform: uppercase; letter-spacing: .05em; }
+  .mi-field input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: 'CoFoSans', monospace;
+    width: 160px;
+  }
+  .mi-field input:focus { outline: none; border-color: var(--text3); }
+  .mi-field input.wide { width: 280px; }
+
+  /* ── Buttons ── */
+  .mi-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .mi-btn:hover:not(:disabled) { border-color: var(--text2); color: var(--text); }
+  .mi-btn:disabled { opacity: .35; cursor: default; }
+  .mi-btn.primary { border-color: #27AE60; color: #27AE60; }
+  .mi-btn.primary:hover:not(:disabled) { background: rgba(39,174,96,.08); }
+  .mi-btn.danger  { border-color: #E74C3C55; color: #E74C3C; }
+
+  /* ── Paste items ── */
+  .mi-endpoint-list { display: flex; flex-direction: column; gap: 8px; }
+  .mi-endpoint {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mi-endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    cursor: pointer;
+    background: var(--bg3);
+    transition: background .12s;
+  }
+  .mi-endpoint-header:hover { background: rgba(255,255,255,.03); }
+
+  .mi-ep-status {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; flex-shrink: 0;
+  }
+  .mi-ep-status.ok   { border-color: #27AE60; color: #27AE60; background: rgba(39,174,96,.1); }
+  .mi-ep-status.err  { border-color: #E74C3C; color: #E74C3C; background: rgba(231,76,60,.1); }
+  .mi-ep-status.idle { border-color: var(--border); color: var(--text3); }
+
+  .mi-ep-label { font-size: 12px; font-weight: 600; color: var(--text2); min-width: 130px; }
+  .mi-ep-url   {
+    flex: 1; font-size: 10px; color: var(--text3);
+    font-family: 'CoFoSans', monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mi-ep-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .mi-ep-copy, .mi-ep-open {
+    font-size: 10px; font-family: 'CoFoSans', monospace;
+    background: none; border: 1px solid var(--border);
+    color: var(--text3); border-radius: 3px; padding: 2px 8px;
+    cursor: pointer; transition: color .12s, border-color .12s;
+  }
+  .mi-ep-copy:hover, .mi-ep-open:hover { border-color: var(--text2); color: var(--text); }
+  .mi-ep-chevron { font-size: 10px; color: var(--text3); flex-shrink: 0; transition: transform .2s; }
+  .mi-ep-chevron.open { transform: rotate(90deg); }
+
+  .mi-ep-body { display: none; padding: 12px; border-top: 1px solid var(--border); }
+  .mi-ep-body.open { display: block; }
+
+  .mi-ep-hint { font-size: 11px; color: var(--text3); font-family: 'CoFoSans', monospace; margin-bottom: 8px; }
+
+  .mi-textarea {
+    width: 100%; box-sizing: border-box;
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text2);
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 90px;
+    max-height: 260px;
+  }
+  .mi-textarea:focus { outline: none; border-color: var(--text3); }
+
+  .mi-ep-feedback {
+    margin-top: 6px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    min-height: 18px;
+  }
+  .mi-ep-feedback.ok  { color: #27AE60; }
+  .mi-ep-feedback.err { color: #E74C3C; }
+
+  .mi-ep-submit-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+
+  /* ── Team accordion ── */
+  .mi-team-list { display: flex; flex-direction: column; gap: 6px; }
+  .mi-team {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mi-team-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; cursor: pointer;
+    background: var(--bg3);
+    transition: background .12s;
+  }
+  .mi-team-header:hover { background: rgba(255,255,255,.03); }
+  .mi-team-name  { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+  .mi-team-prog  { font-size: 10px; color: var(--text3); font-family: 'CoFoSans', monospace; flex-shrink: 0; }
+  .mi-team-body  { display: none; padding: 12px 14px; border-top: 1px solid var(--border); }
+  .mi-team-body.open { display: block; }
+
+  .mi-team-endpoints { margin-bottom: 12px; }
+
+  /* ── Player sub-list ── */
+  .mi-player-section { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+  .mi-player-section-title {
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--text3); margin-bottom: 10px;
+  }
+  .mi-player-list { display: flex; flex-direction: column; gap: 4px; }
+  .mi-player {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .mi-player-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; cursor: pointer;
+    font-size: 11px;
+    transition: background .12s;
+  }
+  .mi-player-header:hover { background: rgba(255,255,255,.02); }
+  .mi-player-name { flex: 1; color: var(--text2); font-weight: 600; }
+  .mi-player-prog { font-size: 10px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+  .mi-player-body { display: none; padding: 8px 10px; border-top: 1px solid var(--border); background: var(--bg1); }
+  .mi-player-body.open { display: block; }
+
+  /* Compact player endpoints: 2-col grid */
+  .mi-player-ep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .mi-player-ep {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .mi-player-ep-hdr {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 8px; cursor: pointer;
+    background: var(--bg3);
+    font-size: 10px;
+  }
+  .mi-player-ep-hdr:hover { background: rgba(255,255,255,.03); }
+  .mi-player-ep-body { display: none; padding: 6px 8px; border-top: 1px solid var(--border); }
+  .mi-player-ep-body.open { display: block; }
+  .mi-player-ep-body .mi-textarea { min-height: 60px; font-size: 10px; }
+
+  /* ── Process section ── */
+  .mi-summary {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 18px; font-family: 'CoFoSans', monospace;
+  }
+  .mi-summary-item { display: flex; flex-direction: column; gap: 3px; }
+  .mi-summary-item label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+  .mi-summary-item span  { font-size: 18px; color: var(--text); font-weight: 700; }
+
+  .mi-log {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text3);
+    max-height: 340px;
+    overflow-y: auto;
+    margin-top: 14px;
+    display: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .mi-log.visible { display: block; }
+  .mi-log-line    { color: var(--text2); }
+  .mi-log-done    { color: #27AE60; font-weight: 700; }
+  .mi-log-error   { color: #E74C3C; }
+  .mi-log-progress { color: #4A90E2; }
+
+  /* ── Info bar ── */
+  .mi-info {
+    background: rgba(74,144,226,.07);
+    border: 1px solid rgba(74,144,226,.2);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: #4A90E2;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 680px) {
+    .mi-player-ep-grid { grid-template-columns: 1fr; }
+    .mi-config-row { flex-direction: column; }
+    .mi-field input { width: 100%; }
+    .mi-field input.wide { width: 100%; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mi-breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <span>Manual Import</span>
+</div>
+
+<div class="mi-header">
+  <h1>Manual Import</h1>
+  <p>Paste SofaScore API responses directly — no browser automation required</p>
+</div>
+
+<div class="mi-info" id="mi-tip">
+  Open each URL in a browser tab that has already visited sofascore.com (to get past Cloudflare),
+  then copy the full JSON response (Ctrl+A → Ctrl+C) and paste it into the matching field below.<br>
+  <strong>Only Standings is required.</strong> All other fields are optional.
+</div>
+
+<!-- Steps indicator -->
+<div class="mi-steps">
+  <div class="mi-step active" id="step-ind-1"><div class="mi-step-num">1</div>Setup</div>
+  <div class="mi-step-sep"></div>
+  <div class="mi-step" id="step-ind-2"><div class="mi-step-num">2</div>League</div>
+  <div class="mi-step-sep"></div>
+  <div class="mi-step" id="step-ind-3"><div class="mi-step-num">3</div>Teams</div>
+  <div class="mi-step-sep"></div>
+  <div class="mi-step" id="step-ind-4"><div class="mi-step-num">4</div>Process</div>
+</div>
+
+<!-- ── Step 1: Config ── -->
+<div class="mi-card" id="mi-step-1">
+  <div class="mi-card-title">1. Competition Setup</div>
+  <div class="mi-config-row">
+    <div class="mi-field">
+      <label>Unique Tournament ID</label>
+      <input id="mi-uniq-tid" type="text" placeholder="e.g. 9" oninput="onConfigChange()">
+    </div>
+    <div class="mi-field">
+      <label>Season ID</label>
+      <input id="mi-season-id" type="text" placeholder="e.g. 77849" oninput="onConfigChange()">
+    </div>
+    <div class="mi-field">
+      <label>Output Directory (optional)</label>
+      <input id="mi-out-dir" type="text" placeholder="leave blank for default" class="wide">
+    </div>
+  </div>
+  <div id="mi-config-status" style="margin-top:10px;font-size:11px;color:var(--text3);font-family:'CoFoSans',monospace;"></div>
+</div>
+
+<!-- ── Step 2: League JSONs ── -->
+<div class="mi-card" id="mi-step-2" style="display:none;">
+  <div class="mi-card-title">
+    2. League Data
+    <span class="mi-card-badge required">required: standings</span>
+    <span class="mi-card-badge optional" id="mi-league-count" style="margin-left:auto;">0 / 3 pasted</span>
+  </div>
+  <div class="mi-endpoint-list" id="mi-league-endpoints"></div>
+</div>
+
+<!-- ── Step 3: Teams ── -->
+<div class="mi-card" id="mi-step-3" style="display:none;">
+  <div class="mi-card-title">
+    3. Teams
+    <span class="mi-card-badge optional" id="mi-teams-count" style="margin-left:auto;"></span>
+  </div>
+  <div id="mi-team-list" class="mi-team-list"></div>
+</div>
+
+<!-- ── Step 4: Process ── -->
+<div class="mi-card" id="mi-step-4" style="display:none;">
+  <div class="mi-card-title">4. Process</div>
+  <div class="mi-summary" id="mi-summary"></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <button class="mi-btn primary" id="mi-process-btn" onclick="processAll()">⚙ Process All Pasted Data</button>
+    <span id="mi-process-status" style="font-size:11px;color:var(--text3);font-family:'CoFoSans',monospace;"></span>
+  </div>
+  <div class="mi-log" id="mi-log"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────────────
+const S = {
+  config:   { uniq_tid: '', season_id: '', out_dir: '' },
+  league:   {},          // { standings, cuptrees, season_info }
+  teams:    {},          // { team_id: { profile, stats, squad, players: {} } }
+  teamMeta: [],          // [{ id, name }] from parsed standings
+};
+
+const BASE = 'https://api.sofascore.com/api/v1';
+
+function urls() {
+  const { uniq_tid: u, season_id: s } = S.config;
+  return {
+    standings:   `${BASE}/unique-tournament/${u}/season/${s}/standings/total`,
+    cuptrees:    `${BASE}/unique-tournament/${u}/season/${s}/cuptrees`,
+    season_info: `${BASE}/unique-tournament/${u}/season/${s}/info`,
+    teamProfile: tid => `${BASE}/team/${tid}`,
+    teamStats:   tid => `${BASE}/team/${tid}/unique-tournament/${u}/season/${s}/statistics/overall`,
+    teamSquad:   tid => `${BASE}/team/${tid}/players`,
+    playerProfile: pid => `${BASE}/player/${pid}`,
+    playerStats:   pid => `${BASE}/player/${pid}/unique-tournament/${u}/season/${s}/statistics/overall`,
+    playerHeatmap: pid => `${BASE}/player/${pid}/unique-tournament/${u}/season/${s}/heatmap/overall`,
+    playerChars:   pid => `${BASE}/player/${pid}/characteristics`,
+  };
+}
+
+// ── Step indicators ────────────────────────────────────────────────────────
+function setStep(n) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(`step-ind-${i}`);
+    el.classList.toggle('active', i === n);
+    el.classList.toggle('done', i < n);
+  });
+}
+
+// ── Config change ──────────────────────────────────────────────────────────
+window.onConfigChange = function () {
+  S.config.uniq_tid  = document.getElementById('mi-uniq-tid').value.trim();
+  S.config.season_id = document.getElementById('mi-season-id').value.trim();
+  S.config.out_dir   = document.getElementById('mi-out-dir').value.trim();
+
+  const ready = S.config.uniq_tid && S.config.season_id;
+  document.getElementById('mi-config-status').textContent = ready
+    ? `URLs ready for tournament ${S.config.uniq_tid}, season ${S.config.season_id}`
+    : '';
+
+  const step2 = document.getElementById('mi-step-2');
+  if (ready) {
+    step2.style.display = '';
+    renderLeagueEndpoints();
+    setStep(2);
+    document.getElementById('mi-step-4').style.display = '';
+    updateSummary();
+  } else {
+    step2.style.display = 'none';
+  }
+};
+
+// ── League endpoints ───────────────────────────────────────────────────────
+const LEAGUE_EPS = [
+  { key: 'standings',   label: 'Standings',   req: true  },
+  { key: 'cuptrees',    label: 'Cup Trees',    req: false },
+  { key: 'season_info', label: 'Season Info',  req: false },
+];
+
+function renderLeagueEndpoints() {
+  const list = document.getElementById('mi-league-endpoints');
+  const U    = urls();
+  list.innerHTML = LEAGUE_EPS.map(ep => {
+    const u = U[ep.key];
+    return endpointHtml({
+      id:    `league-ep-${ep.key}`,
+      label: ep.label,
+      url:   u,
+      req:   ep.req,
+      hint:  'Open the URL in a browser that has visited sofascore.com, copy the JSON, paste here.',
+      onSubmit: `submitLeague('${ep.key}')`,
+    });
+  }).join('');
+}
+
+window.submitLeague = function (key) {
+  const raw = document.getElementById(`ta-league-ep-${key}`).value.trim();
+  const fb  = document.getElementById(`fb-league-ep-${key}`);
+  const st  = document.getElementById(`st-league-ep-${key}`);
+  try {
+    const data = JSON.parse(raw);
+    S.league[key] = data;
+    setStatus(st, 'ok');
+    fb.className   = 'mi-ep-feedback ok';
+    fb.textContent = `✓ Parsed — ${Object.keys(data).length} top-level keys`;
+
+    // Parse standings → extract teams
+    if (key === 'standings') {
+      parseStandings(data);
+    }
+
+    updateLeagueCount();
+    updateSummary();
+  } catch(e) {
+    setStatus(st, 'err');
+    fb.className   = 'mi-ep-feedback err';
+    fb.textContent = `✗ Invalid JSON: ${e.message}`;
+  }
+};
+
+function updateLeagueCount() {
+  const n = Object.keys(S.league).length;
+  document.getElementById('mi-league-count').textContent = `${n} / 3 pasted`;
+}
+
+// ── Parse standings → build teams section ─────────────────────────────────
+function parseStandings(data) {
+  fetch('/api/manual_import/parse_standings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json: data }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.error) return;
+    S.teamMeta = res.teams;
+    renderTeams(res.teams);
+    document.getElementById('mi-step-3').style.display = '';
+    setStep(3);
+    updateSummary();
+  })
+  .catch(() => {});
+}
+
+// ── Teams ──────────────────────────────────────────────────────────────────
+function renderTeams(teams) {
+  const U    = urls();
+  const list = document.getElementById('mi-team-list');
+  document.getElementById('mi-teams-count').textContent =
+    `${teams.length} teams · 0 / ${teams.length * 3} endpoints pasted`;
+
+  list.innerHTML = teams.map(tm => {
+    const tid  = tm.id;
+    const safe = escHtml(tm.name);
+    return `
+      <div class="mi-team" id="team-${tid}">
+        <div class="mi-team-header" onclick="toggleTeam('${tid}')">
+          <div class="mi-ep-status idle" id="team-st-${tid}"></div>
+          <div class="mi-team-name">${safe}</div>
+          <div class="mi-team-prog" id="team-prog-${tid}">0 / 3</div>
+          <div class="mi-ep-chevron" id="team-chev-${tid}">▶</div>
+        </div>
+        <div class="mi-team-body" id="team-body-${tid}">
+          <div class="mi-team-endpoints mi-endpoint-list">
+            ${teamEpHtml(tid, 'profile',   'Profile',   U.teamProfile(tid))}
+            ${teamEpHtml(tid, 'stats',     'Stats',     U.teamStats(tid))}
+            ${teamEpHtml(tid, 'squad',     'Squad',     U.teamSquad(tid), true)}
+          </div>
+          <div id="players-section-${tid}"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function teamEpHtml(tid, field, label, url, isSquad) {
+  const id = `team-${tid}-${field}`;
+  return endpointHtml({
+    id, label, url,
+    hint: 'Open URL, copy JSON, paste here.',
+    onSubmit: `submitTeam('${tid}','${field}')`,
+    extra: isSquad ? `afterPaste: parseSquad('${tid}')` : '',
+  });
+}
+
+window.toggleTeam = function (tid) {
+  const body = document.getElementById(`team-body-${tid}`);
+  const chev = document.getElementById(`team-chev-${tid}`);
+  const open = body.classList.toggle('open');
+  chev.textContent  = open ? '▼' : '▶';
+};
+
+window.submitTeam = function (tid, field) {
+  const id  = `team-${tid}-${field}`;
+  const raw = document.getElementById(`ta-${id}`).value.trim();
+  const fb  = document.getElementById(`fb-${id}`);
+  const st  = document.getElementById(`st-${id}`);
+  try {
+    const data = JSON.parse(raw);
+    if (!S.teams[tid]) S.teams[tid] = { players: {} };
+    S.teams[tid][field] = data;
+    setStatus(st, 'ok');
+    fb.className   = 'mi-ep-feedback ok';
+    fb.textContent = `✓ Parsed — ${Object.keys(data).length} keys`;
+
+    if (field === 'squad') parseSquad(tid, data);
+    updateTeamProgress(tid);
+    updateSummary();
+  } catch(e) {
+    setStatus(st, 'err');
+    fb.className   = 'mi-ep-feedback err';
+    fb.textContent = `✗ Invalid JSON: ${e.message}`;
+  }
+};
+
+function updateTeamProgress(tid) {
+  if (!S.teams[tid]) return;
+  const pasted = ['profile','stats','squad'].filter(f => S.teams[tid][f]).length;
+  document.getElementById(`team-prog-${tid}`).textContent = `${pasted} / 3`;
+  if (pasted === 3) setStatus(document.getElementById(`team-st-${tid}`), 'ok');
+  else if (pasted > 0) setStatus(document.getElementById(`team-st-${tid}`), 'idle');
+
+  // Update header count
+  const total = S.teamMeta.length;
+  const done  = S.teamMeta.filter(tm => {
+    const td = S.teams[tm.id];
+    return td && ['profile','stats','squad'].every(f => td[f]);
+  }).length;
+  document.getElementById('mi-teams-count').textContent =
+    `${total} teams · ${done} / ${total * 3} endpoints pasted`;
+}
+
+// ── Squad parse → player list ──────────────────────────────────────────────
+function parseSquad(tid, data) {
+  fetch('/api/manual_import/parse_squad', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json: data }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.error || !res.players.length) return;
+    renderPlayers(tid, res.players);
+    updateSummary();
+  })
+  .catch(() => {});
+}
+
+function renderPlayers(tid, players) {
+  const U    = urls();
+  const sect = document.getElementById(`players-section-${tid}`);
+  const rows = players.map(p => {
+    const pid  = p.id;
+    const safe = escHtml(p.name);
+    return `
+      <div class="mi-player" id="player-${pid}">
+        <div class="mi-player-header" onclick="togglePlayer('${pid}')">
+          <div class="mi-ep-status idle" id="player-st-${pid}"></div>
+          <div class="mi-player-name">${safe}</div>
+          <div class="mi-player-prog" id="player-prog-${pid}">0 / 4</div>
+          <div class="mi-ep-chevron" id="player-chev-${pid}">▶</div>
+        </div>
+        <div class="mi-player-body" id="player-body-${pid}">
+          <div class="mi-player-ep-grid">
+            ${playerEpHtml(tid, pid, 'profile',         'Profile',    U.playerProfile(pid))}
+            ${playerEpHtml(tid, pid, 'stats',           'Stats',      U.playerStats(pid))}
+            ${playerEpHtml(tid, pid, 'heatmap',         'Heatmap',    U.playerHeatmap(pid))}
+            ${playerEpHtml(tid, pid, 'characteristics', 'Chars',      U.playerChars(pid))}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  sect.innerHTML = `
+    <div class="mi-player-section">
+      <div class="mi-player-section-title">Players (optional) — ${players.length}</div>
+      <div class="mi-player-list">${rows}</div>
+    </div>`;
+}
+
+function playerEpHtml(tid, pid, field, label, url) {
+  const id = `player-${pid}-${field}`;
+  return `
+    <div class="mi-player-ep">
+      <div class="mi-player-ep-hdr" onclick="togglePlayerEp('${id}')">
+        <div class="mi-ep-status idle" id="st-${id}"></div>
+        <span style="font-size:10px;font-weight:600;color:var(--text2);flex:1;">${label}</span>
+        <button class="mi-ep-copy" onclick="event.stopPropagation();copyUrl('${escHtml(url)}',this)">Copy URL</button>
+        <span class="mi-ep-chevron" id="chev-${id}">▶</span>
+      </div>
+      <div class="mi-player-ep-body" id="body-${id}">
+        <textarea class="mi-textarea" id="ta-${id}" placeholder="Paste JSON here…"
+                  rows="4" oninput="autoSubmitPlayer(event,'${tid}','${pid}','${field}')"></textarea>
+        <div class="mi-ep-feedback" id="fb-${id}"></div>
+      </div>
+    </div>`;
+}
+
+window.togglePlayer = function (pid) {
+  const body = document.getElementById(`player-body-${pid}`);
+  const chev = document.getElementById(`player-chev-${pid}`);
+  const open = body.classList.toggle('open');
+  chev.textContent = open ? '▼' : '▶';
+};
+
+window.togglePlayerEp = function (id) {
+  const body = document.getElementById(`body-${id}`);
+  const chev = document.getElementById(`chev-${id}`);
+  const open = body.classList.toggle('open');
+  chev.textContent = open ? '▼' : '▶';
+};
+
+window.autoSubmitPlayer = function (e, tid, pid, field) {
+  const raw = e.target.value.trim();
+  const fb  = document.getElementById(`fb-player-${pid}-${field}`);
+  const st  = document.getElementById(`st-player-${pid}-${field}`);
+  try {
+    const data = JSON.parse(raw);
+    if (!S.teams[tid]) S.teams[tid] = { players: {} };
+    if (!S.teams[tid].players) S.teams[tid].players = {};
+    S.teams[tid].players[pid] = S.teams[tid].players[pid] || {};
+    S.teams[tid].players[pid][field] = data;
+    setStatus(st, 'ok');
+    if (fb) { fb.className = 'mi-ep-feedback ok'; fb.textContent = '✓'; }
+    updatePlayerProgress(pid, S.teams[tid].players[pid]);
+    updateSummary();
+  } catch(e2) {
+    setStatus(st, 'err');
+    if (fb) { fb.className = 'mi-ep-feedback err'; fb.textContent = '✗'; }
+  }
+};
+
+function updatePlayerProgress(pid, pdata) {
+  const n = ['profile','stats','heatmap','characteristics'].filter(f => pdata[f]).length;
+  const prog = document.getElementById(`player-prog-${pid}`);
+  const st   = document.getElementById(`player-st-${pid}`);
+  if (prog) prog.textContent = `${n} / 4`;
+  if (st) {
+    if (n === 4) setStatus(st, 'ok');
+    else if (n > 0) setStatus(st, 'idle');
+  }
+}
+
+// ── Summary ────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const nLeague  = Object.keys(S.league).length;
+  const nTeams   = Object.values(S.teams).filter(t => t && (t.profile || t.stats || t.squad)).length;
+  const nPlayers = Object.values(S.teams).reduce((acc, t) => {
+    if (!t || !t.players) return acc;
+    return acc + Object.values(t.players).filter(p => p && Object.keys(p).length).length;
+  }, 0);
+  const nPlayerEps = Object.values(S.teams).reduce((acc, t) => {
+    if (!t || !t.players) return acc;
+    return acc + Object.values(t.players).reduce((a, p) => a + Object.keys(p).length, 0);
+  }, 0);
+
+  document.getElementById('mi-summary').innerHTML = `
+    <div class="mi-summary-item"><label>League JSONs</label><span>${nLeague}</span></div>
+    <div class="mi-summary-item"><label>Teams</label><span>${nTeams}</span></div>
+    <div class="mi-summary-item"><label>Players</label><span>${nPlayers}</span></div>
+    <div class="mi-summary-item"><label>Player JSONs</label><span>${nPlayerEps}</span></div>
+  `;
+
+  const btn = document.getElementById('mi-process-btn');
+  btn.disabled = !S.config.uniq_tid || !S.config.season_id || !S.league.standings;
+}
+
+// ── Process ────────────────────────────────────────────────────────────────
+window.processAll = function () {
+  const btn    = document.getElementById('mi-process-btn');
+  const status = document.getElementById('mi-process-status');
+  const log    = document.getElementById('mi-log');
+
+  btn.disabled = true;
+  status.textContent = 'Starting…';
+  log.innerHTML = '';
+  log.classList.add('visible');
+
+  S.config.out_dir = document.getElementById('mi-out-dir').value.trim();
+
+  fetch('/api/manual_import/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config: S.config, league: S.league, teams: S.teams }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.error) { status.textContent = `Error: ${res.error}`; btn.disabled = false; return; }
+    pollJob(res.job_id, btn, status, log);
+  })
+  .catch(e => {
+    status.textContent = `Request failed: ${e}`;
+    btn.disabled = false;
+  });
+};
+
+function pollJob(jobId, btn, status, log) {
+  let offset = 0;
+  const iv = setInterval(() => {
+    fetch(`/api/scrape/${jobId}?offset=${offset}`)
+    .then(r => r.json())
+    .then(data => {
+      data.lines.forEach(line => {
+        const div = document.createElement('div');
+        if (line.startsWith('DONE:'))     div.className = 'mi-log-done';
+        else if (line.startsWith('ERROR:')) div.className = 'mi-log-error';
+        else if (line.startsWith('PROGRESS:')) div.className = 'mi-log-progress';
+        else div.className = 'mi-log-line';
+        div.textContent = line;
+        log.appendChild(div);
+      });
+      log.scrollTop = log.scrollHeight;
+      offset += data.lines.length;
+      status.textContent = `${data.progress}% complete`;
+      if (data.done) {
+        clearInterval(iv);
+        btn.disabled = false;
+        status.textContent = data.error ? 'Completed with errors.' : '✓ Done!';
+        setStep(4);
+      }
+    })
+    .catch(() => {});
+  }, 1000);
+}
+
+// ── Shared endpoint HTML builder ───────────────────────────────────────────
+function endpointHtml({ id, label, url, req, hint, onSubmit }) {
+  const safeUrl = escHtml(url);
+  return `
+    <div class="mi-endpoint" id="ep-${id}">
+      <div class="mi-endpoint-header" onclick="toggleEp('${id}')">
+        <div class="mi-ep-status idle" id="st-${id}"></div>
+        <div class="mi-ep-label">${label}${req ? ' <span style="color:#E74C3C;font-size:9px;">*</span>' : ''}</div>
+        <div class="mi-ep-url">${safeUrl}</div>
+        <div class="mi-ep-actions">
+          <button class="mi-ep-copy" onclick="event.stopPropagation();copyUrl('${safeUrl}',this)">Copy URL</button>
+          <a class="mi-ep-open" href="${safeUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open ↗</a>
+        </div>
+        <span class="mi-ep-chevron" id="chev-${id}">▶</span>
+      </div>
+      <div class="mi-ep-body" id="body-${id}">
+        <div class="mi-ep-hint">${hint || ''}</div>
+        <textarea class="mi-textarea" id="ta-${id}" placeholder="Paste JSON response here…" rows="5"></textarea>
+        <div class="mi-ep-feedback" id="fb-${id}"></div>
+        <div class="mi-ep-submit-row">
+          <button class="mi-btn primary" onclick="${onSubmit}">✓ Submit</button>
+          <button class="mi-btn" onclick="clearEp('${id}')">Clear</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.toggleEp = function (id) {
+  const body = document.getElementById(`body-${id}`);
+  const chev = document.getElementById(`chev-${id}`);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+};
+
+window.clearEp = function (id) {
+  document.getElementById(`ta-${id}`).value = '';
+  document.getElementById(`fb-${id}`).textContent = '';
+  document.getElementById(`fb-${id}`).className = 'mi-ep-feedback';
+  setStatus(document.getElementById(`st-${id}`), 'idle');
+};
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function setStatus(el, state) {
+  if (!el) return;
+  el.className = `mi-ep-status ${state}`;
+  el.textContent = state === 'ok' ? '✓' : state === 'err' ? '✗' : '';
+}
+
+window.copyUrl = function (url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1200);
+  }).catch(() => {});
+};
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.getElementById('mi-step-4').style.display = 'none';
+updateSummary();
+
+})();
+</script>
+{% endblock %}

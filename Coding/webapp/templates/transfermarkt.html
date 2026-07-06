@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+{% block title %}Transfermarkt Scraper{% endblock %}
+
+{% block head %}
+<style>
+  .tm-header { margin-bottom: 24px; }
+  .tm-header h1 { margin: 0 0 4px; font-size: 22px; }
+  .tm-header p  { margin: 0; font-size: 12px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+
+  .tm-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .tm-card-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text); margin-bottom: 16px;
+  }
+
+  /* ── Input row ── */
+  .tm-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .tm-field { display: flex; flex-direction: column; gap: 5px; }
+  .tm-field label { font-size: 11px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+  .tm-field input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .tm-field input:focus { border-color: var(--text2); }
+  #tm-url-input { width: 400px; }
+  #tm-season-input { width: 80px; }
+
+  /* ── Mode badge ── */
+  .tm-mode-wrap {
+    display: flex; align-items: flex-end; padding-bottom: 2px;
+  }
+  .tm-mode-badge {
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text3);
+    letter-spacing: .04em;
+    white-space: nowrap;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .tm-mode-badge.mode-competition  { border-color: #3498DB44; color: #3498DB; background: #3498DB11; }
+  .tm-mode-badge.mode-club         { border-color: #9B59B644; color: #9B59B6; background: #9B59B611; }
+  .tm-mode-badge.mode-player       { border-color: #2ECC7144; color: #2ECC71; background: #2ECC7111; }
+  .tm-mode-badge.mode-national_team{ border-color: #E67E2244; color: #E67E22; background: #E67E2211; }
+
+  /* ── Button ── */
+  .tm-btn {
+    padding: 9px 20px; border-radius: 5px;
+    border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    transition: opacity .15s;
+  }
+  .tm-btn:hover { opacity: .85; }
+  .tm-btn-primary { background: #2ECC71; color: #000; }
+  .tm-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ── Progress bar ── */
+  .tm-progress-wrap {
+    background: var(--bg3); border-radius: 4px;
+    height: 6px; overflow: hidden; margin-bottom: 12px;
+  }
+  .tm-progress-bar { height: 100%; background: #2ECC71; width: 0%; transition: width .3s; }
+
+  /* ── Log ── */
+  .tm-log {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 14px 16px; font-family: 'CoFoSans', monospace; font-size: 11px;
+    color: var(--text3); max-height: 320px; overflow-y: auto;
+    line-height: 1.6; white-space: pre-wrap; word-break: break-all;
+  }
+  .tm-log .log-error { color: #E74C3C; }
+  .tm-log .log-done  { color: #2ECC71; }
+
+  /* ── Summary ── */
+  .tm-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px; margin-top: 4px;
+  }
+  .tm-result-stat {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px; text-align: center;
+  }
+  .tm-result-stat .value { font-size: 26px; font-weight: 700; color: #2ECC71; margin-bottom: 4px; }
+  .tm-result-stat .label { font-size: 11px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+  .tm-result-stat.hidden-stat { display: none; }
+
+  /* ── Past runs ── */
+  .tm-mode-group { margin-bottom: 18px; }
+  .tm-mode-group-title {
+    font-size: 10px; font-family: 'CoFoSans', monospace; letter-spacing: .06em;
+    color: var(--text3); text-transform: uppercase; margin-bottom: 8px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  .tm-past-run {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .tm-past-run:last-child { border-bottom: none; }
+  .tm-past-run .name { font-weight: 600; color: var(--text); }
+  .tm-past-run .meta { color: var(--text3); font-family: 'CoFoSans', monospace; font-size: 11px; }
+  .tm-past-files { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tm-past-file {
+    font-size: 10px; font-family: 'CoFoSans', monospace;
+    padding: 2px 7px; border-radius: 3px;
+    background: var(--bg3); color: var(--text3); border: 1px solid var(--border);
+  }
+
+  .hidden { display: none !important; }
+
+  /* ── WAF token row ── */
+  #tm-token-input { flex: 1; min-width: 260px; }
+  .tm-btn-secondary {
+    background: var(--bg3); color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .tm-btn-secondary:disabled { opacity: .35; cursor: not-allowed; }
+  .tm-btn-danger {
+    background: #E74C3C22; color: #E74C3C;
+    border: 1px solid #E74C3C44;
+  }
+  .tm-btn-danger:hover { background: #E74C3C33; }
+  .tm-btn-danger:disabled { opacity: .35; cursor: not-allowed; }
+  .tm-token-status {
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    padding: 4px 10px; border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text3);
+    white-space: nowrap; transition: background .2s, color .2s, border-color .2s;
+  }
+  .tm-token-status.status-set { border-color: #2ECC7144; color: #2ECC71; background: #2ECC7111; }
+
+  /* ── URL caution ── */
+  .tm-url-caution {
+    display: none; margin-top: 7px;
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    color: #F39C12; background: #F39C1211;
+    border: 1px solid #F39C1244; border-radius: 4px;
+    padding: 5px 10px;
+  }
+  .tm-url-caution.visible { display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "_transfermarkt_nav.html" %}
+<div class="tm-header">
+  <h1>Transfermarkt Scraper</h1>
+  <p>Paste any Transfermarkt URL — competition, club, player, or national team</p>
+</div>
+
+<!-- Input card -->
+<div class="tm-card">
+  <div class="tm-card-title">Target</div>
+  <div class="tm-row">
+    <div class="tm-field">
+      <label>URL</label>
+      <input id="tm-url-input" type="text"
+        placeholder="https://www.transfermarkt.co.uk/..."
+        oninput="onUrlChange()">
+      <div class="tm-url-caution" id="tm-url-caution">
+        ⚠ Use <strong>transfermarkt.co.uk</strong> — .com URLs will be rewritten but may behave differently
+      </div>
+    </div>
+
+    <div class="tm-mode-wrap">
+      <span class="tm-mode-badge" id="tm-mode-badge">—</span>
+    </div>
+
+    <div class="tm-field" id="tm-season-wrap">
+      <label>SEASON</label>
+      <input id="tm-season-input" type="number" min="2000" max="2099" value="2024" placeholder="2024">
+    </div>
+
+    <button class="tm-btn tm-btn-primary" id="tm-start-btn" onclick="startScrape()">Start</button>
+  </div>
+
+  <!-- WAF token row -->
+  <div class="tm-row" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);">
+    <div class="tm-field" style="flex: 1;">
+      <label>WAF TOKEN <span style="font-weight:400;">(optional — paste <code>aws-waf-token</code> cookie value if scraper is blocked)</span></label>
+      <input id="tm-token-input" type="text"
+        placeholder="e.g. EQoBAAAAA… (from browser DevTools → Application → Cookies)"
+        oninput="onTokenChange()">
+    </div>
+    <div class="tm-mode-wrap">
+      <button class="tm-btn tm-btn-secondary" id="tm-apply-btn"
+        onclick="applyToken()" disabled>Apply</button>
+    </div>
+    <div class="tm-mode-wrap">
+      <span class="tm-token-status" id="tm-token-status">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- Progress card -->
+<div class="tm-card hidden" id="tm-progress-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div class="tm-card-title" id="tm-status-title" style="margin-bottom:0;">Running…</div>
+    <button class="tm-btn tm-btn-danger" id="tm-cancel-btn" onclick="cancelScrape()">Cancel</button>
+  </div>
+  <div class="tm-progress-wrap"><div class="tm-progress-bar" id="tm-bar"></div></div>
+  <div class="tm-log" id="tm-log"></div>
+</div>
+
+<!-- Summary card -->
+<div class="tm-card hidden" id="tm-summary-card">
+  <div class="tm-card-title">Results</div>
+  <div class="tm-results-grid">
+    <div class="tm-result-stat" id="stat-clubs">
+      <div class="value" id="res-clubs">—</div><div class="label">CLUBS</div>
+    </div>
+    <div class="tm-result-stat">
+      <div class="value" id="res-players">—</div><div class="label">PLAYERS</div>
+    </div>
+    <div class="tm-result-stat">
+      <div class="value" id="res-apps">—</div><div class="label">APPEARANCES</div>
+    </div>
+  </div>
+  <p id="res-path" style="margin-top:14px;font-size:11px;color:var(--text3);font-family:'CoFoSans',monospace;"></p>
+</div>
+
+<!-- Past runs card -->
+<div class="tm-card" id="tm-past-card">
+  <div class="tm-card-title">Previous Scrapes</div>
+  <div id="tm-past-list"><span style="font-size:12px;color:var(--text3);">Loading…</span></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ── Mode detection (mirrors Python detect_mode) ── */
+const MODE_LABELS = {
+  competition:   'Competition',
+  club:          'Club',
+  player:        'Player',
+  national_team: 'National Team',
+};
+
+function detectMode(url) {
+  try {
+    const path = new URL(url.includes('://') ? url : 'https://x.com' + url).pathname;
+    const parts = path.split('/').filter(Boolean);
+    if (parts.includes('wettbewerb'))  return 'competition';
+    if (parts.includes('spieler'))     return 'player';
+    if (parts.includes('kader'))       return 'national_team';
+    if (parts.includes('verein'))      return 'club';
+  } catch (_) {}
+  return null;
+}
+
+function onUrlChange() {
+  const url        = document.getElementById('tm-url-input').value.trim();
+  const badge      = document.getElementById('tm-mode-badge');
+  const seasonWrap = document.getElementById('tm-season-wrap');
+  const seasonInput = document.getElementById('tm-season-input');
+  const caution    = document.getElementById('tm-url-caution');
+
+  const mode = detectMode(url);
+  badge.className   = 'tm-mode-badge' + (mode ? ' mode-' + mode : '');
+  badge.textContent = mode ? MODE_LABELS[mode] : '—';
+
+  // Hide season for player mode
+  seasonWrap.classList.toggle('hidden', mode === 'player');
+
+  // Auto-fill season from saison_id in URL or path
+  if (mode && mode !== 'player') {
+    const fromQuery = url.match(/[?&]saison_id=(\d{4})/);
+    const fromPath  = url.match(/\/saison_id\/(\d{4})/);
+    const detected  = (fromQuery || fromPath)?.[1];
+    if (detected) seasonInput.value = detected;
+  }
+
+  // Warn if using .com instead of .co.uk
+  const usingDotCom = url && /transfermarkt\.com(?!.*\.co\.uk)/i.test(url) && !/transfermarkt\.co\.uk/i.test(url);
+  caution.classList.toggle('visible', !!usingDotCom);
+}
+
+/* ── WAF token ── */
+function onTokenChange() {
+  const token = el('tm-token-input').value.trim();
+  el('tm-apply-btn').disabled = !token;
+  if (!token) setTokenStatus('—', '');
+}
+
+function applyToken() {
+  const token = el('tm-token-input').value.trim();
+  if (!token) return;
+  setTokenStatus('✓ Set', 'status-set');
+}
+
+function setTokenStatus(text, cls) {
+  const s = el('tm-token-status');
+  s.textContent = text;
+  s.className   = 'tm-token-status' + (cls ? ' ' + cls : '');
+}
+
+/* ── Job state ── */
+let _jobId   = null;
+let _pollInt = null;
+let _offset  = 0;
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+function el(id)   { return document.getElementById(id); }
+
+/* ── Start scrape ── */
+async function startScrape() {
+  const url    = el('tm-url-input').value.trim();
+  const mode   = detectMode(url);
+  const season = mode === 'player' ? null : parseInt(el('tm-season-input').value);
+
+  if (!url) { alert('Enter a Transfermarkt URL'); return; }
+  if (!mode) { alert('Cannot detect entity type from this URL.\nExpected a competition, club, player, or national team URL.'); return; }
+
+  el('tm-start-btn').disabled = true;
+  el('tm-cancel-btn').disabled = true;
+  el('tm-cancel-btn').textContent = 'Cancel';
+  _offset = 0;
+  el('tm-log').innerHTML = '';
+  el('tm-bar').style.width = '0%';
+  el('tm-status-title').textContent = `Running (${MODE_LABELS[mode]})…`;
+  el('tm-status-title').style.color = '';
+  hide('tm-summary-card');
+  show('tm-progress-card');
+
+  const wafToken = el('tm-token-input').value.trim() || null;
+  const resp = await fetch('/api/transfermarkt/scrape', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ url, season, waf_token: wafToken }),
+  });
+  const data = await resp.json();
+
+  if (!resp.ok || data.error) {
+    appendLog('ERROR: ' + (data.error || 'unknown'), true);
+    el('tm-start-btn').disabled = false;
+    return;
+  }
+
+  _jobId   = data.job_id;
+  el('tm-cancel-btn').disabled = false;
+  _pollInt = setInterval(pollStatus, 900);
+}
+
+/* ── Cancel scrape ── */
+async function cancelScrape() {
+  if (!_jobId) return;
+  el('tm-cancel-btn').disabled = true;
+  el('tm-cancel-btn').textContent = 'Cancelling…';
+  try {
+    await fetch(`/api/transfermarkt/scrape/${_jobId}/cancel`, { method: 'POST' });
+  } catch (_) {}
+}
+
+/* ── Poll job status ── */
+async function pollStatus() {
+  if (!_jobId) return;
+  const resp = await fetch(`/api/transfermarkt/scrape/${_jobId}?offset=${_offset}`);
+  if (!resp.ok) return;
+  const data = await resp.json();
+
+  data.lines.forEach(line => appendLog(line, line.startsWith('ERROR')));
+  _offset += data.lines.length;
+  el('tm-bar').style.width = data.progress + '%';
+
+  if (data.done) {
+    clearInterval(_pollInt);
+    el('tm-start-btn').disabled = false;
+    el('tm-cancel-btn').disabled = true;
+    el('tm-cancel-btn').textContent = 'Cancel';
+
+    if (data.cancelled) {
+      el('tm-status-title').textContent = 'Cancelled';
+      el('tm-status-title').style.color = '#F39C12';
+    } else if (data.error) {
+      el('tm-status-title').textContent = 'Failed';
+      el('tm-status-title').style.color = '#E74C3C';
+    } else {
+      el('tm-status-title').textContent = 'Done';
+      el('tm-status-title').style.color = '#2ECC71';
+      if (data.result) showSummary(data.result);
+      loadPastRuns();
+    }
+  }
+}
+
+function appendLog(line, isError) {
+  if (line.startsWith('PROGRESS:')) return;
+  const log  = el('tm-log');
+  const span = document.createElement('span');
+  span.className = isError ? 'log-error' : (line.includes('Done —') ? 'log-done' : '');
+  span.textContent = line + '\n';
+  log.appendChild(span);
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ── Summary ── */
+function showSummary(result) {
+  el('res-clubs').textContent   = result.clubs_count       ?? '—';
+  el('res-players').textContent = result.players_count     ?? '—';
+  el('res-apps').textContent    = result.appearances_count ?? '—';
+  el('res-path').textContent    = 'Saved to: ' + (result.out_dir || '');
+
+  // Hide clubs stat for non-competition modes
+  const mode = result.mode || '';
+  el('stat-clubs').classList.toggle('hidden-stat', mode !== 'competition');
+
+  show('tm-summary-card');
+}
+
+/* ── Past runs ── */
+async function loadPastRuns() {
+  const resp = await fetch('/api/transfermarkt/results');
+  if (!resp.ok) return;
+  const items = await resp.json();
+  const list  = el('tm-past-list');
+
+  if (!items.length) {
+    list.innerHTML = '<span style="font-size:12px;color:var(--text3);">No previous scrapes found.</span>';
+    return;
+  }
+
+  // Group by mode
+  const groups = {};
+  items.forEach(it => {
+    const m = it.mode || 'unknown';
+    if (!groups[m]) groups[m] = [];
+    groups[m].push(it);
+  });
+
+  const modeOrder = ['competition', 'club', 'player', 'national_team'];
+  list.innerHTML = modeOrder
+    .filter(m => groups[m])
+    .map(m => `
+      <div class="tm-mode-group">
+        <div class="tm-mode-group-title">${MODE_LABELS[m] || m}</div>
+        ${groups[m].map(it => `
+          <div class="tm-past-run">
+            <div>
+              <div class="name">${it.competition.replace(/-/g, ' ')}</div>
+              <div class="meta">${it.season ? 'Season ' + it.season : 'No season'}</div>
+            </div>
+            <div class="tm-past-files">
+              ${Object.keys(it.files).map(k => `<span class="tm-past-file">${k}.json</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+}
+
+// Init
+loadPastRuns();
+onUrlChange();
+</script>
+{% endblock %}

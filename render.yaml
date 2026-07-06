@@ -12,7 +12,7 @@ services:
     # Run from the repo root so wsgi.py can find everything
     rootDir: .
 
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements-full.txt
 
     # Gunicorn starts the Flask app via wsgi.py
     # --workers 1 keeps memory within Render's free 512 MB limit

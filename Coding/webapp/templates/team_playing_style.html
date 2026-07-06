@@ -1,0 +1,869 @@
+{% extends "base.html" %}
+{% block title %}Playing Styles — {{ competition_name }}{% endblock %}
+
+{% block head %}
+<style>
+  /* ── Page layout ── */
+  .ps-breadcrumb { margin-bottom: 18px; }
+  .ps-breadcrumb a { color: var(--text3); font-size: 12px; text-decoration: none; }
+  .ps-breadcrumb a:hover { color: var(--text2); }
+  .ps-breadcrumb span { color: var(--text3); font-size: 12px; margin: 0 6px; }
+
+  .ps-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .ps-header h1 { margin: 0; font-size: 22px; }
+  .ps-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; font-family: 'CoFoSans', monospace; }
+
+  /* ── Export button ── */
+  .ps-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+  .ps-export-btn:not(:disabled):hover { border-color: #27AE60; color: #27AE60; }
+  .ps-export-btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* ── Style legend ── */
+  .ps-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .ps-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'CoFoSans', monospace;
+  }
+  .ps-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Card grid ── */
+  .ps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .ps-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color .15s;
+    cursor: pointer;
+  }
+  .ps-card:hover { border-color: var(--border2); }
+  .ps-card.active { border-color: var(--green); }
+
+  .ps-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    gap: 10px;
+  }
+  .ps-card-team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .ps-team-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .ps-team-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ps-club-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    color: var(--text3);
+    text-decoration: none;
+    font-size: 12px;
+    flex-shrink: 0;
+    transition: color .15s, background .15s;
+  }
+  .ps-club-link:hover { color: var(--text); background: var(--bg3); }
+  .ps-badge {
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+
+  /* ── Confidence bars ── */
+  .ps-bars { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .ps-bar-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 34px;
+    align-items: center;
+    gap: 8px;
+  }
+  .ps-bar-label { font-size: 10px; color: var(--text3); font-family: 'CoFoSans', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ps-bar-track { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .ps-bar-fill  { height: 100%; border-radius: 2px; transition: width .3s; }
+  .ps-bar-pct   { font-size: 10px; color: var(--text3); font-family: 'CoFoSans', monospace; text-align: right; }
+
+  /* ── Expand panel ── */
+  .ps-panel {
+    display: none;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 14px;
+  }
+  .ps-panel.visible { display: flex; flex-direction: column; gap: 0; }
+  .ps-panel-top { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: start; }
+
+  .ps-panel-meta { display: flex; flex-direction: column; gap: 10px; }
+  .ps-panel-name { font-size: 16px; font-weight: 700; }
+  .ps-panel-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ps-panel-close {
+    margin-top: 8px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 4px 10px;
+    cursor: pointer;
+    width: fit-content;
+    font-family: 'CoFoSans', monospace;
+  }
+  .ps-panel-close:hover { border-color: var(--text2); color: var(--text); }
+
+  .ps-radar-wrap { position: relative; height: 420px; }
+
+  /* ── Per-match stats table (inside expand panel) ── */
+  .ps-panel-stats { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 18px; }
+  .ps-stats-heading {
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .ps-stats-wrap { overflow-x: auto; }
+  .ps-stats-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .ps-stats-tbl thead th {
+    padding: 6px 12px;
+    text-align: left;
+    color: var(--text3);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .05em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .ps-stats-tbl thead th:not(:first-child) { text-align: right; }
+  .ps-stats-tbl tbody tr:hover { background: rgba(255,255,255,0.025); }
+  .ps-stats-tbl td {
+    padding: 5px 12px;
+    border-bottom: 1px solid rgba(58,58,58,0.45);
+    white-space: nowrap;
+    color: var(--text2);
+  }
+  .ps-stats-tbl td:not(:first-child) { text-align: right; }
+  .ps-stats-tbl td:first-child { color: var(--text3); font-size: 11px; }
+  .stat-above { color: #2ECC71 !important; }
+  .stat-below { color: #E74C3C !important; }
+  .stat-rank  { color: var(--text3); font-size: 10.5px; }
+
+  /* ── Table section ── */
+  .ps-table-section { margin-top: 32px; }
+  .ps-table-title { font-size: 13px; font-family: 'CoFoSans', monospace; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .ps-table-wrap { overflow-x: auto; }
+
+  .ps-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .ps-table th {
+    padding: 8px 10px;
+    text-align: left;
+    font-family: 'CoFoSans', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .ps-table th:hover { color: var(--text2); }
+  .ps-table th.sort-active { color: var(--text); }
+  .ps-table th .sort-arrow { margin-left: 4px; font-size: 9px; }
+  .ps-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .ps-table tr:last-child td { border-bottom: none; }
+  .ps-table tr:hover td { background: var(--bg3); }
+  .ps-table td.td-team { font-weight: 600; color: var(--text); }
+  .ps-table td.td-score { color: var(--text2); font-family: 'CoFoSans', monospace; text-align: right; }
+  .ps-table td.td-score.top-score { color: var(--text); font-weight: 700; }
+
+  /* ── Loading / error states ── */
+  .ps-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+    font-size: 13px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .ps-error {
+    background: rgba(220,53,69,.08);
+    border: 1px solid rgba(220,53,69,.3);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #dc3545;
+  }
+
+  @media (max-width: 700px) {
+    .ps-panel.visible { grid-template-columns: 1fr; }
+    .ps-radar-wrap { height: 340px; }
+    .ps-bar-row { grid-template-columns: 100px 1fr 30px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ps-breadcrumb">
+  <a href="/competitions">Competitions</a>
+  <span>/</span>
+  <a href="/competition/{{ country }}/{{ competition }}">{{ country_name }}</a>
+  <span>/</span>
+  <a href="/competition/{{ country }}/{{ competition }}">{{ competition_name }}</a>
+  <span>/</span>
+  <span>Playing Styles</span>
+</div>
+
+<div class="ps-header">
+  <h1 id="ps-page-h1">Playing Styles</h1>
+  <button class="ps-export-btn" id="ps-export-btn" disabled onclick="exportToExcel()">
+    ↓ Export Stats (Excel)
+  </button>
+</div>
+<div class="ps-sub">{{ competition_name }} · {{ country_name }} · Z-score normalised within competition</div>
+
+<!-- Style colour legend -->
+<div class="ps-legend" id="ps-legend"></div>
+
+<!-- Loading state -->
+<div class="ps-loading" id="ps-loading">Loading team data…</div>
+<div id="ps-error" style="display:none;"></div>
+
+<!-- Card grid -->
+<div class="ps-grid" id="ps-grid" style="display:none;"></div>
+
+<!-- Expand panel (shown below grid when a card is clicked) -->
+<div class="ps-panel" id="ps-panel">
+  <div class="ps-panel-top">
+    <div class="ps-panel-meta">
+      <div class="ps-panel-name" id="panel-team-name"></div>
+      <div class="ps-panel-badges" id="panel-badges"></div>
+      <div style="margin-top:4px; font-size:11px; color:var(--text3); font-family:'CoFoSans',monospace; line-height:1.6;" id="panel-radar-note">
+        Axes show each metric normalised within the competition.<br>
+        50 = league average · Above 50 = above average.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <a id="panel-club-link" href="#" style="display:none;font-size:11px;color:var(--text3);text-decoration:none;
+           border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-family:'CoFoSans',monospace;
+           transition:border-color .15s,color .15s;"
+           onmouseover="this.style.borderColor='var(--text2)';this.style.color='var(--text)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
+          View Club Page ↗
+        </a>
+        <button class="ps-panel-close" onclick="closePanel()">✕ Close</button>
+      </div>
+    </div>
+    <div class="ps-radar-wrap">
+      <canvas id="ps-radar-canvas"></canvas>
+    </div>
+  </div>
+  <div class="ps-panel-stats" id="ps-panel-stats"></div>
+</div>
+
+<!-- Style table -->
+<div class="ps-table-section" id="ps-table-section" style="display:none;">
+  <div class="ps-table-title">All Teams</div>
+  <div class="ps-table-wrap">
+    <table class="ps-table" id="ps-table">
+      <thead id="ps-thead"></thead>
+      <tbody id="ps-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Data attributes for JS -->
+<div id="ps-data"
+     data-competition="{{ competition }}"
+     data-country="{{ country }}"
+     style="display:none;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── Constants ──────────────────────────────────────────────────────────────
+  const STYLE_COLORS = {
+    'Control Possession':  '#4A90E2',
+    'Tiki-Taka':           '#E84393',
+    'Vertical Tiki-Taka':  '#9B59B6',
+    'Gegenpress':          '#E74C3C',
+    'Wing Play':           '#27AE60',
+    'Route One':           '#E67E22',
+    'Fluid Counter-Attack':'#1ABC9C',
+    'Direct Counter-Attack':'#F39C12',
+    'Catenaccio':          '#546E7A',
+    'Park The Bus':        '#8D99AE',
+  };
+
+  const STYLE_KEYS = [
+    'Control Possession', 'Tiki-Taka', 'Vertical Tiki-Taka', 'Gegenpress',
+    'Wing Play', 'Route One', 'Fluid Counter-Attack', 'Direct Counter-Attack',
+    'Catenaccio', 'Park The Bus',
+  ];
+
+  const RADAR_KEYS = [
+    'possession', 'pass_accuracy', 'pass_volume', 'directness',
+    'crossing', 'aerial_volume', 'aerial_win', 'press_proxy',
+    'recovery', 'offsides_pm', 'shots_for', 'shots_against',
+    'clean_sheets_rate', 'dribbles', 'shot_efficiency',
+  ];
+
+  const RADAR_LABELS = [
+    'Possession', 'Pass Accuracy', 'Pass Volume', 'Directness',
+    'Crossing', 'Aerial Volume', 'Aerial Win %', 'Press Intensity',
+    'Ball Recovery', 'Offside Traps', 'Shots For', 'Shots Against',
+    'Clean Sheet Rate', 'Dribbles', 'Shot Efficiency',
+  ];
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let teamsData    = null;
+  let expandedSlug = null;
+  let radarChart   = null;
+  let sortCol      = 'name';
+  let sortDir      = 'asc';
+  let statDefs          = null;
+  let leagueAvg         = null;
+  let totalTeams        = 0;
+  let competitionColors = null;
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  const dataEl      = document.getElementById('ps-data');
+  const competition = dataEl.dataset.competition;
+  const country     = dataEl.dataset.country;
+
+  renderLegend();
+  fetchData();
+
+  // ── Legend ─────────────────────────────────────────────────────────────────
+  function renderLegend() {
+    const legend = document.getElementById('ps-legend');
+    STYLE_KEYS.forEach(style => {
+      const item = document.createElement('div');
+      item.className = 'ps-legend-item';
+      item.innerHTML = `
+        <div class="ps-legend-dot" style="background:${STYLE_COLORS[style]};"></div>
+        <span>${style}</span>
+      `;
+      legend.appendChild(item);
+    });
+  }
+
+  // ── Fetch ──────────────────────────────────────────────────────────────────
+  async function fetchData() {
+    try {
+      const res = await fetch(
+        `/api/playing_style_data?competition=${encodeURIComponent(competition)}&country=${encodeURIComponent(country)}`
+      );
+      const json = await res.json();
+      if (!res.ok) {
+        showError(json.error || 'Failed to load data.');
+        return;
+      }
+      teamsData         = json.teams;
+      statDefs          = json.stat_defs          || null;
+      leagueAvg         = json.league_avg         || {};
+      totalTeams        = json.total_teams        || 0;
+      competitionColors = json.competition_colors || null;
+      // Apply competition accent to page title
+      if (competitionColors) {
+        const ca = readableAccent(competitionColors.primary, competitionColors.secondary);
+        const h1 = document.getElementById('ps-page-h1');
+        if (h1) {
+          h1.style.borderLeft  = `4px solid ${ca}`;
+          h1.style.paddingLeft = '12px';
+        }
+      }
+      document.getElementById('ps-loading').style.display = 'none';
+      document.getElementById('ps-grid').style.display = 'grid';
+      document.getElementById('ps-table-section').style.display = 'block';
+      renderCards();
+      renderTable();
+    } catch (err) {
+      showError('Network error — could not reach the server.');
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById('ps-loading').style.display = 'none';
+    const el = document.getElementById('ps-error');
+    el.style.display = 'block';
+    el.className = 'ps-error';
+    el.textContent = msg;
+  }
+
+  // ── Cards ──────────────────────────────────────────────────────────────────
+  function renderCards() {
+    const grid = document.getElementById('ps-grid');
+    grid.innerHTML = '';
+    teamsData.forEach(team => {
+      const card = document.createElement('div');
+      card.className = 'ps-card';
+      card.dataset.slug = team.slug;
+      card.addEventListener('click', () => togglePanel(team));
+
+      // Apply team color accent
+      const tc     = team.team_colors || {};
+      const accent = readableAccent(tc.primary, tc.secondary);
+      card.dataset.accent    = accent;
+      card.style.borderLeft  = `3px solid ${accent}`;
+      card.style.background  = hexToRgba(accent, 0.07);
+
+      const primaryColor = STYLE_COLORS[team.primary_style] || '#6E6E6E';
+      const sortedStyles = Object.entries(team.style_scores)
+        .sort((a, b) => b[1] - a[1]);
+
+      const logoHtml = team.logo_url
+        ? `<img src="${escHtml(team.logo_url)}" class="ps-team-logo" alt="" onerror="this.style.display='none'">`
+        : '';
+
+      const barsHtml = sortedStyles.map(([style, score]) => {
+        const color = STYLE_COLORS[style] || '#6E6E6E';
+        return `
+          <div class="ps-bar-row">
+            <span class="ps-bar-label">${escHtml(style)}</span>
+            <div class="ps-bar-track">
+              <div class="ps-bar-fill" style="width:${(score * 100).toFixed(1)}%; background:${color};"></div>
+            </div>
+            <span class="ps-bar-pct">${(score * 100).toFixed(0)}%</span>
+          </div>`;
+      }).join('');
+
+      const clubUrl = `/competition/${encodeURIComponent(country)}/${encodeURIComponent(competition)}/${encodeURIComponent(team.slug)}`;
+      card.innerHTML = `
+        <div class="ps-card-header">
+          <div class="ps-card-team">
+            ${logoHtml}
+            <span class="ps-team-name">${escHtml(team.name)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <span class="ps-badge" style="background:${primaryColor}22; color:${primaryColor}; border:1px solid ${primaryColor}55;">
+              ${escHtml(team.primary_style)}
+            </span>
+            <a class="ps-club-link" href="${clubUrl}" title="View club page" onclick="event.stopPropagation();">↗</a>
+          </div>
+        </div>
+        <div class="ps-bars">${barsHtml}</div>
+      `;
+
+      grid.appendChild(card);
+    });
+  }
+
+  // ── Expand panel ──────────────────────────────────────────────────────────
+  function togglePanel(team) {
+    if (expandedSlug === team.slug) {
+      closePanel();
+      return;
+    }
+    expandedSlug = team.slug;
+
+    // Highlight active card — reset all to base tint, brighten the active one
+    document.querySelectorAll('.ps-card').forEach(c => {
+      c.classList.remove('active');
+      if (c.dataset.accent) c.style.background = hexToRgba(c.dataset.accent, 0.07);
+    });
+    const activeCard = document.querySelector(`.ps-card[data-slug="${CSS.escape(team.slug)}"]`);
+    if (activeCard) {
+      activeCard.classList.add('active');
+      activeCard.style.background = hexToRgba(activeCard.dataset.accent || '#6E6E6E', 0.14);
+    }
+
+    // Fill panel metadata
+    const tc      = team.team_colors || {};
+    const tAccent = readableAccent(tc.primary, tc.secondary);
+    const nameEl  = document.getElementById('panel-team-name');
+    nameEl.textContent  = team.name;
+    nameEl.style.color  = tAccent;
+
+    // Render top-3 style badges
+    const badgesEl = document.getElementById('panel-badges');
+    badgesEl.innerHTML = '';
+    const topStyles = Object.entries(team.style_scores)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+    topStyles.forEach(([style, score], i) => {
+      const color = STYLE_COLORS[style] || '#6E6E6E';
+      const badge = document.createElement('span');
+      badge.className = 'ps-badge';
+      badge.style.cssText = `background:${color}22; color:${color}; border:1px solid ${color}55; font-size:${i === 0 ? '11px' : '10px'};`;
+      badge.textContent = `${style} · ${(score * 100).toFixed(0)}%`;
+      badgesEl.appendChild(badge);
+    });
+
+    // Club page link in panel
+    const clubLinkEl = document.getElementById('panel-club-link');
+    if (clubLinkEl) {
+      clubLinkEl.href = `/competition/${encodeURIComponent(country)}/${encodeURIComponent(competition)}/${encodeURIComponent(team.slug)}`;
+      clubLinkEl.style.display = '';
+    }
+
+    // Enable export button for this team
+    const exportBtn = document.getElementById('ps-export-btn');
+    exportBtn.disabled = false;
+    exportBtn.title = `Export per-match stats for ${team.name}`;
+
+    // Show panel + scroll into view
+    const panel = document.getElementById('ps-panel');
+    panel.classList.add('visible');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Draw radar
+    drawRadar(team);
+
+    // Render per-match stats table
+    renderStatsTable(team);
+  }
+
+  window.closePanel = function () {
+    expandedSlug = null;
+    document.querySelectorAll('.ps-card').forEach(c => {
+      c.classList.remove('active');
+      if (c.dataset.accent) c.style.background = hexToRgba(c.dataset.accent, 0.07);
+    });
+    document.getElementById('ps-panel').classList.remove('visible');
+    document.getElementById('ps-panel-stats').innerHTML = '';
+    const clubLinkEl = document.getElementById('panel-club-link');
+    if (clubLinkEl) { clubLinkEl.style.display = 'none'; clubLinkEl.href = '#'; }
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+    const exportBtn = document.getElementById('ps-export-btn');
+    exportBtn.disabled = true;
+    exportBtn.title = '';
+  };
+
+  // ── Excel Export ──────────────────────────────────────────────────────────
+  window.exportToExcel = function () {
+    if (!expandedSlug || !statDefs || !teamsData) return;
+    const team = teamsData.find(t => t.slug === expandedSlug);
+    if (!team || !team.stats_pm) return;
+
+    const rows = [['Metric', 'This Team', 'Lg Avg', 'Diff', 'Rank']];
+    statDefs.forEach(def => {
+      const entry = team.stats_pm[def.field];
+      if (!entry || entry.value === null) return;
+      const val  = entry.value;
+      const avg  = leagueAvg[def.field];
+      const rank = entry.rank;
+      const diff = (avg !== null && avg !== undefined) ? +(val - avg).toFixed(2) : null;
+      rows.push([
+        def.label,
+        +val.toFixed(2),
+        avg !== null && avg !== undefined ? +avg.toFixed(2) : null,
+        diff,
+        rank ? `${ordinal(rank)} / ${totalTeams}` : null,
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    // Column widths
+    ws['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 14 }];
+    const wb = XLSX.utils.book_new();
+    const sheetName = team.name.replace(/[\\\/:*?"<>|]/g, '').slice(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName || 'Stats');
+    XLSX.writeFile(wb, `${team.name.replace(/[^a-zA-Z0-9 _-]/g, '')}_stats.xlsx`);
+  };
+
+  // ── Per-match stats table ─────────────────────────────────────────────────
+  function ordinal(n) {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  function renderStatsTable(team) {
+    const el = document.getElementById('ps-panel-stats');
+    if (!statDefs || !leagueAvg || !team.stats_pm) {
+      el.innerHTML = '';
+      return;
+    }
+
+    const rows = statDefs.map(def => {
+      const entry = team.stats_pm[def.field];
+      if (!entry || entry.value === null) return null;
+
+      const val  = entry.value;
+      const avg  = leagueAvg[def.field];
+      const rank = entry.rank;
+
+      const diff = (avg !== null && avg !== undefined) ? val - avg : null;
+      const isAbove = diff !== null && diff > 0;
+      const isBelow = diff !== null && diff < 0;
+
+      // Color logic: for "lower is better" stats flip the good/bad assignment
+      let valClass = '';
+      if (isAbove) valClass = def.lower_is_better ? 'stat-below' : 'stat-above';
+      else if (isBelow) valClass = def.lower_is_better ? 'stat-above' : 'stat-below';
+
+      let diffClass = '';
+      if (isAbove) diffClass = def.lower_is_better ? 'stat-below' : 'stat-above';
+      else if (isBelow) diffClass = def.lower_is_better ? 'stat-above' : 'stat-below';
+
+      const fmtVal  = val.toFixed(2);
+      const fmtAvg  = avg !== null ? avg.toFixed(2) : '—';
+      const fmtDiff = diff !== null ? (diff >= 0 ? `+${diff.toFixed(2)}` : diff.toFixed(2)) : '—';
+      const fmtRank = rank ? `${ordinal(rank)} / ${totalTeams}` : '—';
+
+      return `<tr>
+        <td>${escHtml(def.label)}</td>
+        <td class="${valClass}">${fmtVal}</td>
+        <td>${fmtAvg}</td>
+        <td class="${diffClass}">${fmtDiff}</td>
+        <td class="stat-rank">${fmtRank}</td>
+      </tr>`;
+    }).filter(Boolean).join('');
+
+    el.innerHTML = `
+      <div class="ps-stats-heading">Per Match Stats</div>
+      <div class="ps-stats-wrap">
+        <table class="ps-stats-tbl">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>This Team</th>
+              <th>Lg Avg</th>
+              <th>Diff</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function drawRadar(team) {
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+
+    const primaryColor = STYLE_COLORS[team.primary_style] || '#6E6E6E';
+    const radarVals = RADAR_KEYS.map(k => team.radar[k] !== undefined ? team.radar[k] : 50);
+    // League average is always 50 on every axis in Z-score space (by definition)
+    const avgVals = Array(RADAR_KEYS.length).fill(50);
+
+    const ctx = document.getElementById('ps-radar-canvas').getContext('2d');
+    radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: RADAR_LABELS,
+        datasets: [
+          {
+            label: team.name,
+            data: radarVals,
+            fill: true,
+            backgroundColor: primaryColor + '28',
+            borderColor: primaryColor,
+            pointBackgroundColor: primaryColor,
+            pointBorderColor: '#0F0F0F',
+            pointRadius: 3,
+            borderWidth: 2,
+            order: 1,
+          },
+          {
+            label: 'League Avg',
+            data: avgVals,
+            fill: true,
+            backgroundColor: 'rgba(255,255,255,0.04)',
+            borderColor: 'rgba(255,255,255,0.30)',
+            pointBackgroundColor: 'rgba(255,255,255,0.18)',
+            pointBorderColor: 'transparent',
+            pointRadius: 2,
+            borderWidth: 1.5,
+            borderDash: [5, 4],
+            order: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            ticks: { display: false, stepSize: 25 },
+            grid:        { color: 'rgba(255,255,255,0.08)' },
+            angleLines:  { color: 'rgba(255,255,255,0.10)' },
+            pointLabels: {
+              color: '#9A9A9A',
+              font:  { size: 10, family: 'CoFoSans, monospace' },
+              // Show metric name on line 1, team's value on line 2
+              callback: function (label, index) {
+                return [label, radarVals[index].toFixed(0)];
+              },
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: '#9A9A9A',
+              font: { size: 10, family: 'CoFoSans, monospace' },
+              boxWidth: 14,
+              boxHeight: 2,
+              padding: 14,
+              usePointStyle: false,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              title: (items) => items[0].label,
+              label: (ctx) => ` ${ctx.dataset.label}: ${Number(ctx.raw).toFixed(0)}`,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // ── Table ──────────────────────────────────────────────────────────────────
+  function renderTable() {
+    // Build header
+    const thead = document.getElementById('ps-thead');
+    const headerCells = [
+      { key: 'name', label: 'Team' },
+      ...STYLE_KEYS.map(s => ({ key: s, label: s })),
+    ];
+    thead.innerHTML = `<tr>${headerCells.map(col => `
+      <th data-col="${escHtml(col.key)}"
+          class="${sortCol === col.key ? 'sort-active' : ''}"
+          onclick="sortTable('${escHtml(col.key)}')">
+        ${escHtml(col.label)}
+        <span class="sort-arrow">${sortCol === col.key ? (sortDir === 'asc' ? '↑' : '↓') : ''}</span>
+      </th>`).join('')}
+    </tr>`;
+
+    // Build body
+    const sorted = [...teamsData].sort(comparator());
+    const tbody = document.getElementById('ps-tbody');
+    tbody.innerHTML = sorted.map(team => {
+      const maxScore = Math.max(...STYLE_KEYS.map(s => team.style_scores[s] || 0));
+      const cells = STYLE_KEYS.map(s => {
+        const score = team.style_scores[s] || 0;
+        const isTop = score === maxScore;
+        const color = STYLE_COLORS[s] || '#6E6E6E';
+        const style = isTop ? `color:${color}; font-weight:700;` : '';
+        return `<td class="td-score${isTop ? ' top-score' : ''}" style="${style}">${(score * 100).toFixed(0)}%</td>`;
+      }).join('');
+      return `<tr>
+        <td class="td-team">${escHtml(team.name)}</td>
+        ${cells}
+      </tr>`;
+    }).join('');
+  }
+
+  window.sortTable = function (col) {
+    if (sortCol === col) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortCol = col;
+      sortDir = col === 'name' ? 'asc' : 'desc';
+    }
+    renderTable();
+  };
+
+  function comparator() {
+    return (a, b) => {
+      let va, vb;
+      if (sortCol === 'name') {
+        va = a.name.toLowerCase();
+        vb = b.name.toLowerCase();
+      } else {
+        va = a.style_scores[sortCol] || 0;
+        vb = b.style_scores[sortCol] || 0;
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    };
+  }
+
+  // ── Utility ────────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+})();
+</script>
+{% endblock %}

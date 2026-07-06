@@ -1,0 +1,22 @@
+{# Shared sub-navigation for Transfermarkt pages. #}
+<div class="tm-subnav">
+  <a href="/transfermarkt"         class="tm-subnav-link {% if endpoint == 'transfermarkt_page' %}active{% endif %}">Scraper</a>
+  <a href="/transfermarkt/league"  class="tm-subnav-link {% if endpoint == 'tm_league' %}active{% endif %}">League</a>
+  <a href="/transfermarkt/club"    class="tm-subnav-link {% if endpoint == 'tm_club' %}active{% endif %}">Club</a>
+  <a href="/transfermarkt/player"  class="tm-subnav-link {% if endpoint == 'tm_player' %}active{% endif %}">Player</a>
+  <a href="/transfermarkt/scatter" class="tm-subnav-link {% if endpoint == 'tm_scatter' %}active{% endif %}">Scatter</a>
+</div>
+<style>
+.tm-subnav {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin-bottom: 20px; padding: 4px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.tm-subnav-link {
+  padding: 7px 16px; border-radius: var(--radius-sm); text-decoration: none;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text3); transition: background .15s, color .15s;
+}
+.tm-subnav-link:hover { color: var(--text2); background: var(--bg3); }
+.tm-subnav-link.active { color: #000; background: var(--green); }
+</style>

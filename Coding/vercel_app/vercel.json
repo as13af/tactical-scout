@@ -1,0 +1,4 @@
+{
+  "_readme": "Deploy from the REPO ROOT, not this folder. The authoritative vercel.json is at the project root (Tactical Compatibility Player/vercel.json). It uses includeFiles to bundle templates, static, and tactical_match_engine from their original locations — no duplication needed.",
+  "version": 2
+}

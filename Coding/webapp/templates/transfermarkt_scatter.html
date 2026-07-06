@@ -1,0 +1,692 @@
+{% extends "base.html" %}
+{% block title %}Transfermarkt — Scatter{% endblock %}
+{% block body_class %}ui2{% endblock %}
+
+{% block head %}
+<style>
+/* ── Controls ── */
+.tm-controls {
+  display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px;
+}
+.tm-field { display: flex; flex-direction: column; gap: 5px; }
+.tm-field label {
+  font-size: 11px; color: var(--text2); font-family: 'CoFoSans', monospace;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.tm-select {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 11px;
+}
+.tm-select:focus { outline: none; border-color: var(--green); }
+.tm-select.wide { min-width: 260px; }
+
+.tm-toggle { display: flex; gap: 2px; }
+.tm-toggle-btn {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 5px;
+  color: var(--text3); font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .06em; padding: 8px 14px; cursor: pointer; transition: all .15s;
+}
+.tm-toggle-btn.active { background: var(--green); color: #000; border-color: var(--green); }
+
+/* ── Position tabs ── */
+.tm-pos-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+.tm-pos-tab {
+  background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text3); font-size: 11px; font-weight: 700; font-family: 'CoFoSans', monospace;
+  text-transform: uppercase; letter-spacing: .06em; padding: 7px 18px;
+  cursor: pointer; transition: all .15s;
+}
+.tm-pos-tab[data-pos="All"].active  { background: rgba(217,217,217,0.12); border-color: #D9D9D9; color: #fff; }
+.tm-pos-tab[data-pos="GK"].active   { background: rgba(250,204,21,0.15);  border-color: #FACC15; color: #FACC15; }
+.tm-pos-tab[data-pos="DEF"].active  { background: rgba(59,130,246,0.15);  border-color: #3B82F6; color: #3B82F6; }
+.tm-pos-tab[data-pos="MID"].active  { background: rgba(34,197,94,0.15);   border-color: #22C55E; color: #22C55E; }
+.tm-pos-tab[data-pos="ATT"].active  { background: rgba(244,63,94,0.15);   border-color: #F43F5E; color: #F43F5E; }
+.tm-pos-tab:hover { border-color: var(--text2); color: var(--text2); }
+
+/* ── Scatter chart ── */
+.tm-sc-chart-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+}
+.tm-sc-chart { cursor: crosshair; }
+.tm-sc-axis line, .tm-sc-axis path { stroke: var(--border); }
+.tm-sc-axis text { fill: var(--text3); font-size: 10px; font-family: 'CoFoSans', monospace; }
+.tm-sc-grid line { stroke: var(--border); opacity: .3; }
+.tm-sc-lbl { fill: var(--text2); font-size: 9px; font-family: 'CoFoSans', monospace; pointer-events: none; }
+.tm-sc-pt { cursor: pointer; transition: opacity .1s; }
+.tm-sc-pt:hover { opacity: 1 !important; }
+
+/* ── Position legend ── */
+.tm-pos-legend {
+  display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px;
+  font-size: 11px; font-family: 'CoFoSans', monospace;
+}
+.tm-pos-legend-item { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); }
+.tm-pos-legend-dot  { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* ── Entity card ── */
+.tm-entity-card {
+  background: var(--bg3); border: 1px solid #fff; border-radius: 8px;
+  padding: 14px 18px; margin-bottom: 14px;
+  font-family: 'CoFoSans', monospace; display: none;
+}
+.tm-entity-card.visible { display: block; }
+.tm-ec-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.tm-ec-name   { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.tm-ec-meta   { font-size: 12px; color: var(--text3); }
+.tm-ec-link {
+  display: inline-block; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text2); font-size: 11px; font-family: 'CoFoSans', monospace;
+  padding: 6px 12px; text-decoration: none; transition: border-color .15s; white-space: nowrap;
+}
+.tm-ec-link:hover { border-color: var(--green); color: var(--green); }
+.tm-ec-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+.tm-ec-stat  { display: flex; flex-direction: column; gap: 2px; }
+.tm-ec-stat-label {
+  font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em;
+}
+.tm-ec-stat-value { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1; }
+.tm-pct-wrap  { display: flex; flex-direction: column; gap: 3px; margin-top: 5px; }
+.tm-pct-track {
+  width: 96px; height: 5px; background: rgba(58,58,58,0.6);
+  border-radius: 3px; overflow: hidden;
+}
+.tm-pct-fill  { height: 100%; border-radius: 3px; transition: width .3s ease; }
+.tm-pct-label { font-size: 10px; color: var(--text3); font-variant-numeric: tabular-nums; }
+
+/* ── Ranking table ── */
+.tm-rank-wrap  { overflow-x: auto; margin-top: 6px; }
+.tm-rank-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; font-family: 'CoFoSans', monospace;
+}
+.tm-rank-table th {
+  color: var(--text2); text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+  user-select: none; white-space: nowrap;
+}
+.tm-rank-table th:hover { color: var(--text); }
+.tm-rank-table th.sort-asc::after  { content: ' \25b2'; color: #D9D9D9; }
+.tm-rank-table th.sort-desc::after { content: ' \25bc'; color: #D9D9D9; }
+.tm-rank-table th.num { text-align: right; }
+.tm-rank-table td {
+  padding: 8px 12px; border-bottom: 1px solid rgba(58,58,58,0.6);
+  color: var(--text); white-space: nowrap;
+}
+.tm-rank-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tm-rank-table tbody tr { cursor: pointer; transition: background .15s; }
+.tm-rank-table tbody tr:hover  { background: var(--bg3); }
+.tm-rank-table tbody tr.tm-row-selected {
+  background: rgba(217,217,217,0.07); border-left: 3px solid #fff;
+}
+.tm-rank-num  { color: var(--text3); font-size: 12px; }
+.tm-rank-name { font-weight: 600; }
+.tm-pct-badge {
+  display: inline-block; padding: 2px 7px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+}
+.pct-hi  { background: rgba(34,197,94,0.18);  color: #22C55E; }
+.pct-mid { background: rgba(250,204,21,0.18);  color: #FACC15; }
+.pct-lo  { background: rgba(244,63,94,0.18);   color: #F43F5E; }
+.tm-pos-badge {
+  display: inline-block; padding: 2px 7px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+}
+.pos-GK  { background: rgba(250,204,21,0.15); color: #FACC15; }
+.pos-DEF { background: rgba(59,130,246,0.15); color: #3B82F6; }
+.pos-MID { background: rgba(34,197,94,0.15);  color: #22C55E; }
+.pos-ATT { background: rgba(244,63,94,0.15);  color: #F43F5E; }
+
+.tm-empty   { text-align: center; padding: 60px 20px; color: var(--text3); font-size: 13px; }
+.tm-loading { text-align: center; padding: 30px; color: var(--text3); font-size: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "_transfermarkt_nav.html" %}
+
+<div class="page-header">
+  <h1>Scatter Graph</h1>
+  <div class="sub">Per-90 metrics · Transfermarkt appearance data · Percentile ranks within position group</div>
+</div>
+
+<div class="tm-controls">
+  <div class="tm-field">
+    <label>League &amp; Season</label>
+    <select id="league-select" class="tm-select wide" onchange="onLeagueChange()">
+      <option value="">— select a league —</option>
+    </select>
+  </div>
+  <div class="tm-field">
+    <label>X Axis</label>
+    <select id="x-axis" class="tm-select" onchange="onAxisChange()"></select>
+  </div>
+  <div class="tm-field">
+    <label>Y Axis</label>
+    <select id="y-axis" class="tm-select" onchange="onAxisChange()"></select>
+  </div>
+  <div class="tm-field">
+    <label>Season</label>
+    <div class="tm-toggle">
+      <button class="tm-toggle-btn active" id="btn-current" onclick="setMode('current')">Current</button>
+      <button class="tm-toggle-btn"        id="btn-career"  onclick="setMode('career')">Career</button>
+    </div>
+  </div>
+  <div class="tm-field">
+    <label>Labels</label>
+    <div class="tm-toggle">
+      <button class="tm-toggle-btn active" id="btn-labels-on"  onclick="setLabels(true)">On</button>
+      <button class="tm-toggle-btn"        id="btn-labels-off" onclick="setLabels(false)">Off</button>
+    </div>
+  </div>
+</div>
+
+<div id="pos-tabs" class="tm-pos-tabs" style="display:none;">
+  <button class="tm-pos-tab active" data-pos="All" onclick="setPosTab('All')">All</button>
+  <button class="tm-pos-tab" data-pos="GK"  onclick="setPosTab('GK')">GK</button>
+  <button class="tm-pos-tab" data-pos="DEF" onclick="setPosTab('DEF')">DEF</button>
+  <button class="tm-pos-tab" data-pos="MID" onclick="setPosTab('MID')">MID</button>
+  <button class="tm-pos-tab" data-pos="ATT" onclick="setPosTab('ATT')">ATT</button>
+</div>
+
+<div id="chart-wrap" class="tm-sc-chart-wrap" style="display:none;">
+  <div id="chart"></div>
+  <div class="tm-pos-legend">
+    <span class="tm-pos-legend-item"><span class="tm-pos-legend-dot" style="background:#FACC15"></span>GK</span>
+    <span class="tm-pos-legend-item"><span class="tm-pos-legend-dot" style="background:#3B82F6"></span>DEF</span>
+    <span class="tm-pos-legend-item"><span class="tm-pos-legend-dot" style="background:#22C55E"></span>MID</span>
+    <span class="tm-pos-legend-item"><span class="tm-pos-legend-dot" style="background:#F43F5E"></span>ATT</span>
+  </div>
+</div>
+
+<div id="entity-card" class="tm-entity-card">
+  <div class="tm-ec-header">
+    <div>
+      <div class="tm-ec-name" id="ec-name"></div>
+      <div class="tm-ec-meta" id="ec-meta"></div>
+    </div>
+    <a class="tm-ec-link" id="ec-link" href="#">View Player →</a>
+  </div>
+  <div class="tm-ec-stats" id="ec-stats"></div>
+</div>
+
+<div id="rank-section" class="card" style="display:none;">
+  <div class="card-title" style="margin-bottom:12px;">Ranking</div>
+  <div class="tm-rank-wrap">
+    <table class="tm-rank-table">
+      <thead id="rank-thead"></thead>
+      <tbody id="rank-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="sc-empty" class="tm-empty">Select a league above to load data.</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const $  = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const AXIS_OPTS = [
+  { value: 'goals_per90',         label: 'Goals / 90' },
+  { value: 'assists_per90',       label: 'Assists / 90' },
+  { value: 'goals_assists_per90', label: 'G+A / 90' },
+  { value: 'yellow_cards_per90',  label: 'Yellow Cards / 90' },
+  { value: 'minutes',             label: 'Minutes Played' },
+  { value: 'starts',              label: 'Starts' },
+  { value: 'appearances',         label: 'Appearances' },
+  { value: 'goals',               label: 'Goals (raw)' },
+  { value: 'assists',             label: 'Assists (raw)' },
+];
+
+const POS_COLORS = {
+  GK:  { fill: 'rgba(250,204,21,0.32)',  stroke: '#FACC15' },
+  DEF: { fill: 'rgba(59,130,246,0.32)',  stroke: '#3B82F6' },
+  MID: { fill: 'rgba(34,197,94,0.32)',   stroke: '#22C55E' },
+  ATT: { fill: 'rgba(244,63,94,0.32)',   stroke: '#F43F5E' },
+};
+
+let DATA        = [];
+let mode        = 'current';
+let showLabels  = true;
+let activePosTab = 'All';
+let selectedIdx  = null;   // index into DRAWN_PLAYERS
+let DRAWN_PLAYERS = [];    // filtered players currently drawn
+let rankSortCol  = 'rank';
+let rankSortDir  = 'asc';
+let rankRows     = [];
+
+function posGroup(position) {
+  if (!position) return 'MID';
+  const p = position.toLowerCase();
+  if (p.includes('goalkeeper') || p.includes(' gk')) return 'GK';
+  if (p.includes('defender') || p.includes(' back') || p.includes('centreback')) return 'DEF';
+  if (p.includes('attack') || p.includes('forward') || p.includes('striker') || p.includes('winger')) return 'ATT';
+  if (p.includes('midfield') || p.includes(' mid')) return 'MID';
+  return 'MID';
+}
+
+function axisLabel(k) {
+  return (AXIS_OPTS.find(o => o.value === k) || {}).label || k;
+}
+
+function initAxes() {
+  ['x-axis','y-axis'].forEach((id, i) => {
+    const el = $(id);
+    el.innerHTML = AXIS_OPTS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+    el.value = i === 0 ? 'goals_per90' : 'assists_per90';
+  });
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+async function init() {
+  initAxes();
+  const leagues = await fetchJSON('/api/transfermarkt/leagues').catch(() => []);
+  const sel = $('league-select');
+  leagues.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.path;
+    opt.textContent = `${l.country} — ${l.display}`;
+    sel.appendChild(opt);
+  });
+
+  const params = new URLSearchParams(location.search);
+  const pathParam = params.get('path');
+  const modeParam = params.get('mode');
+  if (modeParam === 'career') setMode('career', false);
+  if (pathParam) {
+    sel.value = pathParam;
+    await loadData();
+  }
+}
+
+function setMode(m, reload = true) {
+  mode = m;
+  $('btn-current').classList.toggle('active', m === 'current');
+  $('btn-career').classList.toggle('active',  m === 'career');
+  if (reload && DATA.length) loadData();
+}
+
+function setLabels(on) {
+  showLabels = on;
+  $('btn-labels-on').classList.toggle('active',  on);
+  $('btn-labels-off').classList.toggle('active', !on);
+  if (DATA.length) draw();
+}
+
+function setPosTab(pos) {
+  activePosTab = pos;
+  document.querySelectorAll('.tm-pos-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.pos === pos);
+  });
+  selectedIdx = null;
+  $('entity-card').classList.remove('visible');
+  draw();
+}
+
+async function onLeagueChange() {
+  const path = $('league-select').value;
+  if (!path) {
+    DATA = [];
+    $('chart-wrap').style.display = 'none';
+    $('pos-tabs').style.display = 'none';
+    $('entity-card').classList.remove('visible');
+    $('rank-section').style.display = 'none';
+    $('sc-empty').textContent = 'Select a league above to load data.';
+    $('sc-empty').style.display = '';
+    history.replaceState(null, '', '/transfermarkt/scatter');
+    return;
+  }
+  await loadData();
+}
+
+function onAxisChange() {
+  selectedIdx = null;
+  $('entity-card').classList.remove('visible');
+  if (DATA.length) draw();
+}
+
+async function loadData() {
+  const path = $('league-select').value;
+  if (!path) return;
+  history.replaceState(null, '', `/transfermarkt/scatter?path=${encodeURIComponent(path)}&mode=${mode}`);
+  $('sc-empty').textContent = 'Loading…';
+  $('sc-empty').style.display = '';
+  $('chart-wrap').style.display = 'none';
+  $('pos-tabs').style.display = 'none';
+  $('entity-card').classList.remove('visible');
+  $('rank-section').style.display = 'none';
+  selectedIdx = null;
+
+  try {
+    const res = await fetchJSON(`/api/transfermarkt/scatter/data?path=${encodeURIComponent(path)}&mode=${mode}`);
+    DATA = res.players || [];
+    if (!DATA.length) {
+      $('sc-empty').textContent = 'No players with data found.';
+      return;
+    }
+    $('sc-empty').style.display = 'none';
+    $('chart-wrap').style.display = '';
+    $('pos-tabs').style.display = 'flex';
+    draw();
+  } catch (e) {
+    $('sc-empty').textContent = `Error: ${e.message}`;
+  }
+}
+
+// ── Percentile helpers ────────────────────────────────────────────────────────
+function percentileRank(sortedVals, val) {
+  let count = 0;
+  for (const v of sortedVals) {
+    if (v <= val) count++;
+    else break;
+  }
+  return Math.round(count / sortedVals.length * 100);
+}
+
+function buildPercentileData(pts, xk, yk) {
+  const posPool = activePosTab === 'All' ? pts : pts.filter(p => posGroup(p.position) === activePosTab);
+  const xVals = posPool.map(p => p.stats[xk]).filter(v => v !== null && v !== undefined).sort((a,b)=>a-b);
+  const yVals = posPool.map(p => p.stats[yk]).filter(v => v !== null && v !== undefined).sort((a,b)=>a-b);
+  return pts.map((p, i) => {
+    const xv = p.stats[xk], yv = p.stats[yk];
+    return {
+      ...p,
+      _idx:  i,
+      xv:    xv,
+      yv:    yv,
+      xPct:  xv !== null && xv !== undefined ? percentileRank(xVals, xv) : null,
+      yPct:  yv !== null && yv !== undefined ? percentileRank(yVals, yv) : null,
+    };
+  });
+}
+
+function pctBadgeClass(pct) {
+  if (pct === null) return '';
+  if (pct >= 67) return 'pct-hi';
+  if (pct >= 34) return 'pct-mid';
+  return 'pct-lo';
+}
+
+function pctBarColor(pct) {
+  if (pct === null) return '#444';
+  if (pct >= 67) return '#22C55E';
+  if (pct >= 34) return '#FACC15';
+  return '#F43F5E';
+}
+
+// ── Main draw ─────────────────────────────────────────────────────────────────
+function draw() {
+  const xk = $('x-axis').value;
+  const yk = $('y-axis').value;
+  const chart = $('chart');
+
+  // Filter by position tab, then by having both axis values
+  let candidates = DATA;
+  if (activePosTab !== 'All') {
+    candidates = DATA.filter(p => posGroup(p.position) === activePosTab);
+  }
+  const pts = candidates.filter(p =>
+    p.stats[xk] !== null && p.stats[xk] !== undefined &&
+    p.stats[yk] !== null && p.stats[yk] !== undefined
+  );
+
+  if (!pts.length) {
+    chart.innerHTML = '<div class="tm-empty">No players with both selected metrics.</div>';
+    $('rank-section').style.display = 'none';
+    return;
+  }
+
+  // Compute percentile data against the full position pool from DATA
+  const fullPool = activePosTab === 'All' ? DATA : DATA.filter(p => posGroup(p.position) === activePosTab);
+  const xValsAll = fullPool.map(p => p.stats[xk]).filter(v => v !== null && v !== undefined).sort((a,b)=>a-b);
+  const yValsAll = fullPool.map(p => p.stats[yk]).filter(v => v !== null && v !== undefined).sort((a,b)=>a-b);
+
+  DRAWN_PLAYERS = pts.map((p, i) => ({
+    ...p,
+    _idx: i,
+    xv:   p.stats[xk],
+    yv:   p.stats[yk],
+    xPct: percentileRank(xValsAll, p.stats[xk]),
+    yPct: percentileRank(yValsAll, p.stats[yk]),
+  }));
+
+  // Build SVG
+  const W = chart.clientWidth || 820, H = 480;
+  const m = { t: 20, r: 20, b: 52, l: 60 };
+  const xs = DRAWN_PLAYERS.map(p => p.xv), ys = DRAWN_PLAYERS.map(p => p.yv);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const padX = (xMax - xMin) * 0.12 || 0.5;
+  const padY = (yMax - yMin) * 0.12 || 0.5;
+  const sx = v => m.l + ((v - (xMin-padX)) / ((xMax+padX)-(xMin-padX))) * (W-m.l-m.r);
+  const sy = v => H - m.b - ((v - (yMin-padY)) / ((yMax+padY)-(yMin-padY))) * (H-m.t-m.b);
+  const tks = (lo, hi, n=5) => Array.from({length: n+1}, (_, i) => lo + (hi-lo)*i/n);
+  const gxTks = tks(xMin-padX, xMax+padX);
+  const gyTks = tks(yMin-padY, yMax+padY);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" class="tm-sc-chart">`;
+
+  // Grid
+  svg += '<g class="tm-sc-grid">';
+  gxTks.forEach(t => svg += `<line x1="${sx(t)}" y1="${m.t}" x2="${sx(t)}" y2="${H-m.b}"/>`);
+  gyTks.forEach(t => svg += `<line x1="${m.l}" y1="${sy(t)}" x2="${W-m.r}" y2="${sy(t)}"/>`);
+  svg += '</g>';
+
+  // Axes
+  svg += `<g class="tm-sc-axis">
+    <line x1="${m.l}" y1="${H-m.b}" x2="${W-m.r}" y2="${H-m.b}"/>
+    <line x1="${m.l}" y1="${m.t}"   x2="${m.l}"   y2="${H-m.b}"/>`;
+  gxTks.forEach(t => svg += `<text x="${sx(t)}" y="${H-m.b+16}" text-anchor="middle">${+t.toFixed(2)}</text>`);
+  gyTks.forEach(t => svg += `<text x="${m.l-8}" y="${sy(t)+3}"  text-anchor="end">${+t.toFixed(2)}</text>`);
+  svg += `<text x="${(m.l+W-m.r)/2}" y="${H-6}"  text-anchor="middle" style="fill:var(--text2);font-size:11px;">${esc(axisLabel(xk))}</text>`;
+  svg += `<text transform="translate(14,${(m.t+H-m.b)/2}) rotate(-90)" text-anchor="middle" style="fill:var(--text2);font-size:11px;">${esc(axisLabel(yk))}</text>`;
+  svg += '</g>';
+
+  // Dots
+  DRAWN_PLAYERS.forEach((p, i) => {
+    const cx = sx(p.xv), cy = sy(p.yv);
+    const grp = posGroup(p.position);
+    const col = POS_COLORS[grp] || POS_COLORS.MID;
+    const isSelected = selectedIdx === i;
+    const isDimmed   = selectedIdx !== null && !isSelected;
+
+    const fill    = isSelected ? 'rgba(255,255,255,0.92)' : isDimmed ? 'rgba(58,58,58,0.12)' : col.fill;
+    const stroke  = isSelected ? '#ffffff' : isDimmed ? 'rgba(110,110,110,0.22)' : col.stroke;
+    const r       = isSelected ? 10 : isDimmed ? 5 : 7;
+    const opacity = isDimmed ? 0.4 : 0.9;
+
+    svg += `<circle class="tm-sc-pt" cx="${cx}" cy="${cy}" r="${r}"
+              fill="${fill}" stroke="${stroke}" stroke-width="1.5" opacity="${opacity}"
+              onclick="selectPlayer(${i})">
+              <title>${esc(p.name)} (${esc(p.club)})\n${axisLabel(xk)}: ${p.xv}\n${axisLabel(yk)}: ${p.yv}</title>
+            </circle>`;
+    if (showLabels) {
+      const labelOpacity = isDimmed ? 0.25 : 1;
+      const labelColor   = isSelected ? '#ffffff' : 'var(--text2)';
+      svg += `<text class="tm-sc-lbl" x="${cx+10}" y="${cy+3}"
+                fill="${labelColor}" opacity="${labelOpacity}">${esc(p.name)}</text>`;
+    }
+  });
+
+  svg += '</svg>';
+  chart.innerHTML = svg;
+
+  buildRankingTable(xk, yk);
+  if (selectedIdx !== null) showEntityCard(selectedIdx, xk, yk);
+}
+
+// ── Player selection ──────────────────────────────────────────────────────────
+function selectPlayer(i) {
+  selectedIdx = (selectedIdx === i) ? null : i;
+  const xk = $('x-axis').value;
+  const yk = $('y-axis').value;
+  if (selectedIdx === null) {
+    $('entity-card').classList.remove('visible');
+  } else {
+    showEntityCard(selectedIdx, xk, yk);
+  }
+  draw();
+  highlightRankRow();
+}
+
+function showEntityCard(i, xk, yk) {
+  const p = DRAWN_PLAYERS[i];
+  if (!p) return;
+
+  const grp = posGroup(p.position);
+  const col = POS_COLORS[grp] || POS_COLORS.MID;
+
+  $('ec-name').textContent = p.name;
+  $('ec-meta').textContent = [
+    p.club,
+    p.position || null,
+    p.age ? p.age + ' yrs' : null,
+  ].filter(Boolean).join(' · ');
+  $('ec-link').href = `/transfermarkt/player?path=${encodeURIComponent(p.path)}`;
+
+  // Build stats grid: minutes/appearances/starts + axis stats with percentile bars
+  const fmtVal = v => (v === null || v === undefined) ? '—' : (+v % 1 === 0 ? v : v.toFixed(2));
+  let html = '';
+
+  // Basic stats
+  [
+    { label: 'Minutes', value: fmtVal(p.stats.minutes) },
+    { label: 'Apps',    value: fmtVal(p.stats.appearances) },
+    { label: 'Starts',  value: fmtVal(p.stats.starts) },
+  ].forEach(s => {
+    html += `<div class="tm-ec-stat">
+      <span class="tm-ec-stat-label">${s.label}</span>
+      <span class="tm-ec-stat-value">${s.value}</span>
+    </div>`;
+  });
+
+  // X axis stat with percentile
+  html += buildStatWithPct(axisLabel(xk), fmtVal(p.xv), p.xPct, col.stroke);
+  // Y axis stat with percentile
+  html += buildStatWithPct(axisLabel(yk), fmtVal(p.yv), p.yPct, col.stroke);
+
+  $('ec-stats').innerHTML = html;
+  $('entity-card').classList.add('visible');
+}
+
+function buildStatWithPct(label, value, pct, accentColor) {
+  const barColor = pctBarColor(pct);
+  const pctText  = pct !== null ? pct + 'th pctl' : '—';
+  return `<div class="tm-ec-stat">
+    <span class="tm-ec-stat-label">${esc(label)}</span>
+    <span class="tm-ec-stat-value">${value}</span>
+    <div class="tm-pct-wrap">
+      <div class="tm-pct-track">
+        <div class="tm-pct-fill" style="width:${pct||0}%;background:${barColor}"></div>
+      </div>
+      <span class="tm-pct-label">${pctText}</span>
+    </div>
+  </div>`;
+}
+
+// ── Ranking table ─────────────────────────────────────────────────────────────
+function buildRankingTable(xk, yk) {
+  // Rows sorted by combined percentile desc by default
+  rankRows = DRAWN_PLAYERS.map((p, i) => ({
+    i, name: p.name, club: p.club,
+    pos: posGroup(p.position), position: p.position || '',
+    mins: p.stats.minutes || 0,
+    xv: p.xv, yv: p.yv,
+    xPct: p.xPct, yPct: p.yPct,
+    combined: (p.xPct || 0) + (p.yPct || 0),
+  }));
+
+  // Build header
+  $('rank-thead').innerHTML = `<tr>
+    <th data-col="rank" class="num sort-asc">#</th>
+    <th data-col="name">Name</th>
+    <th data-col="club">Club</th>
+    <th data-col="pos">Pos</th>
+    <th data-col="mins" class="num">Mins</th>
+    <th data-col="xv" class="num">${esc(axisLabel(xk))}</th>
+    <th data-col="xPct" class="num">X Pctl</th>
+    <th data-col="yv" class="num">${esc(axisLabel(yk))}</th>
+    <th data-col="yPct" class="num">Y Pctl</th>
+  </tr>`;
+
+  document.querySelectorAll('#rank-thead th').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (rankSortCol === col) {
+        rankSortDir = rankSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        rankSortCol = col;
+        rankSortDir = 'desc';
+      }
+      renderRankingTable();
+    });
+  });
+
+  rankSortCol = 'rank';
+  rankSortDir = 'asc';
+  renderRankingTable();
+  $('rank-section').style.display = '';
+}
+
+function renderRankingTable() {
+  // Sort: combined desc for default rank
+  const withRank = [...rankRows].sort((a, b) => b.combined - a.combined)
+    .map((r, i) => ({ ...r, rank: i + 1 }));
+
+  let sorted;
+  if (rankSortCol === 'rank') {
+    sorted = rankSortDir === 'asc' ? withRank : [...withRank].reverse();
+  } else {
+    sorted = [...withRank].sort((a, b) => {
+      const av = a[rankSortCol], bv = b[rankSortCol];
+      if (typeof av === 'string') return rankSortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      return rankSortDir === 'asc' ? (av||0) - (bv||0) : (bv||0) - (av||0);
+    });
+  }
+
+  // Update header sort indicators
+  document.querySelectorAll('#rank-thead th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === rankSortCol) th.classList.add('sort-' + rankSortDir);
+  });
+
+  const fmtV = v => (v === null || v === undefined) ? '—' : (+v % 1 === 0 ? v : (+v).toFixed(2));
+
+  $('rank-tbody').innerHTML = sorted.map(r => {
+    const isSelected = selectedIdx === r.i;
+    const trClass = isSelected ? 'tm-row-selected' : '';
+    const xBadge = r.xPct !== null ? `<span class="tm-pct-badge ${pctBadgeClass(r.xPct)}">${r.xPct}th</span>` : '—';
+    const yBadge = r.yPct !== null ? `<span class="tm-pct-badge ${pctBadgeClass(r.yPct)}">${r.yPct}th</span>` : '—';
+    return `<tr class="${trClass}" onclick="selectPlayer(${r.i})">
+      <td class="num tm-rank-num">${r.rank}</td>
+      <td class="tm-rank-name">${esc(r.name)}</td>
+      <td>${esc(r.club)}</td>
+      <td><span class="tm-pos-badge pos-${r.pos}">${r.pos}</span></td>
+      <td class="num">${fmtV(r.mins)}</td>
+      <td class="num">${fmtV(r.xv)}</td>
+      <td class="num">${xBadge}</td>
+      <td class="num">${fmtV(r.yv)}</td>
+      <td class="num">${yBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function highlightRankRow() {
+  document.querySelectorAll('#rank-tbody tr').forEach((tr, i) => {
+    tr.classList.toggle('tm-row-selected', false);
+  });
+  renderRankingTable();
+}
+
+window.addEventListener('resize', () => { if (DATA.length) draw(); });
+
+init();
+</script>
+{% endblock %}

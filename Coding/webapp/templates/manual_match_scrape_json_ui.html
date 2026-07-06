@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+{% block title %}Manual Match Scrape JSON UI{% endblock %}
+
+{% block head %}
+<style>
+  .mm-breadcrumb { margin-bottom: 18px; font-size: 12px; color: var(--text3); }
+  .mm-breadcrumb a { color: var(--text3); text-decoration: none; }
+  .mm-breadcrumb a:hover { color: var(--text2); }
+  .mm-breadcrumb span { margin: 0 6px; }
+
+  .mm-header { margin-bottom: 20px; }
+  .mm-header h1 { margin: 0 0 4px; font-size: 22px; }
+  .mm-header p  { margin: 0; font-size: 12px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+
+  .mm-info {
+    background: rgba(74,144,226,.07);
+    border: 1px solid rgba(74,144,226,.2);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: #4A90E2;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  /* ── Cards ── */
+  .mm-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .mm-card-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mm-badge {
+    font-size: 10px; font-family: 'CoFoSans', monospace;
+    padding: 2px 7px; border-radius: 3px;
+    background: var(--bg3); color: var(--text3);
+    border: 1px solid var(--border);
+  }
+  .mm-badge.req { border-color: #E74C3C44; color: #E74C3C; }
+  .mm-badge.opt { color: var(--text3); }
+  .mm-badge.count { margin-left: auto; }
+
+  /* ── Add event row ── */
+  .mm-add-row {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .mm-input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: 'CoFoSans', monospace;
+    width: 220px;
+  }
+  .mm-input:focus { outline: none; border-color: var(--text3); }
+
+  /* ── Options row ── */
+  .mm-options {
+    display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .mm-opt-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    color: var(--text2); cursor: pointer;
+  }
+  .mm-opt-label input { cursor: pointer; }
+
+  /* ── Buttons ── */
+  .mm-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 1px solid var(--border);
+    color: var(--text3); border-radius: 4px;
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    padding: 7px 14px; cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .mm-btn:hover:not(:disabled) { border-color: var(--text2); color: var(--text); }
+  .mm-btn:disabled { opacity: .35; cursor: default; }
+  .mm-btn.primary { border-color: #27AE60; color: #27AE60; }
+  .mm-btn.primary:hover:not(:disabled) { background: rgba(39,174,96,.08); }
+  .mm-btn.sm { padding: 4px 10px; font-size: 10px; }
+
+  /* ── Event accordion ── */
+  .mm-event-list { display: flex; flex-direction: column; gap: 8px; }
+  .mm-event {
+    border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden;
+  }
+  .mm-event-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; cursor: pointer;
+    background: var(--bg3); transition: background .12s;
+  }
+  .mm-event-header:hover { background: rgba(255,255,255,.03); }
+  .mm-event-id     { font-size: 12px; font-weight: 700; color: var(--text); font-family: 'CoFoSans', monospace; width: 100px; flex-shrink: 0; }
+  .mm-event-meta   { flex: 1; font-size: 11px; color: var(--text3); font-family: 'CoFoSans', monospace; }
+  .mm-event-prog   { font-size: 10px; color: var(--text3); font-family: 'CoFoSans', monospace; flex-shrink: 0; }
+  .mm-event-del    { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 13px; flex-shrink: 0; padding: 0 4px; }
+  .mm-event-del:hover { color: #E74C3C; }
+  .mm-event-chev   { font-size: 10px; color: var(--text3); flex-shrink: 0; transition: transform .2s; }
+  .mm-event-chev.open { transform: rotate(90deg); }
+  .mm-event-body   { display: none; padding: 14px 16px; border-top: 1px solid var(--border); }
+  .mm-event-body.open { display: block; }
+
+  /* ── Endpoint rows ── */
+  .mm-ep-list { display: flex; flex-direction: column; gap: 6px; }
+  .mm-ep {
+    border: 1px solid var(--border);
+    border-radius: 5px; overflow: hidden;
+  }
+  .mm-ep-hdr {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; cursor: pointer;
+    background: var(--bg3); transition: background .12s;
+  }
+  .mm-ep-hdr:hover { background: rgba(255,255,255,.02); }
+
+  .mm-ep-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; flex-shrink: 0;
+  }
+  .mm-ep-dot.ok  { border-color: #27AE60; color: #27AE60; background: rgba(39,174,96,.1); }
+  .mm-ep-dot.err { border-color: #E74C3C; color: #E74C3C; background: rgba(231,76,60,.1); }
+
+  .mm-ep-label { font-size: 11px; font-weight: 600; color: var(--text2); width: 120px; flex-shrink: 0; }
+  .mm-ep-url   {
+    flex: 1; font-size: 10px; color: var(--text3);
+    font-family: 'CoFoSans', monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mm-ep-acts  { display: flex; gap: 5px; flex-shrink: 0; }
+  .mm-ep-copy, .mm-ep-open {
+    font-size: 10px; font-family: 'CoFoSans', monospace;
+    background: none; border: 1px solid var(--border);
+    color: var(--text3); border-radius: 3px; padding: 2px 7px;
+    cursor: pointer; transition: color .12s, border-color .12s;
+  }
+  .mm-ep-copy:hover, .mm-ep-open:hover { border-color: var(--text2); color: var(--text); }
+  .mm-ep-chev  { font-size: 9px; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+  .mm-ep-chev.open { transform: rotate(90deg); }
+
+  .mm-ep-body { display: none; padding: 10px 12px; border-top: 1px solid var(--border); }
+  .mm-ep-body.open { display: block; }
+
+  .mm-textarea {
+    width: 100%; box-sizing: border-box;
+    background: var(--bg1); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text2);
+    font-size: 10.5px; font-family: 'CoFoSans', monospace;
+    padding: 7px 9px; resize: vertical;
+    min-height: 80px; max-height: 220px;
+  }
+  .mm-textarea:focus { outline: none; border-color: var(--text3); }
+
+  .mm-fb {
+    margin-top: 5px; font-size: 10.5px;
+    font-family: 'CoFoSans', monospace; min-height: 16px;
+  }
+  .mm-fb.ok  { color: #27AE60; }
+  .mm-fb.err { color: #E74C3C; }
+
+  .mm-ep-submit-row { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* ── Summary + log ── */
+  .mm-summary {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 16px; font-family: 'CoFoSans', monospace;
+  }
+  .mm-summary-item { display: flex; flex-direction: column; gap: 3px; }
+  .mm-summary-item label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+  .mm-summary-item span  { font-size: 18px; color: var(--text); font-weight: 700; }
+
+  .mm-log {
+    background: var(--bg1); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 14px;
+    font-size: 11px; font-family: 'CoFoSans', monospace;
+    color: var(--text3); max-height: 320px; overflow-y: auto;
+    margin-top: 14px; display: none; white-space: pre-wrap; word-break: break-all;
+  }
+  .mm-log.visible { display: block; }
+  .mm-log-line     { color: var(--text2); }
+  .mm-log-done     { color: #27AE60; font-weight: 700; }
+  .mm-log-error    { color: #E74C3C; }
+  .mm-log-progress { color: #4A90E2; }
+
+  /* empty state */
+  .mm-empty {
+    text-align: center; padding: 32px 20px;
+    font-size: 12px; color: var(--text3);
+    font-family: 'CoFoSans', monospace;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mm-breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <span>Manual Match Scrape JSON UI</span>
+</div>
+
+<div class="mm-header">
+  <h1>Manual Match Scrape JSON UI</h1>
+  <p>Paste SofaScore match API responses — no browser automation needed</p>
+</div>
+
+<div class="mm-info">
+  For each event, open the URL in a browser that has already visited sofascore.com,
+  then copy the full JSON (Ctrl+A → Ctrl+C) and paste into the matching field.<br>
+  <strong>Event</strong> is required. Incidents, Lineups, Statistics and optionally Shotmap/Heatmaps are recommended.
+</div>
+
+<!-- ── Add events ── -->
+<div class="mm-card">
+  <div class="mm-card-title">
+    Events
+    <span class="mm-badge count" id="mm-event-count">0 events</span>
+  </div>
+
+  <div class="mm-add-row">
+    <input id="mm-event-input" class="mm-input" type="text"
+           placeholder="Event ID or SofaScore URL"
+           onkeydown="if(event.key==='Enter') addEvent()">
+    <button class="mm-btn primary" onclick="addEvent()">+ Add Event</button>
+    <button class="mm-btn sm" onclick="addBulk()" title="Add multiple IDs, one per line">Bulk Add…</button>
+  </div>
+
+  <!-- Bulk textarea (hidden by default) -->
+  <div id="mm-bulk-wrap" style="display:none;margin-bottom:12px;">
+    <textarea id="mm-bulk-ta" class="mm-textarea" rows="5"
+              placeholder="Paste event IDs or URLs, one per line…"></textarea>
+    <div style="margin-top:6px;display:flex;gap:8px;">
+      <button class="mm-btn primary sm" onclick="submitBulk()">Add All</button>
+      <button class="mm-btn sm" onclick="document.getElementById('mm-bulk-wrap').style.display='none'">Cancel</button>
+    </div>
+  </div>
+
+  <div id="mm-event-list" class="mm-event-list">
+    <div class="mm-empty" id="mm-empty">No events added yet — enter an Event ID above.</div>
+  </div>
+</div>
+
+<!-- ── Options ── -->
+<div class="mm-card">
+  <div class="mm-card-title">Options</div>
+  <div class="mm-options">
+    <label class="mm-opt-label">
+      <input type="checkbox" id="opt-shotmap" onchange="onOptionChange()">
+      Include Shotmap
+    </label>
+    <label class="mm-opt-label">
+      <input type="checkbox" id="opt-heatmap" onchange="onOptionChange()">
+      Include Team Heatmaps
+    </label>
+    <label class="mm-opt-label" style="flex:1;">
+      Output Dir
+      <input id="opt-outdir" class="mm-input" type="text" placeholder="leave blank for default" style="width:260px;margin-left:6px;">
+    </label>
+  </div>
+</div>
+
+<!-- ── Process ── -->
+<div class="mm-card">
+  <div class="mm-card-title">Process</div>
+  <div class="mm-summary" id="mm-summary"></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <button class="mm-btn primary" id="mm-process-btn" onclick="processAll()" disabled>⚙ Process All Pasted Data</button>
+    <span id="mm-process-status" style="font-size:11px;color:var(--text3);font-family:'CoFoSans',monospace;"></span>
+  </div>
+  <div class="mm-log" id="mm-log"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+'use strict';
+
+const API_BASE  = 'https://api.sofascore.com/api/v1';
+const HM_BASE   = 'https://www.sofascore.com/api/v1';
+
+// ── State ──────────────────────────────────────────────────────────────────
+// events: { event_id: { event?, incidents?, lineups?, statistics?, shotmap?,
+//                        heatmap_home?, heatmap_away?,
+//                        home_id?, away_id?, home_name?, away_name? } }
+const events = {};
+
+// ── ID parsing ─────────────────────────────────────────────────────────────
+function extractId(raw) {
+  raw = raw.trim();
+  if (/^\d+$/.test(raw)) return raw;
+  const m = raw.match(/[#&]id:(\d+)/) || raw.match(/\/event\/(\d+)/);
+  return m ? m[1] : null;
+}
+
+// ── Add single event ───────────────────────────────────────────────────────
+window.addEvent = function () {
+  const inp = document.getElementById('mm-event-input');
+  const id  = extractId(inp.value);
+  if (!id) { inp.style.borderColor = '#E74C3C'; return; }
+  inp.style.borderColor = '';
+  inp.value = '';
+  if (events[id]) return;  // already added
+  events[id] = {};
+  renderEvent(id);
+  updateCounts();
+};
+
+// ── Bulk add ───────────────────────────────────────────────────────────────
+window.addBulk = function () {
+  document.getElementById('mm-bulk-wrap').style.display = '';
+};
+
+window.submitBulk = function () {
+  const lines = document.getElementById('mm-bulk-ta').value.split('\n');
+  lines.forEach(line => {
+    const id = extractId(line);
+    if (id && !events[id]) { events[id] = {}; renderEvent(id); }
+  });
+  document.getElementById('mm-bulk-ta').value = '';
+  document.getElementById('mm-bulk-wrap').style.display = 'none';
+  updateCounts();
+};
+
+// ── Remove event ───────────────────────────────────────────────────────────
+window.removeEvent = function (id) {
+  delete events[id];
+  const el = document.getElementById(`ev-${id}`);
+  if (el) el.remove();
+  updateCounts();
+  if (!Object.keys(events).length)
+    document.getElementById('mm-empty').style.display = '';
+};
+
+// ── Render a single event accordion ───────────────────────────────────────
+function renderEvent(id) {
+  document.getElementById('mm-empty').style.display = 'none';
+
+  const ev = document.createElement('div');
+  ev.className = 'mm-event';
+  ev.id = `ev-${id}`;
+  ev.innerHTML = `
+    <div class="mm-event-header" onclick="toggleEvent('${id}')">
+      <div class="mm-event-id">#${id}</div>
+      <div class="mm-event-meta" id="ev-meta-${id}">— paste Event JSON to load details</div>
+      <div class="mm-event-prog" id="ev-prog-${id}">0 pasted</div>
+      <button class="mm-event-del" onclick="event.stopPropagation();removeEvent('${id}')" title="Remove">✕</button>
+      <span class="mm-event-chev" id="ev-chev-${id}">▶</span>
+    </div>
+    <div class="mm-event-body" id="ev-body-${id}">
+      ${buildEpList(id)}
+    </div>`;
+  document.getElementById('mm-event-list').appendChild(ev);
+
+  // Auto-open on add
+  toggleEvent(id);
+}
+
+// ── Build endpoint list for an event ──────────────────────────────────────
+function buildEpList(id) {
+  const eps = [
+    { field: 'event',      label: 'Event',      url: `${API_BASE}/event/${id}`,              req: true  },
+    { field: 'incidents',  label: 'Incidents',   url: `${API_BASE}/event/${id}/incidents`,    req: false },
+    { field: 'lineups',    label: 'Lineups',     url: `${API_BASE}/event/${id}/lineups`,      req: false },
+    { field: 'statistics', label: 'Statistics',  url: `${API_BASE}/event/${id}/statistics`,   req: false },
+    { field: 'shotmap',    label: 'Shotmap',     url: `${API_BASE}/event/${id}/shotmap`,      req: false, optFlag: 'shotmap' },
+    // Heatmap URLs are generated after event is parsed — shown via JS
+    { field: 'heatmap_home', label: 'Heatmap Home', url: '', req: false, optFlag: 'heatmap', dynamic: true },
+    { field: 'heatmap_away', label: 'Heatmap Away', url: '', req: false, optFlag: 'heatmap', dynamic: true },
+  ];
+
+  return `<div class="mm-ep-list">${eps.map(ep => epHtml(id, ep)).join('')}</div>`;
+}
+
+function epHtml(evId, ep) {
+  const eid    = `${evId}-${ep.field}`;
+  const urlHtml = ep.url
+    ? `<div class="mm-ep-url" id="url-${eid}">${ep.url}</div>
+       <div class="mm-ep-acts">
+         <button class="mm-ep-copy" onclick="event.stopPropagation();copyUrl('${ep.url}',this)">Copy</button>
+         <a class="mm-ep-open" href="${ep.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open ↗</a>
+       </div>`
+    : `<div class="mm-ep-url" id="url-${eid}" style="color:var(--text3);font-style:italic;">URL generated after Event is parsed</div>
+       <div class="mm-ep-acts" id="acts-${eid}"></div>`;
+
+  // Optional-flag items start hidden if the option isn't checked
+  const optHide = ep.optFlag ? `id="opt-row-${eid}" style="display:${isOptEnabled(ep.optFlag)?'':'none'}"` : '';
+
+  return `
+    <div class="mm-ep" ${optHide}>
+      <div class="mm-ep-hdr" onclick="toggleEp('${eid}')">
+        <div class="mm-ep-dot" id="dot-${eid}"></div>
+        <div class="mm-ep-label">${ep.label}${ep.req ? ' <span style="color:#E74C3C;font-size:8px;">★</span>' : ''}</div>
+        ${urlHtml}
+        <span class="mm-ep-chev" id="chev-${eid}">▶</span>
+      </div>
+      <div class="mm-ep-body" id="body-${eid}">
+        <textarea class="mm-textarea" id="ta-${eid}" rows="5"
+                  placeholder="Paste JSON response here…"></textarea>
+        <div class="mm-fb" id="fb-${eid}"></div>
+        <div class="mm-ep-submit-row">
+          <button class="mm-btn primary sm" onclick="submitEp('${evId}','${ep.field}')">✓ Submit</button>
+          <button class="mm-btn sm" onclick="clearEp('${eid}')">Clear</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function isOptEnabled(flag) {
+  if (flag === 'shotmap') return document.getElementById('opt-shotmap').checked;
+  if (flag === 'heatmap') return document.getElementById('opt-heatmap').checked;
+  return true;
+}
+
+window.onOptionChange = function () {
+  // Show/hide optional endpoint rows across all events
+  Object.keys(events).forEach(id => {
+    ['shotmap','heatmap_home','heatmap_away'].forEach(field => {
+      const flag = field === 'shotmap' ? 'shotmap' : 'heatmap';
+      const row  = document.getElementById(`opt-row-${id}-${field}`);
+      if (row) row.style.display = isOptEnabled(flag) ? '' : 'none';
+    });
+  });
+};
+
+// ── Toggle event accordion ────────────────────────────────────────────────
+window.toggleEvent = function (id) {
+  const body = document.getElementById(`ev-body-${id}`);
+  const chev = document.getElementById(`ev-chev-${id}`);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+};
+
+// ── Toggle endpoint row ───────────────────────────────────────────────────
+window.toggleEp = function (eid) {
+  const body = document.getElementById(`body-${eid}`);
+  const chev = document.getElementById(`chev-${eid}`);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+};
+
+window.clearEp = function (eid) {
+  document.getElementById(`ta-${eid}`).value = '';
+  document.getElementById(`fb-${eid}`).textContent = '';
+  document.getElementById(`fb-${eid}`).className = 'mm-fb';
+  const dot = document.getElementById(`dot-${eid}`);
+  dot.className = 'mm-ep-dot'; dot.textContent = '';
+};
+
+// ── Submit a pasted JSON ───────────────────────────────────────────────────
+window.submitEp = function (evId, field) {
+  const eid = `${evId}-${field}`;
+  const raw  = document.getElementById(`ta-${eid}`).value.trim();
+  const fb   = document.getElementById(`fb-${eid}`);
+  const dot  = document.getElementById(`dot-${eid}`);
+
+  try {
+    const data = JSON.parse(raw);
+    events[evId][field] = data;
+    dot.className = 'mm-ep-dot ok'; dot.textContent = '✓';
+    fb.className = 'mm-fb ok';
+    fb.textContent = `✓ Parsed — ${Object.keys(data).length} top-level keys`;
+
+    // After event is parsed: extract team IDs and update heatmap URLs
+    if (field === 'event') {
+      parseEventMeta(evId, data);
+    }
+
+    updateEventProgress(evId);
+    updateSummary();
+  } catch (e) {
+    dot.className = 'mm-ep-dot err'; dot.textContent = '✗';
+    fb.className = 'mm-fb err';
+    fb.textContent = `✗ Invalid JSON: ${e.message}`;
+  }
+};
+
+// ── After event metadata is pasted: fill team info + heatmap URLs ──────────
+function parseEventMeta(evId, data) {
+  fetch('/api/manual_match/parse_event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json: data }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.error) return;
+    events[evId].home_id   = res.home_id;
+    events[evId].away_id   = res.away_id;
+    events[evId].home_name = res.home_name;
+    events[evId].away_name = res.away_name;
+
+    // Update meta line
+    const meta = document.getElementById(`ev-meta-${evId}`);
+    if (meta) meta.textContent =
+      `${res.home_name} vs ${res.away_name} · ${res.competition}`;
+
+    // Update heatmap URLs now that we have team IDs
+    updateHeatmapUrl(evId, 'heatmap_home', res.home_id, res.home_name);
+    updateHeatmapUrl(evId, 'heatmap_away', res.away_id, res.away_name);
+  })
+  .catch(() => {});
+}
+
+function updateHeatmapUrl(evId, field, teamId, teamName) {
+  if (!teamId) return;
+  const eid = `${evId}-${field}`;
+  const url = `${HM_BASE}/event/${evId}/heatmap/${teamId}`;
+
+  const urlEl  = document.getElementById(`url-${eid}`);
+  const actsEl = document.getElementById(`acts-${eid}`);
+  if (urlEl)  urlEl.textContent = url;
+  if (urlEl)  urlEl.style.fontStyle = '';
+  if (actsEl) actsEl.innerHTML =
+    `<button class="mm-ep-copy" onclick="event.stopPropagation();copyUrl('${url}',this)">Copy</button>
+     <a class="mm-ep-open" href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open ↗</a>`;
+
+  // Also update the label to include team name
+  const labelEl = document.getElementById(`body-${eid}`)?.closest('.mm-ep')?.querySelector('.mm-ep-label');
+  if (labelEl) labelEl.textContent = field === 'heatmap_home'
+    ? `Heatmap (${teamName})`
+    : `Heatmap (${teamName})`;
+}
+
+// ── Update event progress indicator ───────────────────────────────────────
+function updateEventProgress(evId) {
+  const FIELDS = ['event','incidents','lineups','statistics','shotmap','heatmap_home','heatmap_away'];
+  const edata  = events[evId] || {};
+  const pasted = FIELDS.filter(f => edata[f]).length;
+  const prog = document.getElementById(`ev-prog-${evId}`);
+  if (prog) prog.textContent = `${pasted} pasted`;
+}
+
+// ── Summary ────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const ids     = Object.keys(events);
+  const total   = ids.length;
+  const hasEvt  = ids.filter(id => events[id].event).length;
+  const totalEp = ids.reduce((a, id) => {
+    const e = events[id];
+    return a + ['event','incidents','lineups','statistics','shotmap','heatmap_home','heatmap_away']
+      .filter(f => e[f]).length;
+  }, 0);
+
+  document.getElementById('mm-summary').innerHTML = `
+    <div class="mm-summary-item"><label>Events Added</label><span>${total}</span></div>
+    <div class="mm-summary-item"><label>Event JSON Pasted</label><span>${hasEvt}</span></div>
+    <div class="mm-summary-item"><label>Total JSONs Pasted</label><span>${totalEp}</span></div>
+  `;
+
+  document.getElementById('mm-process-btn').disabled = (hasEvt === 0);
+}
+
+updateSummary();
+
+// ── Event count ────────────────────────────────────────────────────────────
+function updateCounts() {
+  const n = Object.keys(events).length;
+  document.getElementById('mm-event-count').textContent =
+    `${n} event${n !== 1 ? 's' : ''}`;
+  updateSummary();
+}
+
+// ── Process ────────────────────────────────────────────────────────────────
+window.processAll = function () {
+  const btn    = document.getElementById('mm-process-btn');
+  const status = document.getElementById('mm-process-status');
+  const log    = document.getElementById('mm-log');
+
+  btn.disabled = true;
+  status.textContent = 'Starting…';
+  log.innerHTML = '';
+  log.classList.add('visible');
+
+  const config = {
+    output_dir:       document.getElementById('opt-outdir').value.trim() || null,
+    include_shotmap:  document.getElementById('opt-shotmap').checked,
+    include_heatmap:  document.getElementById('opt-heatmap').checked,
+    save_to_disk:     true,
+  };
+
+  // Strip non-JSON helper fields before sending
+  const eventsPayload = {};
+  Object.entries(events).forEach(([id, ed]) => {
+    eventsPayload[id] = {
+      event:       ed.event       || null,
+      incidents:   ed.incidents   || null,
+      lineups:     ed.lineups     || null,
+      statistics:  ed.statistics  || null,
+      shotmap:     ed.shotmap     || null,
+      heatmap_home: ed.heatmap_home || null,
+      heatmap_away: ed.heatmap_away || null,
+    };
+  });
+
+  fetch('/api/manual_match/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config, events: eventsPayload }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.error) { status.textContent = `Error: ${res.error}`; btn.disabled = false; return; }
+    pollJob(res.job_id, btn, status, log);
+  })
+  .catch(e => { status.textContent = `Request failed: ${e}`; btn.disabled = false; });
+};
+
+function pollJob(jobId, btn, status, log) {
+  let offset = 0;
+  const iv = setInterval(() => {
+    fetch(`/api/scrape/${jobId}?offset=${offset}`)
+    .then(r => r.json())
+    .then(data => {
+      data.lines.forEach(line => {
+        const div = document.createElement('div');
+        if      (line.startsWith('DONE:'))     div.className = 'mm-log-done';
+        else if (line.startsWith('ERROR:'))    div.className = 'mm-log-error';
+        else if (line.startsWith('PROGRESS:')) div.className = 'mm-log-progress';
+        else                                   div.className = 'mm-log-line';
+        div.textContent = line;
+        log.appendChild(div);
+      });
+      log.scrollTop = log.scrollHeight;
+      offset += data.lines.length;
+      status.textContent = `${data.progress}% complete`;
+      if (data.done) {
+        clearInterval(iv);
+        btn.disabled = false;
+        status.textContent = data.error ? 'Completed with errors.' : '✓ Done!';
+      }
+    })
+    .catch(() => {});
+  }, 1000);
+}
+
+// ── Utility ────────────────────────────────────────────────────────────────
+window.copyUrl = function (url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1200);
+  }).catch(() => {});
+};
+
+})();
+</script>
+{% endblock %}

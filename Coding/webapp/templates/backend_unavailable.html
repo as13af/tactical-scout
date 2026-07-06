@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Backend Not Connected — Scout{% endblock %}
+{% block body_class %}ui2{% endblock %}
+
+{% block content %}
+<div style="max-width:640px;margin:7rem auto;text-align:center;padding:0 1.5rem;">
+  <div style="font-size:3rem;margin-bottom:1rem;">🗄️</div>
+  <h1 style="font-size:1.6rem;margin-bottom:.75rem;">Data backend not connected</h1>
+  <p style="opacity:.75;line-height:1.6;">
+    This is a frontend-only deployment. The MongoDB data service isn't configured,
+    so player, club and competition data can't be loaded yet.
+  </p>
+  <p style="opacity:.6;margin-top:1rem;font-size:.9rem;">
+    Set the <code>MONGO_URI</code> environment variable to a reachable MongoDB
+    (e.g. MongoDB Atlas) to enable the full application.
+  </p>
+  <a href="{{ url_for('home') }}"
+     style="display:inline-block;margin-top:2rem;padding:.65rem 1.4rem;border-radius:8px;background:#4f46e5;color:#fff;text-decoration:none;">
+    ← Back to home
+  </a>
+</div>
+{% endblock %}

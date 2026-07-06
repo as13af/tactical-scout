@@ -1,0 +1,33 @@
+# Full dependency set — used by Render (see render.yaml) and local dev via wsgi.py.
+# This is the desktop/scraping/plotting stack and is NOT installable on Vercel
+# serverless (no system tkinter, exceeds the 250 MB unzipped function limit).
+# Vercel uses the slim requirements.txt at the repo root instead.
+
+# ── Web Application ───────────────────────────────────────────────────────────
+flask>=3.0.0
+gunicorn>=22.0.0
+pymongo>=4.6.0
+
+# ── Web Scraping ──────────────────────────────────────────────────────────────
+selenium>=4.20.0
+webdriver-manager>=4.0.1
+
+# ── Data / Visualisation ──────────────────────────────────────────────────────
+matplotlib>=3.10.6
+numpy>=2.3.1
+scipy>=1.16.2
+
+# ── Excel export ─────────────────────────────────────────────────────────────
+openpyxl>=3.1.0
+
+# ── PDF generation ────────────────────────────────────────────────────────────
+reportlab>=4.0.0
+
+# ── PowerPoint generation ─────────────────────────────────────────────────────
+python-pptx>=0.6.21
+
+# ── GUI ───────────────────────────────────────────────────────────────────────
+customtkinter>=5.2.2
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest>=8.0.0

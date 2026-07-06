@@ -1,24 +1,9 @@
-# ── Web Application ───────────────────────────────────────────────────────────
+# ── Vercel deployment requirements (Flask app boot + frontend) ────────────────
+# Kept intentionally minimal. Vercel serverless functions have a 250 MB unzipped
+# size limit and no system tkinter, so the heavy desktop / scraping / plotting
+# dependencies live in requirements-full.txt (used by Render and local dev).
+#
+# The app imports mongo_loader (-> pymongo) at boot, so pymongo is required even
+# for a frontend-only deploy; it is only the driver and does not connect on import.
 flask>=3.0.0
-gunicorn>=22.0.0
-
-# ── Web Scraping ──────────────────────────────────────────────────────────────
-selenium>=4.20.0
-webdriver-manager>=4.0.1
-
-# ── Data / Visualisation ──────────────────────────────────────────────────────
-matplotlib>=3.10.6
-numpy>=2.3.1
-scipy>=1.16.2
-
-# ── Excel export ─────────────────────────────────────────────────────────────
-openpyxl>=3.1.0
-
-# ── PDF generation ────────────────────────────────────────────────────────────
-reportlab>=4.0.0
-
-# ── GUI ───────────────────────────────────────────────────────────────────────
-customtkinter>=5.2.2
-
-# ── Testing ───────────────────────────────────────────────────────────────────
-pytest>=8.0.0
+pymongo>=4.6.0

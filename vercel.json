@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "Coding/webapp/**,Coding/imported_player.py,tactical_match_engine/**,Coding/vercel_app/**,Resources/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
+}

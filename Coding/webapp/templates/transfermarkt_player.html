@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Transfermarkt — Player{% endblock %}
+
+{% block head %}
+<style>
+.tm-breadcrumb {
+  font-size: 12px; color: var(--text3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.tm-breadcrumb a { color: var(--text2); text-decoration: none; }
+.tm-breadcrumb a:hover { color: var(--green); }
+.tm-breadcrumb .sep { color: var(--border); }
+
+/* Profile card */
+.tm-profile {
+  display: grid; grid-template-columns: auto 1fr; gap: 24px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 20px 24px; margin-bottom: 24px; align-items: start;
+}
+.tm-profile-img {
+  width: 90px; height: 90px; border-radius: 8px;
+  object-fit: cover; background: var(--bg3);
+  border: 1px solid var(--border);
+}
+.tm-profile-img-placeholder {
+  width: 90px; height: 90px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--text3);
+}
+.tm-profile-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.tm-profile-position { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+.tm-profile-meta {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.tm-profile-meta-item { font-size: 12px; }
+.tm-profile-meta-item .label { color: var(--text3); font-family: 'CoFoSans', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 2px; }
+.tm-profile-meta-item .value { color: var(--text2); font-weight: 500; }
+.tm-mv { color: var(--green); font-weight: 700; }
+
+/* Stats tables */
+.tm-section { margin-bottom: 28px; }
+.tm-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 10px;
+}
+.tm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tm-table th {
+  text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--text3); padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.tm-table th.num { text-align: right; }
+.tm-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.tm-table td.num { text-align: right; font-family: 'CoFoSans', monospace; }
+.tm-table tr:hover td { background: var(--bg3); }
+.tm-table .season-col { font-family: 'CoFoSans', monospace; color: var(--text3); }
+
+.tm-empty { text-align: center; padding: 60px 20px; color: var(--text3); font-size: 13px; }
+.tm-loading { text-align: center; padding: 30px; color: var(--text3); font-size: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "_transfermarkt_nav.html" %}
+
+<div id="breadcrumb" class="tm-breadcrumb"></div>
+<div id="player-content">
+  <div class="tm-loading">Loading…</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const $ = id => document.getElementById(id);
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const path = params.get('path') || '';
+  if (!path) {
+    $('player-content').innerHTML = '<div class="tm-empty">No player selected. <a href="/transfermarkt/league">Go to League view</a>.</div>';
+    return;
+  }
+
+  // path: country/slug/season/Club Name/Player Name
+  const parts       = path.split('/');
+  const playerName  = parts[parts.length - 1] || 'Player';
+  const clubName    = parts[parts.length - 2] || '';
+  const season      = parts[2] || '';
+  const leagueSlug  = parts[1] || '';
+  const leaguePath  = parts.slice(0, 3).join('/');
+  const clubPath    = parts.slice(0, 4).join('/');
+
+  // Breadcrumb
+  $('breadcrumb').innerHTML =
+    `<a href="/transfermarkt/league">League</a>
+     <span class="sep">›</span>
+     <a href="/transfermarkt/league?path=${encodeURIComponent(leaguePath)}">${esc(leagueSlug.replace(/-/g,' '))}</a>
+     <span class="sep">›</span>
+     <a href="/transfermarkt/club?path=${encodeURIComponent(clubPath)}">${esc(clubName)}</a>
+     <span class="sep">›</span>
+     <span>${esc(playerName)}</span>`;
+
+  try {
+    const data = await fetchJSON(`/api/transfermarkt/player/data?path=${encodeURIComponent(path)}`);
+    $('player-content').innerHTML = renderPlayer(data);
+  } catch (e) {
+    $('player-content').innerHTML = `<div class="tm-empty">Error loading data: ${e.message}</div>`;
+  }
+}
+
+function renderPlayer(data) {
+  const p  = data.profile  || {};
+  const ap = data.appearances || {};
+  const current = ap.current_season || [];
+  const career  = ap.career         || [];
+
+  const citizenships = Array.isArray(p.citizenships) ? p.citizenships.join(', ') : (p.citizenships || '');
+  const imgEl = p.image_url
+    ? `<img class="tm-profile-img" src="${esc(p.image_url)}" alt="${esc(data.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const imgPlaceholder = `<div class="tm-profile-img-placeholder" ${p.image_url ? 'style="display:none"' : ''}>👤</div>`;
+
+  const metaItems = [
+    {label:'DOB',         value: p.date_of_birth || '—'},
+    {label:'Age',         value: p.age           || '—'},
+    {label:'Height',      value: p.height        || '—'},
+    {label:'Foot',        value: p.foot          || '—'},
+    {label:'Nationality', value: citizenships    || '—'},
+    {label:'Joined',      value: p.joined        || '—'},
+    {label:'Contract',    value: p.contract_expires || '—'},
+  ].map(m => `<div class="tm-profile-meta-item"><span class="label">${m.label}</span><span class="value">${esc(m.value)}</span></div>`).join('');
+
+  const mv = p.current_market_value || '';
+
+  let html = `<div class="tm-profile">
+    <div>${imgEl}${imgPlaceholder}</div>
+    <div>
+      <div class="tm-profile-name">${esc(data.name || p.name || '—')}</div>
+      <div class="tm-profile-position">${esc(p.position || '—')} ${mv ? `· <span class="tm-mv">${esc(mv)}</span>` : ''}</div>
+      <div class="tm-profile-meta">${metaItems}</div>
+    </div>
+  </div>`;
+
+  // Current season table
+  html += `<div class="tm-section">
+    <div class="tm-section-title">Current Season${current.length ? '' : ' — no data'}</div>`;
+  if (current.length) {
+    html += `<table class="tm-table">
+      <thead><tr>
+        <th>Competition</th><th>Club</th>
+        <th class="num">Apps</th><th class="num">Starts</th>
+        <th class="num">Goals</th><th class="num">Assists</th>
+        <th class="num">Min</th><th class="num">YC</th><th class="num">RC</th>
+      </tr></thead><tbody>`;
+    current.forEach(r => {
+      html += `<tr>
+        <td>${esc(r.competition_name || r.competition_code || '—')}</td>
+        <td>${esc(r.club_name        || r.club_id         || '—')}</td>
+        <td class="num">${r.appearances}</td>
+        <td class="num">${r.starts}</td>
+        <td class="num">${r.goals}</td>
+        <td class="num">${r.assists}</td>
+        <td class="num">${r.minutes}</td>
+        <td class="num">${r.yellow_cards}</td>
+        <td class="num">${r.red_cards}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div>';
+
+  // Career table
+  html += `<div class="tm-section">
+    <div class="tm-section-title">Career${career.length ? '' : ' — no data'}</div>`;
+  if (career.length) {
+    html += `<table class="tm-table">
+      <thead><tr>
+        <th class="season-col">Season</th><th>Competition</th><th>Club</th>
+        <th class="num">Apps</th><th class="num">Starts</th>
+        <th class="num">Goals</th><th class="num">Assists</th>
+        <th class="num">Min</th><th class="num">YC</th><th class="num">RC</th>
+      </tr></thead><tbody>`;
+    career.forEach(r => {
+      html += `<tr>
+        <td class="season-col">${esc(r.season_display || r.season_id || '—')}</td>
+        <td>${esc(r.competition_name || r.competition_code || '—')}</td>
+        <td>${esc(r.club_name        || r.club_id         || '—')}</td>
+        <td class="num">${r.appearances}</td>
+        <td class="num">${r.starts}</td>
+        <td class="num">${r.goals}</td>
+        <td class="num">${r.assists}</td>
+        <td class="num">${r.minutes}</td>
+        <td class="num">${r.yellow_cards}</td>
+        <td class="num">${r.red_cards}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div>';
+
+  return html;
+}
+
+init();
+</script>
+{% endblock %}

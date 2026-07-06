@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Transfermarkt — Club{% endblock %}
+
+{% block head %}
+<style>
+.tm-breadcrumb {
+  font-size: 12px; color: var(--text3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.tm-breadcrumb a { color: var(--text2); text-decoration: none; }
+.tm-breadcrumb a:hover { color: var(--green); }
+.tm-breadcrumb .sep { color: var(--border); }
+
+.tm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tm-table th {
+  text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--text3); padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.tm-table th.num { text-align: right; }
+.tm-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.tm-table td.num { text-align: right; font-family: 'CoFoSans', monospace; }
+.tm-table tr:hover td { background: var(--bg3); }
+.tm-table .player-link { color: var(--text); text-decoration: none; font-weight: 500; }
+.tm-table .player-link:hover { color: var(--green); }
+
+.tm-stat-bar {
+  display: inline-block; height: 4px; border-radius: 2px;
+  background: var(--green); opacity: .7; vertical-align: middle; margin-left: 6px;
+}
+
+.tm-empty { text-align: center; padding: 60px 20px; color: var(--text3); font-size: 13px; }
+.tm-loading { text-align: center; padding: 30px; color: var(--text3); font-size: 12px; }
+.tm-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "_transfermarkt_nav.html" %}
+
+<div id="breadcrumb" class="tm-breadcrumb"></div>
+<div id="page-header" class="page-header" style="margin-bottom:20px;">
+  <h1 id="club-title">Club</h1>
+  <div class="sub" id="club-sub"></div>
+</div>
+
+<div id="club-content">
+  <div class="tm-loading">Loading…</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const $ = id => document.getElementById(id);
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmt(v) {
+  return (v === null || v === undefined) ? '—' : v;
+}
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const path = params.get('path') || '';
+  if (!path) {
+    $('club-content').innerHTML = '<div class="tm-empty">No club selected. <a href="/transfermarkt/league">Go to League view</a>.</div>';
+    return;
+  }
+
+  const parts = path.split('/');
+  // parts: [country, slug, season, club_name]
+  const clubName  = parts[3] || parts[parts.length - 1] || 'Club';
+  const season    = parts[2] || '';
+  const leagueSlug = parts[1] || '';
+  const country   = parts[0] || '';
+  const leaguePath = parts.slice(0, 3).join('/');
+
+  $('club-title').textContent = clubName;
+  $('club-sub').textContent   = `${leagueSlug.replace(/-/g,' ')} · ${season}`;
+
+  // Breadcrumb
+  $('breadcrumb').innerHTML =
+    `<a href="/transfermarkt/league">League</a>
+     <span class="sep">›</span>
+     <a href="/transfermarkt/league?path=${encodeURIComponent(leaguePath)}">${esc(leagueSlug.replace(/-/g,' '))}</a>
+     <span class="sep">›</span>
+     <span>${esc(clubName)}</span>`;
+
+  try {
+    const data = await fetchJSON(`/api/transfermarkt/club/data?path=${encodeURIComponent(path)}`);
+    $('club-content').innerHTML = renderClub(data, path);
+  } catch (e) {
+    $('club-content').innerHTML = `<div class="tm-empty">Error loading data: ${e.message}</div>`;
+  }
+}
+
+function renderClub(data, clubPath) {
+  if (!data.players || !data.players.length) {
+    return '<div class="tm-empty">No players found in this club folder.</div>';
+  }
+
+  // For the mini bar chart, compute max minutes
+  const maxMins = Math.max(...data.players.map(p => {
+    const rows = p.appearances.current_season || [];
+    return rows.reduce((s, r) => s + (r.minutes || 0), 0);
+  }), 1);
+
+  let html = `<div class="tm-section-title">Squad — ${data.players.length} players</div>
+  <table class="tm-table">
+    <thead><tr>
+      <th>Player</th><th>Position</th><th>Age</th>
+      <th class="num">Apps</th><th class="num">Starts</th>
+      <th class="num">Goals</th><th class="num">Assists</th>
+      <th class="num">Min</th>
+      <th class="num">YC</th><th class="num">RC</th>
+    </tr></thead><tbody>`;
+
+  data.players.forEach(p => {
+    const rows = p.appearances.current_season || [];
+    const tot = rows.reduce((acc, r) => {
+      acc.apps    += r.appearances    || 0;
+      acc.starts  += r.starts        || 0;
+      acc.goals   += r.goals         || 0;
+      acc.assists += r.assists       || 0;
+      acc.minutes += r.minutes       || 0;
+      acc.yc      += r.yellow_cards  || 0;
+      acc.rc      += r.red_cards     || 0;
+      return acc;
+    }, {apps:0,starts:0,goals:0,assists:0,minutes:0,yc:0,rc:0});
+
+    const barW = Math.round((tot.minutes / maxMins) * 60);
+    const profile = p.profile || {};
+    const playerLink = `/transfermarkt/player?path=${encodeURIComponent(p.path)}`;
+
+    html += `<tr>
+      <td><a class="player-link" href="${playerLink}">${esc(p.name)}</a></td>
+      <td>${esc(profile.position || '—')}</td>
+      <td>${esc(profile.age || '—')}</td>
+      <td class="num">${tot.apps}</td>
+      <td class="num">${tot.starts}</td>
+      <td class="num">${tot.goals}</td>
+      <td class="num">${tot.assists}</td>
+      <td class="num">${tot.minutes}<span class="tm-stat-bar" style="width:${barW}px"></span></td>
+      <td class="num">${tot.yc}</td>
+      <td class="num">${tot.rc}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  return html;
+}
+
+init();
+</script>
+{% endblock %}
