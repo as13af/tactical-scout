@@ -19,6 +19,7 @@ the dev runner rely on.
 import os
 import sys
 import time as _timing
+import unicodedata
 
 # Make this directory importable as top-level modules (`context`, `services`,
 # `routes`) regardless of how the app is launched: `python app.py` from webapp/,
@@ -62,6 +63,20 @@ def _register_request_hooks(app: Flask) -> None:
             return
         if current_user() is None:
             return redirect(url_for('signin', next=request.path))
+
+    @app.url_value_preprocessor
+    def _nfc_url_values(endpoint, values):
+        # Unicode path segments (e.g. Vietnamese club names like "Công_An_Hà_Nội")
+        # can arrive from a browser/proxy/runtime in NFD form, but our data is
+        # stored NFC in Mongo (_country/_competition/_club/_file). Without this,
+        # the exact lookup misses and the page shows "unknown" — happens on Vercel
+        # but not locally. Normalize every string route param to NFC so lookups
+        # match regardless of the form the client sent.
+        if not values:
+            return
+        for k, v in list(values.items()):
+            if isinstance(v, str):
+                values[k] = unicodedata.normalize("NFC", v)
 
     @app.before_request
     def _log_request():
