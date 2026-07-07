@@ -6,7 +6,7 @@
   <title>{% block title %}SofaScore Analytics{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style-v2.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}?v=2">
   <script defer src="{{ url_for('static', filename='js/ui-v2.js') }}"></script>
   <style>
     :root {
@@ -41,6 +41,10 @@
 {% endif %}
 
 <nav>
+  <button class="nav-hamburger" type="button" aria-label="Menu" aria-expanded="false"
+          onclick="var n=this.closest('nav');var o=n.classList.toggle('nav-open');this.setAttribute('aria-expanded',o);">
+    <span></span><span></span><span></span>
+  </button>
   <div class="nav-left">
   <a href="/" class="nav-brand">
     <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="nav-logo">
