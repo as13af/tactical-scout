@@ -1,0 +1,135 @@
+@startuml Football_Placement_Pipeline
+
+skinparam backgroundColor #0a0c0f
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam defaultFontColor #e8eaf0
+
+skinparam activity {
+  BackgroundColor #111318
+  BorderColor #2a2f3a
+  FontColor #e8eaf0
+  ArrowColor #5a6070
+  ArrowFontColor #5a6070
+  ArrowFontSize 11
+  DiamondBackgroundColor #1a1f2a
+  DiamondBorderColor #2a2f3a
+  DiamondFontColor #e8eaf0
+  StartColor #00e5a0
+  EndColor #e05c7a
+}
+
+skinparam note {
+  BackgroundColor #1a1f2a
+  BorderColor #2a2f3a
+  FontColor #9aa0b0
+  FontSize 11
+}
+
+title Football Player Placement Pipeline
+
+start
+
+:Input Client Profile;
+note right
+  - Client name
+  - Position (e.g. Striker)
+  - Current club name
+end note
+
+:Lookup Club League & Tier;
+note right
+  Check IFFHS JSON:
+  Country + Division Tier
+end note
+
+:Retrieve CVS Score;
+note right
+  CVS = S_country × retention^(tier-1)
+  This is the competitive baseline (C)
+end note
+
+partition "Player Scoring" {
+
+  :Collect Key Statistics per 90;
+  note right
+    Pull Wyscout metrics
+    for the player's position role
+    (10 metrics from position JSON)
+  end note
+
+  :Compare vs Teammates (Same Position);
+  note right
+    Percentile per metric:
+    P = (players outperformed / total peers) × 100
+    Visualise with PCA scatter plot
+  end note
+
+  :Calculate Weighted Player Score (0-100);
+  note right
+    Category Score = avg(metric percentiles)
+    Player Score = Σ(Category Score × Weight)
+  end note
+
+}
+
+partition "K-Means Clustering" {
+
+  :Run K-Means on All 293 League CVS Scores;
+  note right
+    Groups leagues into natural
+    competitive clusters (K=5)
+    Optimal K via Elbow Method
+  end note
+
+  :Assign Client League to Cluster;
+
+  :Apply CVS Range Filter;
+  note right
+    Upper band: C × 1.20 to C × 1.30
+    Lower band: C × 0.80 to C × 1.00
+  end note
+
+  :Extract Compatible Leagues;
+
+}
+
+partition "Club Crosscheck" {
+
+  :Gather Club-Level Player Stats;
+  note right
+    Collect stats of players
+    in the same position at
+    each compatible club
+  end note
+
+  :Calculate Compatibility Score per Club;
+  note right
+    CVS Proximity = 1 - |CVS_club - CVS_target| / CVS_target
+    Stat Gap = client metric - avg(club positional peers)
+    Compatibility = 0.6 × Proximity + 0.4 × Stat Gap
+  end note
+
+  :Rank Clubs by Compatibility Score;
+
+}
+
+partition "Output" {
+
+  :Generate Ranked Club Shortlist;
+
+  :Attach Supporting Evidence;
+  note right
+    - PCA scatter plot
+    - Stat comparison table
+    - CVS proximity value
+    - Compatibility score
+  end note
+
+  :Produce Final Placement Report;
+
+}
+
+stop
+
+@enduml

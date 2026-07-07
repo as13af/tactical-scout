@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}League Power Rankings — Scout{% endblock %}
+
+{% block head %}
+<style>
+  .rank-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .rank-controls select,
+  .rank-controls input {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 7px 12px;
+    font-family: 'CoFoSans', monospace;
+    font-size: 13px;
+  }
+  .rank-divs {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+  }
+  .rank-div-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text2);
+    font-family: 'CoFoSans', monospace;
+  }
+  .rank-div-tier {
+    color: var(--text3);
+    min-width: 50px;
+  }
+  .rank-div-name {
+    flex: 1;
+  }
+  .rank-cvs-bar-track {
+    width: 100px;
+    height: 5px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .rank-cvs-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--green);
+  }
+  .rank-cvs-val {
+    min-width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .country-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .rank-row-num {
+    font-family: 'BasementGrotesque', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--text3);
+    min-width: 28px;
+  }
+  .rank-row-pts {
+    font-family: 'BasementGrotesque', sans-serif;
+    font-size: 13px;
+    color: var(--text2);
+    min-width: 60px;
+    text-align: right;
+  }
+  .rank-s-bar {
+    height: 6px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+    width: 120px;
+  }
+  .rank-s-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #2a7aaf, #3a8dbf);
+  }
+  .rank-expanded {
+    padding: 10px 16px 12px 52px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+  .rank-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg2);
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .rank-card:hover { border-color: var(--border2); }
+  .rank-card.open { border-color: var(--green); }
+  .rank-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+  }
+  .rank-country-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .rank-meta-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .rank-meta-col {
+    text-align: right;
+    min-width: 60px;
+  }
+  .rank-chevron {
+    font-size: 14px;
+    color: var(--text3);
+    transition: transform 0.2s;
+  }
+  .rank-card.open .rank-chevron { transform: rotate(90deg); }
+  .no-results {
+    color: var(--text3);
+    text-align: center;
+    padding: 40px 0;
+    font-size: 14px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>League Power Rankings</h1>
+  <div class="sub" id="page-sub">Strongest National Leagues in the World — Opta Power Rankings + IFFHS 2025 · CVS relative to EPL (100)</div>
+</div>
+
+<div class="rank-controls">
+  <select id="conf-select" onchange="applyFilters()">
+    <option value="">All Confederations</option>
+    <option value="Europe">Europe (UEFA)</option>
+    <option value="South America">South America (CONMEBOL)</option>
+    <option value="Africa">Africa (CAF)</option>
+    <option value="Asia">Asia (AFC)</option>
+    <option value="N/C America">N/C America (CONCACAF)</option>
+    <option value="Oceania">Oceania (OFC)</option>
+  </select>
+  <input type="text" id="country-search" placeholder="Search country…" oninput="applyFilters()" style="width:200px;">
+  <span id="rank-count" style="font-size:12px; color:var(--text3); margin-left:4px;"></span>
+</div>
+
+<div id="rankings-list"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allRankings = [];
+
+fetch('/api/league_rankings')
+  .then(r => r.json())
+  .then(data => {
+    if (data.error) {
+      document.getElementById('rankings-list').innerHTML =
+        '<div class="no-results">Error loading rankings: ' + data.error + '</div>';
+      return;
+    }
+    allRankings = data.rankings || [];
+    // Append matched-country count to subtitle
+    const matched = data.iffhs_matched_countries;
+    if (matched) {
+      document.getElementById('page-sub').textContent +=
+        ' · IFFHS matched: ' + matched + ' countries';
+    }
+    applyFilters();
+  })
+  .catch(() => {
+    document.getElementById('rankings-list').innerHTML =
+      '<div class="no-results">Could not load rankings data.</div>';
+  });
+
+function applyFilters() {
+  const conf    = document.getElementById('conf-select').value.toUpperCase();
+  const search  = document.getElementById('country-search').value.toLowerCase().trim();
+  const filtered = allRankings.filter(e => {
+    if (conf && (e.confederation || '').toLowerCase() !== conf.toLowerCase()) return false;
+    if (search && !e.country.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  document.getElementById('rank-count').textContent = filtered.length + ' countries';
+  renderRankings(filtered);
+}
+
+function renderRankings(list) {
+  const container = document.getElementById('rankings-list');
+  container.innerHTML = '';
+  if (!list.length) {
+    container.innerHTML = '<div class="no-results">No countries match your filter.</div>';
+    return;
+  }
+  list.forEach(entry => {
+    const sc    = entry.s_country;
+    const scPct = Math.min(100, sc).toFixed(1);
+    const card  = document.createElement('div');
+    card.className = 'rank-card';
+    card.dataset.open = '0';
+
+    const top1cvs = (entry.divisions && entry.divisions.length)
+      ? entry.divisions[0].cvs : sc;
+    const top1col = top1cvs >= 70 ? 'var(--green)' : top1cvs >= 40 ? 'var(--amber)' : 'var(--text2)';
+
+    card.innerHTML = `
+      <div class="rank-card-header" onclick="toggleRow(this.closest('.rank-card'))">
+        <div class="rank-row-num">${entry.rank}</div>
+        <div>
+          <div class="rank-country-name">
+            ${entry.country}
+            <span class="country-badge">${entry.confederation || ''}</span>
+          </div>
+          <div style="margin-top:4px; display:flex; align-items:center; gap:8px;">
+            <div class="rank-s-bar">
+              <div class="rank-s-bar-fill" style="width:${scPct}%;"></div>
+            </div>
+            <span style="font-size:11px; color:var(--text2); font-family:'CoFoSans',monospace;">${scPct}</span>
+          </div>
+        </div>
+        <div class="rank-meta-right">
+          <div style="text-align:right;">
+            <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">Top Div CVS</div>
+            <div style="font-size:18px; font-family:'BasementGrotesque',sans-serif; font-weight:900; color:${top1col};">${top1cvs.toFixed(1)}</div>
+          </div>
+          <div class="rank-meta-col">
+            <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">IFFHS Pts</div>
+            <div style="font-size:13px; font-family:'BasementGrotesque',sans-serif; color:var(--text);">${entry.iffhs_points != null ? entry.iffhs_points.toLocaleString() : '—'}</div>
+          </div>
+          <div class="rank-meta-col">
+            <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">Retention</div>
+            <div style="font-size:13px; font-family:'BasementGrotesque',sans-serif; color:var(--text2);">${entry.retention != null ? (entry.retention * 100).toFixed(1) + '%' : '—'}</div>
+          </div>
+          <span class="rank-chevron">▶</span>
+        </div>
+      </div>
+      <div class="rank-expanded" style="display:none;" id="exp-${entry.rank}">
+        ${buildDivisions(entry.divisions, sc)}
+      </div>`;
+
+    container.appendChild(card);
+  });
+}
+
+function buildDivisions(divs, sCountry) {
+  if (!divs || !divs.length) {
+    return `<div class="rank-div-row"><span style="color:var(--text3);">No division data.</span></div>`;
+  }
+  return divs.map(d => {
+    const cvs   = d.cvs || 0;
+    const pct   = Math.min(100, cvs);
+    const col   = cvs >= 70 ? 'var(--green)' : cvs >= 40 ? 'var(--amber)' : 'var(--text2)';
+    return `
+      <div class="rank-div-row" style="padding:4px 0; border-bottom:1px solid var(--border);">
+        <span class="rank-div-tier">Tier ${d.tier}</span>
+        <span class="rank-div-name">${d.name}</span>
+        <div class="rank-cvs-bar-track">
+          <div class="rank-cvs-bar-fill" style="width:${pct}%; background:${col};"></div>
+        </div>
+        <span class="rank-cvs-val" style="color:${col};">${cvs.toFixed(1)}</span>
+        ${d.opta_top10 != null ? `<span style="font-size:10px;color:var(--text3);margin-left:4px;">T10:${d.opta_top10.toFixed(1)}</span>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function toggleRow(card) {
+  const isOpen  = card.dataset.open === '1';
+  const expId   = card.querySelector('.rank-expanded').id;
+  const expEl   = document.getElementById(expId);
+  card.dataset.open = isOpen ? '0' : '1';
+  card.classList.toggle('open', !isOpen);
+  expEl.style.display = isOpen ? 'none' : 'block';
+}
+</script>
+{% endblock %}

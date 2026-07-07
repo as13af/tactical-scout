@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Sign In — Scout{% endblock %}
+{% block body_class %}ui2{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="auth-logo">
+  <h1>Welcome back</h1>
+  <p class="auth-sub">Sign in to your Scout account.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="auth-flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('signin') }}" data-no-loading>
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <div class="auth-field">
+      <label for="identifier">Username or email</label>
+      <input type="text" id="identifier" name="identifier" value="{{ identifier or '' }}"
+             autocomplete="username" required autofocus>
+    </div>
+    <div class="auth-field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password"
+             autocomplete="current-password" required data-pw-toggle>
+    </div>
+    <button type="submit" class="auth-btn">Sign in</button>
+  </form>
+
+  <div class="auth-foot">
+    Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+  </div>
+</div>
+{% endblock %}

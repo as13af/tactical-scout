@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SofaScore Analytics{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style-v2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}?v=2">
+  <script defer src="{{ url_for('static', filename='js/ui-v2.js') }}"></script>
+  <style>
+    :root {
+      --accent: #6E6E6E;
+      --text1:  #FFFFFF;
+      --bg1:    #0F0F0F;
+    }
+    .nav-user {
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<!-- Route loading progress bar (top of viewport) -->
+<div id="route-progress"></div>
+
+<!-- Full-page navigation overlay -->
+<div id="route-overlay" aria-hidden="true">
+  <div class="route-spinner"></div>
+</div>
+
+{% if endpoint == 'home' %}
+<!-- Homepage presentation curtain -->
+<div id="intro-curtain">
+  <div class="intro-title">{% block intro_title %}Scout{% endblock %}</div>
+</div>
+{% endif %}
+
+<nav>
+  <button class="nav-hamburger" type="button" aria-label="Menu" aria-expanded="false"
+          onclick="var n=this.closest('nav');var o=n.classList.toggle('nav-open');this.setAttribute('aria-expanded',o);">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-left">
+  <a href="/" class="nav-brand">
+    <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="nav-logo">
+  </a>
+  <div class="nav-search-container">
+    <div class="nav-search-wrapper">
+      <input
+        type="text"
+        id="navSearch"
+        class="nav-search-input"
+        placeholder="Search players, clubs, leagues..."
+        autocomplete="off"
+      >
+      <div id="navSearchDropdown" class="nav-search-dropdown" style="display:none;">
+        <div id="navSearchPlayers" class="nav-search-section">
+          <div class="nav-search-section-title">Players</div>
+          <div class="nav-search-section-items"></div>
+        </div>
+        <div id="navSearchClubs" class="nav-search-section">
+          <div class="nav-search-section-title">Clubs</div>
+          <div class="nav-search-section-items"></div>
+        </div>
+        <div id="navSearchLeagues" class="nav-search-section">
+          <div class="nav-search-section-title">Leagues</div>
+          <div class="nav-search-section-items"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /.nav-left -->
+  <div class="nav-links">
+    <a href="/" {% if endpoint == 'home' %}class="active"{% endif %}>Home</a>
+
+    {% set browse_eps   = ['index','competition','club','player','players','matches','match_detail','player_matches'] %}
+    {% set scouting_eps = ['compatibility','club_compatibility','batch_compare'] %}
+    {% set charts_eps   = ['compare','scatter','player_scatter','playing_styles'] %}
+    {% set more_eps     = ['league_rankings','export_page'] %}
+
+    <div class="nav-item">
+      <span class="nav-trigger {% if endpoint in browse_eps %}active{% endif %}">Browse ▾</span>
+      <div class="nav-dropdown">
+        <a href="/competitions" {% if endpoint in ['index','competition','club','player'] %}class="active"{% endif %}>Competitions</a>
+        <a href="/players"      {% if endpoint == 'players' %}class="active"{% endif %}>Players</a>
+        <a href="/matches"      {% if endpoint in ['matches','match_detail','player_matches'] %}class="active"{% endif %}>Matches</a>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-trigger {% if endpoint in scouting_eps %}active{% endif %}">Scouting ▾</span>
+      <div class="nav-dropdown">
+        <a href="/compatibility"      {% if endpoint == 'compatibility' %}class="active"{% endif %}>Compatibility</a>
+        <a href="/club_compatibility" {% if endpoint == 'club_compatibility' %}class="active"{% endif %}>Club Fit</a>
+        <a href="/batch_compare"      {% if endpoint == 'batch_compare' %}class="active"{% endif %}>Shortlist</a>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-trigger {% if endpoint in charts_eps %}active{% endif %}">Charts ▾</span>
+      <div class="nav-dropdown">
+        <a href="/compare"        {% if endpoint == 'compare' %}class="active"{% endif %}>Compare</a>
+        <a href="/scatter"        {% if endpoint == 'scatter' %}class="active"{% endif %}>Scatter</a>
+        <a href="/player_scatter" {% if endpoint == 'player_scatter' %}class="active"{% endif %}>Player Scatter</a>
+        <a href="/competitions"   {% if endpoint == 'playing_styles' %}class="active"{% endif %}>Playing Styles</a>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <span class="nav-trigger {% if endpoint in more_eps %}active{% endif %}">More ▾</span>
+      <div class="nav-dropdown">
+        <a href="/league_rankings" {% if endpoint == 'league_rankings' %}class="active"{% endif %}>Rankings</a>
+        <a href="/export"          {% if endpoint == 'export_page' %}class="active"{% endif %}>Export</a>
+      </div>
+    </div>
+
+  </div><!-- /.nav-links -->
+
+  <div class="nav-right">
+    <div class="nav-item nav-account">
+      <span class="nav-trigger {% if endpoint in ['signin','signup'] %}active{% endif %}">
+        {% if current_user %}{{ current_user.username }} ▾{% else %}Account ▾{% endif %}
+      </span>
+      <div class="nav-dropdown">
+        {% if current_user %}
+        <div class="nav-account-name">{{ current_user.username }}</div>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+        <a href="{{ url_for('signin') }}" {% if endpoint == 'signin' %}class="active"{% endif %}>Sign in</a>
+        <a href="{{ url_for('signup') }}" {% if endpoint == 'signup' %}class="active"{% endif %}>Sign up</a>
+        {% endif %}
+      </div>
+    </div>
+  </div><!-- /.nav-right -->
+</nav>
+
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+
+<script>
+  /* ── Team / competition color utilities — available on all pages ────────── */
+  window.readableAccent = function (primary, secondary) {
+    function lum(hex) {
+      if (!hex || hex.length < 7) return 0;
+      const r = parseInt(hex.slice(1,3), 16) / 255;
+      const g = parseInt(hex.slice(3,5), 16) / 255;
+      const b = parseInt(hex.slice(5,7), 16) / 255;
+      const c = x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+      return 0.2126 * c(r) + 0.7152 * c(g) + 0.0722 * c(b);
+    }
+    function lighten(hex) {
+      if (!hex || hex.length < 7) return '#6E6E6E';
+      const blend = v => Math.min(255, v + Math.round((255 - v) * 0.6));
+      const r = blend(parseInt(hex.slice(1,3), 16));
+      const g = blend(parseInt(hex.slice(3,5), 16));
+      const b = blend(parseInt(hex.slice(5,7), 16));
+      return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+    const T = 0.04;
+    if (lum(primary) >= T)   return primary;
+    if (secondary && lum(secondary) >= T) return secondary;
+    return lighten(secondary || primary || '#6E6E6E');
+  };
+
+  window.hexToRgba = function (hex, alpha) {
+    if (!hex || hex.length < 7) return `rgba(110,110,110,${alpha})`;
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
+
+  /* ── Unified Search with Autocomplete ──────────────────────────────────────── */
+  const navSearch = document.getElementById('navSearch');
+  const navSearchDropdown = document.getElementById('navSearchDropdown');
+  let searchTimeout;
+
+  navSearch.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const query = this.value.trim();
+
+    if (!query) {
+      navSearchDropdown.style.display = 'none';
+      return;
+    }
+
+    searchTimeout = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(data => {
+          updateSearchDropdown(data);
+          navSearchDropdown.style.display = 'block';
+        })
+        .catch(err => console.error('Search error:', err));
+    }, 200);
+  });
+
+  function updateSearchDropdown(data) {
+    const playersSection = document.getElementById('navSearchPlayers');
+    const clubsSection = document.getElementById('navSearchClubs');
+    const leaguesSection = document.getElementById('navSearchLeagues');
+
+    // Players
+    const playersItems = playersSection.querySelector('.nav-search-section-items');
+    playersItems.innerHTML = '';
+    if (data.players.length > 0) {
+      playersSection.style.display = 'block';
+      data.players.forEach(p => {
+        const item = document.createElement('a');
+        item.href = `/player/${p.path}`;
+        item.className = 'nav-search-item';
+        item.innerHTML = `<strong>${p.name}</strong><br><small>${p.position} • ${p.club}</small>`;
+        playersItems.appendChild(item);
+      });
+    } else {
+      playersSection.style.display = 'none';
+    }
+
+    // Clubs
+    const clubsItems = clubsSection.querySelector('.nav-search-section-items');
+    clubsItems.innerHTML = '';
+    if (data.clubs.length > 0) {
+      clubsSection.style.display = 'block';
+      data.clubs.forEach(c => {
+        const item = document.createElement('a');
+        const path = c.path || `${c.country_slug}/${c.competition_slug}/${c.club_slug}`;
+        item.href = `/competition/${path.split('/').slice(0, 2).join('/')}/${c.club_slug}`;
+        item.className = 'nav-search-item';
+        item.innerHTML = `<strong>${c.name}</strong><br><small>${c.competition}</small>`;
+        clubsItems.appendChild(item);
+      });
+    } else {
+      clubsSection.style.display = 'none';
+    }
+
+    // Leagues
+    const leaguesItems = leaguesSection.querySelector('.nav-search-section-items');
+    leaguesItems.innerHTML = '';
+    if (data.leagues.length > 0) {
+      leaguesSection.style.display = 'block';
+      data.leagues.forEach(l => {
+        const item = document.createElement('a');
+        item.href = `/competition/${l.path}`;
+        item.className = 'nav-search-item';
+        item.innerHTML = `<strong>${l.name}</strong>`;
+        leaguesItems.appendChild(item);
+      });
+    } else {
+      leaguesSection.style.display = 'none';
+    }
+  }
+
+  // Close dropdown on escape or click outside
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      navSearchDropdown.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-search-wrapper')) {
+      navSearchDropdown.style.display = 'none';
+    }
+  });
+</script>
+
+<script>
+  /* ── Route transitions, loading feedback & homepage intro ──────────────────── */
+  (function () {
+    var progress = document.getElementById('route-progress');
+    var overlay  = document.getElementById('route-overlay');
+    var curtain  = document.getElementById('intro-curtain');
+    var reduce   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var navigating = false;
+
+    // ── Homepage presentation curtain: hold, then lift away ──
+    if (curtain) {
+      if (reduce) {
+        curtain.style.display = 'none';
+      } else {
+        var liftCurtain = function () {
+          setTimeout(function () {
+            curtain.classList.add('lift');
+            setTimeout(function () { curtain.style.display = 'none'; }, 750);
+          }, 850);
+        };
+        // Safety net: never leave the curtain stuck if 'load' already fired
+        if (document.readyState === 'complete') liftCurtain();
+        else window.addEventListener('load', liftCurtain);
+        setTimeout(function () {
+          if (curtain.style.display !== 'none' && !curtain.classList.contains('lift')) liftCurtain();
+        }, 4000);
+      }
+    }
+
+    function startRouteLoading() {
+      if (navigating) return;
+      navigating = true;
+      if (progress) {
+        progress.classList.add('active');
+        progress.style.width = '0';
+        void progress.offsetWidth;          // force reflow so the transition runs
+        progress.style.width = '85%';
+      }
+      if (overlay) {
+        // brief delay so near-instant (cached) loads don't flash the overlay
+        overlay._t = setTimeout(function () { overlay.classList.add('active'); }, 140);
+      }
+    }
+
+    function isInternalLink(a) {
+      if (!a) return false;
+      if (a.target && a.target !== '_self') return false;
+      if (a.hasAttribute('download')) return false;
+      var href = a.getAttribute('href');
+      if (!href || href[0] === '#') return false;
+      if (/^(mailto:|tel:|javascript:)/i.test(href)) return false;
+      var url;
+      try { url = new URL(a.href, window.location.href); } catch (e) { return false; }
+      if (url.origin !== window.location.origin) return false;
+      if (url.pathname === window.location.pathname && url.hash) return false; // same-page anchor
+      return true;
+    }
+
+    function isButtonLike(el) {
+      return el.classList.contains('btn') || el.classList.contains('btn-update') ||
+             el.classList.contains('btn-primary') || el.classList.contains('btn-ghost') ||
+             el.classList.contains('compat-btn');
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.defaultPrevented) return;
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+      var a = e.target.closest('a[href]');
+      if (a && isInternalLink(a)) {
+        if (isButtonLike(a)) {
+          a.classList.add('is-loading');          // button-style link → spinner
+        } else if (a.closest('.nav-links')) {
+          a.classList.add('nav-clicked');          // nav link → green pulse
+        }
+        startRouteLoading();
+        return;
+      }
+
+      // Buttons / links that opt in explicitly
+      var optIn = e.target.closest('[data-loading]');
+      if (optIn) optIn.classList.add('is-loading');
+    }, true);
+
+    // Form submissions that navigate (export, filters, etc.)
+    document.addEventListener('submit', function (e) {
+      var form = e.target;
+      if (!form || form.hasAttribute('data-no-loading')) return;
+      var submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.classList.add('is-loading');
+      startRouteLoading();
+    }, true);
+
+    // Finish the bar as the page unloads
+    window.addEventListener('pagehide', function () {
+      if (progress) progress.style.width = '100%';
+    });
+
+    // Reset everything if the page is restored from the back/forward cache
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      navigating = false;
+      if (overlay)  { clearTimeout(overlay._t); overlay.classList.remove('active'); }
+      if (progress) { progress.classList.remove('active'); progress.style.width = '0'; }
+      document.querySelectorAll('.is-loading').forEach(function (el) { el.classList.remove('is-loading'); });
+      document.querySelectorAll('.nav-clicked').forEach(function (el) { el.classList.remove('nav-clicked'); });
+    });
+  })();
+</script>
+
+{% block scripts %}{% endblock %}
+
+<div style="position:fixed;bottom:10px;right:14px;z-index:999;
+            font-size:10px;font-family:'CoFoSans',monospace;letter-spacing:.06em;
+            color:rgba(255,255,255,0.18);pointer-events:none;user-select:none;">
+  {% if using_mongo %}⬡ MongoDB{% else %}⬡ JSON{% endif %}
+</div>
+
+</body>
+</html>

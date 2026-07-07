@@ -31,5 +31,10 @@ Thumbs.db
 .coverage
 htmlcov/
 
+# ── Runtime logs ──────────────────────────────────────────────────────────────
+logs/
+*.log
+
 # ── NOTE: Coding/output/ and Coding/match_output/ are intentionally NOT
 #    ignored — the scraped data must be committed so the server can serve it.
+.vercel

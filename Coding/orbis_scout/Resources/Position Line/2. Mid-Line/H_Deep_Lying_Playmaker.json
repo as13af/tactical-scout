@@ -1,0 +1,106 @@
+{
+  "provider": "Sofascore",
+  "position": "Deep Lying Playmaker",
+  "core_10_model": {
+    "weight_distribution": {
+      "progressive_distribution": 0.35,
+      "retention_control": 0.25,
+      "build_up_orchestration": 0.20,
+      "defensive_support": 0.10,
+      "discipline": 0.10
+    },
+    "metrics": [
+      {
+        "name": "Passes to final third per 90",
+        "sofascore_key": "accurateFinalThirdPasses",
+        "computation": "accurateFinalThirdPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Accurate passes into the final third per 90 minutes (proxy for progressive passes)",
+        "category": "progressive_distribution"
+      },
+      {
+        "name": "Accurate long passes, %",
+        "sofascore_key": "accurateLongBallsPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Accuracy percentage of long passes (proxy for accurate progressive distribution)",
+        "category": "progressive_distribution"
+      },
+      {
+        "name": "Long passes per 90",
+        "sofascore_key": "totalLongBalls",
+        "computation": "totalLongBalls / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Long pass attempts per 90 minutes",
+        "category": "progressive_distribution"
+      },
+      {
+        "name": "Passes per 90",
+        "sofascore_key": "totalPasses",
+        "computation": "totalPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total passes per 90 minutes",
+        "category": "retention_control"
+      },
+      {
+        "name": "Accurate passes, %",
+        "sofascore_key": "accuratePassesPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Pass completion percentage",
+        "category": "retention_control"
+      },
+      {
+        "name": "Key passes per 90",
+        "sofascore_key": "keyPasses",
+        "computation": "keyPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Key passes per 90 minutes (proxy for forward/through passes)",
+        "category": "build_up_orchestration"
+      },
+      {
+        "name": "Pass to assist per 90",
+        "sofascore_key": "passToAssist",
+        "computation": "passToAssist / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Passes directly leading to a goal assist per 90 minutes",
+        "category": "build_up_orchestration"
+      },
+      {
+        "name": "Ball recoveries per 90",
+        "sofascore_key": "ballRecovery",
+        "computation": "ballRecovery / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Ball recoveries per 90 minutes (proxy for interceptions)",
+        "category": "defensive_support"
+      },
+      {
+        "name": "Total duels won, %",
+        "sofascore_key": "totalDuelsWonPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of all duels successfully won",
+        "category": "defensive_support"
+      },
+      {
+        "name": "Fouls per 90",
+        "sofascore_key": "fouls",
+        "computation": "fouls / (minutesPlayed / 90)",
+        "higher_is_better": false,
+        "value": null,
+        "description": "Fouls committed per 90 minutes (lower is better)",
+        "category": "discipline"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

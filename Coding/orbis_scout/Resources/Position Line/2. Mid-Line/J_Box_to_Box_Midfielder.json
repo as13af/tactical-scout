@@ -1,0 +1,115 @@
+{
+  "provider": "Sofascore",
+  "position": "Box to Box Midfielder",
+  "core_10_model": {
+    "weight_distribution": {
+      "defensive_work_rate": 0.25,
+      "vertical_progression": 0.25,
+      "final_third_influence": 0.20,
+      "retention": 0.20,
+      "discipline": 0.10
+    },
+    "metrics": [
+      {
+        "name": "Total duels per 90",
+        "sofascore_key": ["totalDuelsWon", "duelLost"],
+        "computation": "(totalDuelsWon + duelLost) / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total duels engaged per 90 minutes",
+        "category": "defensive_work_rate"
+      },
+      {
+        "name": "Ball recoveries per 90",
+        "sofascore_key": "ballRecovery",
+        "computation": "ballRecovery / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Ball recoveries per 90 minutes (covers interceptions and defensive recoveries)",
+        "category": "defensive_work_rate"
+      },
+      {
+        "name": "Clearances per 90",
+        "sofascore_key": "clearances",
+        "computation": "clearances / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Clearances per 90 minutes reflecting defensive effort",
+        "category": "defensive_work_rate"
+      },
+      {
+        "name": "Successful dribbles per 90",
+        "sofascore_key": "successfulDribbles",
+        "computation": "successfulDribbles / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Successful dribbles per 90 minutes (proxy for progressive runs)",
+        "category": "vertical_progression"
+      },
+      {
+        "name": "Passes to final third per 90",
+        "sofascore_key": "accurateFinalThirdPasses",
+        "computation": "accurateFinalThirdPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Accurate passes into the final third per 90 minutes (proxy for progressive passes)",
+        "category": "vertical_progression"
+      },
+      {
+        "name": "Key passes per 90",
+        "sofascore_key": "keyPasses",
+        "computation": "keyPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Key passes per 90 minutes",
+        "category": "vertical_progression"
+      },
+      {
+        "name": "Goals per 90",
+        "sofascore_key": "goals",
+        "computation": "goals / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Goals scored per 90 minutes",
+        "category": "final_third_influence"
+      },
+      {
+        "name": "Assists per 90",
+        "sofascore_key": "assists",
+        "computation": "assists / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Assists per 90 minutes (proxy for expected assists)",
+        "category": "final_third_influence"
+      },
+      {
+        "name": "Passes per 90",
+        "sofascore_key": "totalPasses",
+        "computation": "totalPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total passes per 90 minutes",
+        "category": "retention"
+      },
+      {
+        "name": "Accurate passes, %",
+        "sofascore_key": "accuratePassesPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Pass completion percentage",
+        "category": "retention"
+      },
+      {
+        "name": "Fouls per 90",
+        "sofascore_key": "fouls",
+        "computation": "fouls / (minutesPlayed / 90)",
+        "higher_is_better": false,
+        "value": null,
+        "description": "Fouls committed per 90 minutes (lower is better)",
+        "category": "discipline"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

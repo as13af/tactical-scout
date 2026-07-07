@@ -1,0 +1,37 @@
+{
+  "id": "P001",
+  "name": "Example Player",
+  "age": 22,
+  "position": "CM",
+  "preferred_foot": "Right",
+  "height_cm": 178,
+  "weight_kg": 72,
+  "current_league_intensity": 0.74,
+  "tactical_familiarity": {
+    "formation_experience": {
+      "4-3-3": 0.9,
+      "4-2-3-1": 0.7,
+      "3-4-3": 0.4
+    },
+    "role_familiarity": {
+      "BoxToBox": 0.85,
+      "DeepLyingPlaymaker": 0.75,
+      "Mezzala": 0.65
+    }
+  },
+  "stats": {
+    "progressive_passes_per90": 5.2,
+    "progressive_carries_per90": 6.8,
+    "passes_completed_pct": 87,
+    "key_passes_per90": 1.9,
+    "xg_per90": 0.18,
+    "xa_per90": 0.21,
+    "pressures_per90": 18,
+    "tackles_won_pct": 62,
+    "interceptions_per90": 1.4,
+    "high_intensity_runs_per90": 21,
+    "sprints_per90": 14,
+    "distance_covered_km": 11.2,
+    "turnovers_per90": 1.8
+  }
+}

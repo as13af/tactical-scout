@@ -1,0 +1,1925 @@
+{% extends "base.html" %}
+{% block title %}Player Scatter — Scout{% endblock %}
+{% block body_class %}ui2{% endblock %}
+
+{% block head %}
+<style>
+  .sc-setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 220px auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  .sc-field label {
+    display: block;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-country-display {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text2);
+    font-size: 13px;
+    font-family: 'CoFoSans', monospace;
+    height: 38px;
+    display: flex;
+    align-items: center;
+  }
+  .sc-filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+  }
+  .sc-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .sc-axis-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto auto auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+  }
+  .sc-axis-field label {
+    display: block;
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-canvas-wrap {
+    position: relative;
+    height: 520px;
+    width: 100%;
+  }
+  .sc-info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+  }
+  .sc-empty {
+    color: var(--text3);
+    font-size: 13px;
+    text-align: center;
+    padding: 60px 0;
+  }
+  .sc-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text2);
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  #scatter-canvas {
+    cursor: grab;
+  }
+  #scatter-canvas:active {
+    cursor: grabbing;
+  }
+  /* ── Highlight + Ranking ── */
+  .sc-highlight-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 14px;
+  }
+  .sc-rank-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .sc-rank-label {
+    font-size: 11px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sc-rank-n-input { width: 68px; }
+  .sc-rank-table-wrap { overflow-x: auto; }
+  .sc-rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .sc-rank-table th {
+    color: var(--text2);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .sc-rank-table th:hover { color: var(--text); }
+  .sc-rank-table th.sort-asc::after  { content: ' \25b2'; color: #D9D9D9; }
+  .sc-rank-table th.sort-desc::after { content: ' \25bc'; color: #D9D9D9; }
+  .sc-rank-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(58,58,58,0.6);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .sc-rank-table tbody tr { cursor: pointer; transition: background .15s; }
+  .sc-rank-table tbody tr:hover { background: var(--bg3); }
+  .sc-rank-table tbody tr.rank-selected {
+    background: rgba(217,217,217,0.07);
+    border-left: 3px solid #FFFFFF;
+  }
+  .sc-rank-table tbody tr.rank-not-top20 td { opacity: 0.5; }
+  .sc-rank-table tbody tr.rank-not-top20:hover td { opacity: 1; }
+  .sc-not-top20-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(110,110,110,0.18);
+    color: #6E6E6E;
+    letter-spacing: .03em;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  .sc-rank-table th.sc-rank-stat { text-align: right; }
+  .sc-rank-num  { color: var(--text3); font-size: 12px; }
+  .sc-rank-name { font-weight: 600; }
+  .sc-rank-stat { text-align: right; font-variant-numeric: tabular-nums; }
+  .sc-rank-pos {
+    font-size: 11px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  /* ── Entity info card ── */
+  .sc-entity-card {
+    display: none;
+    background: var(--bg3);
+    border: 1px solid #FFFFFF;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-family: 'CoFoSans', monospace;
+  }
+  .sc-entity-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+  }
+  .sc-entity-card-meta {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+  .sc-entity-card-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .sc-entity-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sc-entity-stat-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .sc-entity-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .sc-entity-stat-p90 {
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .sc-pct-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 6px;
+  }
+  .sc-pct-bar-track {
+    width: 96px;
+    height: 5px;
+    background: rgba(58,58,58,0.6);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sc-pct-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .3s ease;
+  }
+  .sc-pct-label {
+    font-size: 10px;
+    color: var(--text3);
+    font-variant-numeric: tabular-nums;
+  }
+  .sc-pct-note {
+    font-size: 10px;
+    color: var(--text3);
+    font-style: italic;
+    opacity: .75;
+  }
+  .sc-tier-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .sc-rank-text {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 3px;
+  }
+  /* ── Age filter ── */
+  .sc-age-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sc-age-presets {
+    display: flex;
+    gap: 4px;
+    margin-top: 7px;
+    flex-wrap: wrap;
+  }
+  .sc-age-preset-btn {
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .sc-age-preset-btn:hover {
+    border-color: var(--text2);
+    color: var(--text2);
+  }
+  .sc-age-preset-btn.sc-age-active {
+    background: rgba(217,217,217,0.10);
+    border-color: #D9D9D9;
+    color: #FFFFFF;
+  }
+  .sc-filter-row { flex-wrap: wrap; }
+  /* ── Average stats panel ── */
+  .sc-avg-panel {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .sc-avg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: 'CoFoSans', monospace;
+    color: var(--text2);
+  }
+  .sc-avg-chip-label {
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-size: 10px;
+  }
+  .sc-avg-chip-val {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .sc-avg-chip-sep {
+    color: var(--text3);
+    font-size: 11px;
+  }
+  .sc-avg-scope {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-family: 'CoFoSans', monospace;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text3);
+    padding: 0 4px;
+    align-self: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Player Stats Scatter</h1>
+  <div class="sub">Plot any two statistics across all players in a competition &mdash; toggle between season totals and p90. Top N by combined score &middot; Min. <span id="sc-sub-threshold">&mdash;</span> mins played.</div>
+</div>
+
+<!-- Setup card -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-title" style="margin-bottom:16px;">Select Competition</div>
+  <div class="sc-setup-grid">
+
+    <div class="sc-field">
+      <label>Competition</label>
+      <select id="sc-competition" class="compat-input" onchange="onCompetitionChange()">
+        <option value="">-- choose a competition --</option>
+        {% for c in competitions %}
+          <option value="{{ c.competition }}" data-country="{{ c.country }}">
+            {{ c.competition.replace('_',' ') }} ({{ c.country.replace('_',' ') }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="sc-field">
+      <label>Country</label>
+      <div class="sc-country-display" id="sc-country-display">&mdash;</div>
+    </div>
+
+    <div class="sc-field">
+      <label>Import player (optional)</label>
+      <input type="file" id="sc-import-file" accept="application/json,.json"
+             class="compat-input" onchange="onImportPlayer()" style="padding:6px;">
+      <div class="sc-country-display" id="sc-import-status">&mdash;</div>
+    </div>
+
+    <div class="sc-field">
+      <label>&nbsp;</label>
+      <button class="compat-btn" id="sc-load-btn" onclick="loadScatterData()" disabled
+              style="height:38px; padding:0 20px;">
+        Load Data
+      </button>
+    </div>
+
+  </div>
+
+  <div id="sc-loading" class="sc-loading" style="display:none;">
+    <span class="loading"></span> Loading player statistics&hellip;
+  </div>
+  <div id="sc-info" style="display:none;">
+    <div class="sc-info-chip">
+      <span class="pool-tag" id="sc-chip"></span>
+    </div>
+  </div>
+  <div id="sc-error" class="cf-error" style="display:none;"></div>
+</div>
+
+<!-- Chart area (hidden until data loaded) -->
+<div id="sc-chart-area" style="display:none;">
+
+  <!-- Position filter + Club filter + p90 toggle -->
+  <div class="sc-filter-row">
+    <div class="sc-axis-field">
+      <label>Position</label>
+      <select id="sc-position-filter" class="compat-input" onchange="renderChart()" style="width:140px;">
+        <option value="All">All</option>
+        <option value="GK">GK</option>
+        <option value="DEF">DEF</option>
+        <option value="MID">MID</option>
+        <option value="FWD">FWD</option>
+      </select>
+    </div>
+    <div class="sc-axis-field">
+      <label>Club</label>
+      <select id="sc-club-filter" class="compat-input" onchange="renderChart()" style="min-width:180px;" disabled>
+        <option value="All">All Clubs</option>
+      </select>
+    </div>
+    <div class="sc-axis-field">
+      <label>Stat Mode</label>
+      <div style="display:flex; gap:4px;">
+        <button id="mode-totals" class="compat-btn" onclick="setStatMode('totals')"
+                style="height:38px; padding:0 16px;">Totals</button>
+        <button id="mode-p90"    class="btn-ghost"  onclick="setStatMode('p90')"
+                style="height:38px; padding:0 16px;">p90</button>
+      </div>
+    </div>
+
+    <!-- Contract expiry filter -->
+    <div class="sc-axis-field">
+      <label>Contract Year</label>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="number" id="sc-contract-year" class="compat-input" min="2020" max="2040"
+               style="width:90px;" placeholder="e.g. 2026">
+        <button class="compat-btn" onclick="applyContractFilter()"
+                style="height:38px; padding:0 14px;">Apply</button>
+        <button class="btn-ghost" id="sc-contract-clear" onclick="clearContractFilter()"
+                style="height:38px; padding:0 10px; display:none;">&#x2715;</button>
+      </div>
+    </div>
+
+    <!-- Age filter -->
+    <div class="sc-axis-field">
+      <label>Age</label>
+      <div class="sc-age-inputs">
+        <input type="number" id="sc-age-min" class="compat-input" min="0" max="99"
+               style="width:60px;" placeholder="Min">
+        <span style="color:var(--text3); font-size:14px; line-height:38px;">&ndash;</span>
+        <input type="number" id="sc-age-max" class="compat-input" min="0" max="99"
+               style="width:60px;" placeholder="Max">
+        <button class="compat-btn" onclick="applyAgeFilter()"
+                style="height:38px; padding:0 14px;">Apply</button>
+      </div>
+      <div class="sc-age-presets">
+        <button id="age-preset-all"     class="sc-age-preset-btn sc-age-active" onclick="setAgePreset('all')">All</button>
+        <button id="age-preset-u21"     class="sc-age-preset-btn" onclick="setAgePreset('u21')">U21</button>
+        <button id="age-preset-u23"     class="sc-age-preset-btn" onclick="setAgePreset('u23')">U23</button>
+        <button id="age-preset-u25"     class="sc-age-preset-btn" onclick="setAgePreset('u25')">U25</button>
+        <button id="age-preset-prime"   class="sc-age-preset-btn" onclick="setAgePreset('prime')">Prime</button>
+        <button id="age-preset-veteran" class="sc-age-preset-btn" onclick="setAgePreset('veteran')">Veteran</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc-tabs">
+    <button id="tab-attacking" class="compat-btn" onclick="switchTab('attacking')">Attacking</button>
+    <button id="tab-passing"   class="btn-ghost"  onclick="switchTab('passing')">Passing</button>
+    <button id="tab-defensive" class="btn-ghost"  onclick="switchTab('defensive')">Defensive</button>
+  </div>
+
+  <!-- Axis controls + chart -->
+  <div class="card">
+    <div class="sc-axis-row">
+      <div class="sc-axis-field">
+        <label>X Axis</label>
+        <select id="x-axis-select" class="compat-input" onchange="renderChart()"></select>
+      </div>
+      <div class="sc-axis-field">
+        <label>Y Axis</label>
+        <select id="y-axis-select" class="compat-input" onchange="renderChart()"></select>
+      </div>
+      <div class="sc-axis-field">
+        <label>&nbsp;</label>
+        <button class="compat-btn" onclick="renderChart()"
+                style="height:38px; padding:0 20px;">Plot</button>
+      </div>
+      <div class="sc-axis-field">
+        <label>&nbsp;</label>
+        <button class="btn-ghost" id="sc-reset-zoom" onclick="resetZoom()"
+                style="height:38px; padding:0 16px;" disabled>
+          Reset Zoom
+        </button>
+      </div>
+      <div class="sc-axis-field">
+        <label>&nbsp;</label>
+        <button class="btn-ghost" id="sc-export-btn" onclick="exportPlayerScatterXlsx()"
+                style="height:38px; padding:0 16px;" disabled>
+          &#8595; Export XLSX
+        </button>
+      </div>
+      <div class="sc-axis-field">
+        <label>Top N on chart</label>
+        <input type="number" id="sc-scatter-n" class="compat-input" min="5" max="200"
+               value="30" style="width:72px;" oninput="onScatterTopNChange()">
+      </div>
+    </div>
+
+    <!-- Highlight selector -->
+    <div class="sc-highlight-row">
+      <div class="sc-axis-field">
+        <label>Highlight Player</label>
+        <select id="sc-highlight-select" class="compat-input" onchange="onHighlightSelect()" style="min-width:220px;">
+          <option value="">-- select a player --</option>
+        </select>
+      </div>
+      <div class="sc-axis-field">
+        <button class="btn-ghost" onclick="clearHighlight()" style="height:38px; padding:0 14px;">&#x2715; Clear</button>
+      </div>
+      <div class="sc-axis-field">
+        <label>Search Player</label>
+        <input type="text" id="sc-player-search" class="compat-input"
+               placeholder="Type name…" style="min-width:160px;" oninput="onPlayerSearch()">
+      </div>
+    </div>
+
+    <div id="sc-threshold-banner" style="display:none; margin-bottom:8px; padding:7px 16px; background:#0F0F0F; border:1px solid #FFFFFF; border-radius:20px; font-family:'CoFoSans',monospace; font-size:12px; font-weight:700; color:#FFFFFF; letter-spacing:.04em; text-transform:uppercase;"></div>
+    <!-- Average stats panel -->
+    <div class="sc-avg-panel" id="sc-avg-panel" style="display:none;"></div>
+    <div class="sc-canvas-wrap">
+      <canvas id="scatter-canvas"></canvas>
+    </div>
+
+    <div id="sc-chart-chip" class="sc-info-chip" style="display:none;">
+      <span class="pool-tag" id="sc-chart-chip-text"></span>
+    </div>
+
+    <!-- Persistent entity info card -->
+    <div class="sc-entity-card" id="sc-entity-card">
+      <div class="sc-entity-card-name" id="sc-ec-name"></div>
+      <div class="sc-entity-card-meta" id="sc-ec-meta"></div>
+      <div class="sc-entity-card-stats" id="sc-ec-stats"></div>
+    </div>
+  </div>
+
+  <!-- Ranking table -->
+  <div id="sc-ranking-area" style="display:none; margin-top:20px;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Ranking</div>
+      <div class="sc-rank-controls">
+        <span class="sc-rank-label">Show top</span>
+        <input type="number" id="sc-rank-n" class="compat-input sc-rank-n-input"
+               value="10" min="1" max="500" oninput="onRankTopNChange()">
+        <span class="sc-rank-label">entries</span>
+      </div>
+      <div class="sc-rank-table-wrap">
+        <table class="sc-rank-table">
+          <thead id="sc-rank-thead"></thead>
+          <tbody id="sc-rank-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<script>
+// ── Stat label map ────────────────────────────────────────────────────────────
+const STAT_LABELS = {
+  // Club-level (shared)
+  goalsScored:                 'Goals Scored',
+  goalsConceded:               'Goals Conceded',
+  assists:                     'Assists',
+  shots:                       'Shots',
+  penaltyGoals:                'Penalty Goals',
+  penaltiesTaken:              'Penalties Taken',
+  successfulDribbles:          'Successful Dribbles',
+  dribbleAttempts:             'Dribble Attempts',
+  corners:                     'Corners',
+  averageBallPossession:       'Avg Possession %',
+  totalPasses:                 'Total Passes',
+  accuratePasses:              'Accurate Passes',
+  accuratePassesPercentage:    'Pass Accuracy %',
+  totalLongBalls:              'Total Long Balls',
+  accurateLongBalls:           'Accurate Long Balls',
+  accurateLongBallsPercentage: 'Long Ball Accuracy %',
+  totalCrosses:                'Total Crosses',
+  totalCross:                  'Total Crosses',
+  accurateCrosses:             'Accurate Crosses',
+  accurateCrossesPercentage:   'Cross Accuracy %',
+  cleanSheets:                 'Clean Sheets',
+  interceptions:               'Interceptions',
+  saves:                       'Saves',
+  errorsLeadingToShot:         'Errors Leading to Shot',
+  totalDuels:                  'Total Duels',
+  duelsWon:                    'Duels Won',
+  duelsWonPercentage:          'Duel Win %',
+  totalAerialDuels:            'Total Aerial Duels',
+  aerialDuelsWon:              'Aerial Duels Won',
+  aerialDuelsWonPercentage:    'Aerial Duel Win %',
+  totalDuelsWon:               'Total Duels Won',
+  totalDuelsWonPercentage:     'Duel Win %',
+  offsides:                    'Offsides',
+  fouls:                       'Fouls',
+  yellowCards:                 'Yellow Cards',
+  yellowRedCards:              'Yellow-Red Cards',
+  redCards:                    'Red Cards',
+  shotsAgainst:                'Shots Against',
+  goalKicks:                   'Goal Kicks',
+  ballRecovery:                'Ball Recoveries',
+  freeKicks:                   'Free Kicks',
+  matches:                     'Matches Played',
+  // Player-specific
+  goals:                       'Goals',
+  shotsOnTarget:               'Shots on Target',
+  totalShots:                  'Total Shots',
+  keyPasses:                   'Key Passes',
+  dribbles:                    'Dribbles',
+  dribblesSuccess:             'Successful Dribbles',
+  successfulDribblesPercentage:'Dribble Success %',
+  tackles:                     'Tackles',
+  tacklesWon:                  'Tackles Won',
+  tacklesWonPercentage:        'Tackle Win %',
+  minutesPlayed:               'Minutes Played',
+  appearances:                 'Appearances',
+  matchesStarted:              'Matches Started',
+  rating:                      'Rating',
+  expectedGoals:               'Expected Goals (xG)',
+  expectedAssists:             'Expected Assists (xA)',
+  goalConversionPercentage:    'Goal Conversion %',
+  penaltyConversion:           'Penalty Conversion %',
+  groundDuelsWon:              'Ground Duels Won',
+  groundDuelsWonPercentage:    'Ground Duel Win %',
+  bigChancesCreated:           'Big Chances Created',
+  bigChancesMissed:            'Big Chances Missed',
+  clearances:                  'Clearances',
+  blockedShots:                'Blocked Shots',
+  wasFouled:                   'Was Fouled',
+  touches:                     'Touches',
+  possessionLost:              'Possession Lost',
+  possessionWonAttThird:       'Poss. Won Att. Third',
+  dispossessed:                'Dispossessed',
+  errorLeadToGoal:             'Errors → Goal',
+  errorLeadToShot:             'Errors → Shot',
+  headedGoals:                 'Headed Goals',
+  freeKickGoal:                'Free Kick Goals',
+  goalsFromInsideTheBox:       'Goals Inside Box',
+  goalsFromOutsideTheBox:      'Goals Outside Box',
+  // Additional fields discovered dynamically from player JSON
+  yellowRedCards:              'Yellow-Red Cards',
+  ownGoals:                    'Own Goals',
+  goalsAssistsSum:             'Goals + Assists',
+  inaccuratePasses:            'Inaccurate Passes',
+  dribbledPast:                'Times Dribbled Past',
+  duelLost:                    'Duels Lost',
+  aerialLost:                  'Aerial Duels Lost',
+  substitutionsIn:             'Substitutions In',
+  substitutionsOut:            'Substitutions Out',
+  passToAssist:                'Pass to Assist',
+  shotFromSetPiece:            'Shots from Set Piece',
+  crossesNotClaimed:           'Crosses Not Claimed',
+  goalsConceded:               'Goals Conceded',
+  goalKicks:                   'Goal Kicks',
+  totalAerialDuels:            'Total Aerial Duels',
+  tackles:                     'Tackles',
+  // raw component fields
+  passToAssist:                'Pass to Assist',
+  accurateFinalThirdPasses:    'Accurate Final Third Passes',
+  aerialLost:                  'Aerial Duels Lost',
+  inaccuratePasses:            'Inaccurate Passes',
+  cleanSheet:                  'Clean Sheets',
+  // computed composites
+  attackingScore:              'Attacking Score',
+  possessionScore:             'Possession Score',
+  defensiveScore:              'Defensive Score',
+};
+
+// ── P90-eligible set (countable stats that get a p90 variant) ─────────────────
+const P90_ELIGIBLE = new Set([
+  'goals', 'assists', 'shots', 'totalShots', 'shotsOnTarget', 'keyPasses',
+  'successfulDribbles', 'dribbles', 'dribblesSuccess',
+  'tackles', 'tacklesWon', 'interceptions',
+  'totalDuelsWon', 'duelsWon', 'aerialDuelsWon', 'groundDuelsWon',
+  'accuratePasses', 'accurateCrosses', 'accurateLongBalls',
+  'totalPasses', 'totalCross', 'totalLongBalls',
+  'yellowCards', 'redCards',
+  'minutesPlayed', 'appearances', 'matchesStarted',
+  'expectedGoals', 'expectedAssists',
+  'bigChancesCreated', 'bigChancesMissed',
+  'clearances', 'blockedShots', 'ballRecovery', 'saves',
+  'fouls', 'wasFouled', 'offsides', 'touches',
+  'possessionLost', 'possessionWonAttThird', 'dispossessed',
+  'penaltyGoals', 'penaltiesTaken',
+  'errorLeadToGoal', 'errorLeadToShot',
+  'headedGoals', 'freeKickGoal',
+  'goalsFromInsideTheBox', 'goalsFromOutsideTheBox',
+  // dynamically discovered fields
+  'yellowRedCards', 'ownGoals', 'goalsAssistsSum',
+  'inaccuratePasses', 'dribbledPast', 'duelLost', 'aerialLost',
+  'substitutionsIn', 'substitutionsOut', 'passToAssist', 'shotFromSetPiece',
+  'crossesNotClaimed', 'goalsConceded', 'goalKicks', 'totalAerialDuels', 'tackles',
+  'passToAssist', 'accurateFinalThirdPasses', 'aerialLost', 'inaccuratePasses', 'cleanSheet',
+  'attackingScore', 'possessionScore', 'defensiveScore',
+]);
+
+function baseLabelFor(key) {
+  return STAT_LABELS[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function labelFor(key) {
+  const base = baseLabelFor(key);
+  if (statMode === 'p90' && P90_ELIGIBLE.has(key)) return base + ' p90';
+  return base;
+}
+
+// ── Position color map ────────────────────────────────────────────────────────
+const POS_COLORS = {
+  GK:  { bg: 'rgba(250,204,21,0.25)',  border: '#FACC15' },
+  DEF: { bg: 'rgba(59,130,246,0.25)',  border: '#3B82F6' },
+  MID: { bg: 'rgba(34,197,94,0.25)',   border: '#22C55E' },
+  FWD: { bg: 'rgba(244,63,94,0.25)',   border: '#F43F5E' },
+};
+
+// Dimmed variants for non-top-N club players
+const POS_COLORS_DIM = {
+  GK:  { bg: 'rgba(250,204,21,0.07)',  border: 'rgba(250,204,21,0.35)' },
+  DEF: { bg: 'rgba(59,130,246,0.07)',  border: 'rgba(59,130,246,0.35)' },
+  MID: { bg: 'rgba(34,197,94,0.07)',   border: 'rgba(34,197,94,0.35)'  },
+  FWD: { bg: 'rgba(244,63,94,0.07)',   border: 'rgba(244,63,94,0.35)'  },
+};
+
+function posGroup(position) {
+  if (!position) return 'MID';
+  const p = position.toUpperCase();
+  if (p.includes('GK') || p.includes('GOALKEEPER'))  return 'GK';
+  if (p.includes('DEF') || p.includes('BACK'))       return 'DEF';
+  if (p.includes('FWD') || p.includes('FORWARD') || p.includes('STRIKER') || p.includes('ATT')) return 'FWD';
+  if (p.includes('MID'))                              return 'MID';
+  return 'MID';
+}
+
+// ── Tab defaults ──────────────────────────────────────────────────────────────
+const TAB_DEFAULTS = {
+  attacking: { x: 'goals',           y: 'shots'                   },
+  passing:   { x: 'keyPasses',       y: 'accuratePassesPercentage'},
+  defensive: { x: 'interceptions',   y: 'tacklesWon'              },
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let playerData      = null;
+let statKeys        = [];
+let activeTab       = 'attacking';
+let statMode        = 'totals';
+let chartInst       = null;
+let compLabel       = '';
+let currentComp    = '';
+let currentCountry = '';
+let minThreshold    = 0;
+let importedId      = '';
+let isZoomed        = false;
+let currentPoints   = [];
+let selectedSlug    = null;
+let rankSortCol     = 'x';
+let rankSortDir     = 'desc';
+let rankTopN        = 10;
+let rankXKey        = '';
+let rankYKey        = '';
+let currentClubMode = false;
+let ageMin              = null;
+let ageMax              = null;
+let activeAgePreset     = 'all';
+let scatterTopN         = 30;
+let allQualifyingPoints = [];
+let contractFilterYear  = null;
+
+// ── Average stats helpers ───────────────────────────────────────────────────
+function calcMean(vals) {
+  const v = vals.filter(x => x !== null && x !== undefined && !isNaN(x));
+  if (!v.length) return null;
+  return v.reduce((s, x) => s + x, 0) / v.length;
+}
+
+function calcMedian(vals) {
+  const v = vals.filter(x => x !== null && x !== undefined && !isNaN(x)).slice().sort((a, b) => a - b);
+  if (!v.length) return null;
+  const mid = Math.floor(v.length / 2);
+  return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+}
+
+function updateAvgPanel() {
+  const panel = document.getElementById('sc-avg-panel');
+  if (!panel) return;
+  if (!allQualifyingPoints || !allQualifyingPoints.length) { panel.style.display = 'none'; return; }
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  if (!xKey || !yKey) { panel.style.display = 'none'; return; }
+  // Use the already-filtered pool (respects position + all active filters)
+  const xVals = allQualifyingPoints.map(p => p.x).filter(v => v !== null && v !== undefined && !isNaN(v));
+  const yVals = allQualifyingPoints.map(p => p.y).filter(v => v !== null && v !== undefined && !isNaN(v));
+  const fmt = v => fmtNum2(v);
+  const xMean   = fmt(calcMean(xVals));
+  const xMedian = fmt(calcMedian(xVals));
+  const yMean   = fmt(calcMean(yVals));
+  const yMedian = fmt(calcMedian(yVals));
+  const xLabel  = labelFor(xKey);
+  const yLabel  = labelFor(yKey);
+  const posFilter = document.getElementById('sc-position-filter') ? document.getElementById('sc-position-filter').value : 'All';
+  const posLabel  = posFilter !== 'All' ? posFilter + '\u00a0avg' : 'League avg';
+  panel.innerHTML =
+    '<span class="sc-avg-scope">' + escHtml(posLabel) + '</span>'
+    + '<div class="sc-avg-chip">'
+    + '<span class="sc-avg-chip-label">' + escHtml(xLabel) + '</span>'
+    + '<span class="sc-avg-chip-val">Avg\u00a0' + xMean + '</span>'
+    + '<span class="sc-avg-chip-sep">&middot;</span>'
+    + '<span class="sc-avg-chip-val">Median\u00a0' + xMedian + '</span>'
+    + '</div>'
+    + '<div class="sc-avg-chip">'
+    + '<span class="sc-avg-chip-label">' + escHtml(yLabel) + '</span>'
+    + '<span class="sc-avg-chip-val">Avg\u00a0' + yMean + '</span>'
+    + '<span class="sc-avg-chip-sep">&middot;</span>'
+    + '<span class="sc-avg-chip-val">Median\u00a0' + yMedian + '</span>'
+    + '</div>';
+  panel.style.display = 'flex';
+}
+
+// ── Age presets ───────────────────────────────────────────────────────────────
+const AGE_PRESETS = {
+  all:     [null, null],
+  u21:     [null, 20],
+  u23:     [null, 22],
+  u25:     [null, 24],
+  prime:   [25,   29],
+  veteran: [30,   null],
+};
+
+function setAgePreset(name) {
+  activeAgePreset = name;
+  const [min, max] = AGE_PRESETS[name] || [null, null];
+  const minEl = document.getElementById('sc-age-min');
+  const maxEl = document.getElementById('sc-age-max');
+  if (minEl) minEl.value = min !== null ? min : '';
+  if (maxEl) maxEl.value = max !== null ? max : '';
+  _markAgePreset(name);
+}
+
+function applyAgeFilter() {
+  const minVal = document.getElementById('sc-age-min').value;
+  const maxVal = document.getElementById('sc-age-max').value;
+  ageMin = minVal !== '' ? parseInt(minVal, 10) : null;
+  ageMax = maxVal !== '' ? parseInt(maxVal, 10) : null;
+  // Try to match a preset for highlighting
+  let matched = null;
+  for (const [name, [pMin, pMax]] of Object.entries(AGE_PRESETS)) {
+    if (ageMin === pMin && ageMax === pMax) { matched = name; break; }
+  }
+  _markAgePreset(matched || '');
+  if (playerData) renderChart();
+}
+
+function resetAgeFilter() {
+  ageMin = null; ageMax = null; activeAgePreset = 'all';
+  const minEl = document.getElementById('sc-age-min');
+  const maxEl = document.getElementById('sc-age-max');
+  if (minEl) minEl.value = '';
+  if (maxEl) maxEl.value = '';
+  _markAgePreset('all');
+}
+
+// ── Contract filter ───────────────────────────────────────────────────────────
+function applyContractFilter() {
+  const val = document.getElementById('sc-contract-year').value;
+  contractFilterYear = val ? parseInt(val, 10) : null;
+  const clearBtn = document.getElementById('sc-contract-clear');
+  if (clearBtn) clearBtn.style.display = contractFilterYear ? 'inline-flex' : 'none';
+  if (playerData) renderChart();
+}
+
+function clearContractFilter() {
+  contractFilterYear = null;
+  const inp = document.getElementById('sc-contract-year');
+  if (inp) inp.value = '';
+  const clearBtn = document.getElementById('sc-contract-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  if (playerData) renderChart();
+}
+
+function _markAgePreset(name) {
+  ['all','u21','u23','u25','prime','veteran'].forEach(p => {
+    const btn = document.getElementById('age-preset-' + p);
+    if (btn) btn.classList.toggle('sc-age-active', p === name);
+  });
+}
+
+// ── Zoom / pan helpers ────────────────────────────────────────────────────────
+function onZoomOrPan() {
+  isZoomed = true;
+  document.getElementById('sc-reset-zoom').disabled = false;
+}
+
+function resetZoom() {
+  if (chartInst) chartInst.resetZoom();
+  isZoomed = false;
+  document.getElementById('sc-reset-zoom').disabled = true;
+}
+
+// ── Stat value helper ─────────────────────────────────────────────────────────
+function getStatVal(player, key) {
+  if (statMode === 'p90' && player.stats_p90 && player.stats_p90[key] !== undefined) {
+    return player.stats_p90[key];
+  }
+  return player.stats[key];
+}
+
+// ── Setup ─────────────────────────────────────────────────────────────────────
+function onImportPlayer() {
+  const f = document.getElementById('sc-import-file').files[0];
+  const status = document.getElementById('sc-import-status');
+  if (!f) { importedId = ''; status.textContent = '\u2014'; return; }
+  const fd = new FormData(); fd.append('file', f);
+  status.textContent = 'Uploading\u2026';
+  fetch('/api/import_player', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) { status.textContent = 'Error: ' + d.error; importedId = ''; return; }
+      importedId = d.id;
+      const p = d.preview;
+      status.textContent = '\u2b50 ' + p.name + ' \u00b7 ' + Math.round(p.minutes) + ' min';
+      // reload against the chosen competition so the dot appears
+      if (document.getElementById('sc-competition').value) loadScatterData();
+    })
+    .catch(() => { status.textContent = 'Upload failed'; importedId = ''; });
+}
+
+function onCompetitionChange() {
+  const sel = document.getElementById('sc-competition');
+  const opt = sel.options[sel.selectedIndex];
+  const country = opt.dataset.country || '';
+  document.getElementById('sc-country-display').textContent =
+    country ? country.replace(/_/g, ' ') : '\u2014';
+  document.getElementById('sc-load-btn').disabled = !sel.value;
+  document.getElementById('sc-error').style.display  = 'none';
+  document.getElementById('sc-info').style.display   = 'none';
+  document.getElementById('sc-chart-area').style.display = 'none';
+  document.getElementById('sc-export-btn').disabled = true;
+  playerData = null;
+  const clubSel = document.getElementById('sc-club-filter');
+  if (clubSel) { clubSel.innerHTML = '<option value="All">All Clubs</option>'; clubSel.disabled = true; }
+  resetAgeFilter();
+}
+
+function loadScatterData() {
+  const sel    = document.getElementById('sc-competition');
+  const comp   = sel.value;
+  const opt    = sel.options[sel.selectedIndex];
+  const country = opt.dataset.country || '';
+  if (!comp) return;
+
+  document.getElementById('sc-loading').style.display = 'flex';
+  document.getElementById('sc-error').style.display   = 'none';
+  document.getElementById('sc-info').style.display    = 'none';
+  document.getElementById('sc-chart-area').style.display = 'none';
+  document.getElementById('sc-load-btn').disabled     = true;
+
+  fetch('/api/player_scatter_data?competition=' + encodeURIComponent(comp)
+                               + '&country='    + encodeURIComponent(country)
+                               + (importedId ? '&imported_id=' + encodeURIComponent(importedId) : ''))
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('sc-loading').style.display = 'none';
+      document.getElementById('sc-load-btn').disabled     = false;
+      if (data.error) { showScError(data.error); return; }
+      playerData        = data.players;
+      statKeys          = data.stat_keys;
+      minThreshold      = data.minutes_threshold || 0;
+      compLabel         = comp.replace(/_/g, ' ');
+      currentComp       = comp;
+      currentCountry    = country;
+      populateAxisDropdowns();
+      document.getElementById('sc-sub-threshold').textContent = Math.round(minThreshold);
+      document.getElementById('sc-chip').textContent =
+        playerData.length + ' players loaded \u00b7 ' + compLabel + ' \u00b7 Min. ' + Math.round(minThreshold) + ' mins played';
+      document.getElementById('sc-info').style.display = 'block';
+      document.getElementById('sc-chart-area').style.display = 'block';
+      document.getElementById('sc-export-btn').disabled = false;
+      document.getElementById('sc-position-filter').value = 'All';
+      resetAgeFilter();
+      statMode = 'totals';
+      document.getElementById('mode-totals').className = 'compat-btn';
+      document.getElementById('mode-p90').className    = 'btn-ghost';
+      populateClubDropdown(playerData);
+      switchTab('attacking', false);
+      renderChart();
+    })
+    .catch(() => {
+      document.getElementById('sc-loading').style.display = 'none';
+      document.getElementById('sc-load-btn').disabled     = false;
+      showScError('Network error \u2014 is the server running?');
+    });
+}
+
+function populateAxisDropdowns() {
+  ['x-axis-select', 'y-axis-select'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '';
+    statKeys.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value       = k;
+      opt.textContent = labelFor(k);
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function refreshAxisLabels() {
+  ['x-axis-select', 'y-axis-select'].forEach(id => {
+    const sel = document.getElementById(id);
+    Array.from(sel.options).forEach(opt => {
+      opt.textContent = labelFor(opt.value);
+    });
+  });
+}
+
+// ── Club dropdown ─────────────────────────────────────────────────────────────
+function populateClubDropdown(players) {
+  const clubs = [...new Set(players.map(p => p.club))]
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+  const sel = document.getElementById('sc-club-filter');
+  if (!sel) return;
+  sel.innerHTML = '<option value="All">All Clubs</option>';
+  clubs.forEach(club => {
+    const opt = document.createElement('option');
+    opt.value       = club;
+    opt.textContent = club;
+    sel.appendChild(opt);
+  });
+  sel.value    = 'All';
+  sel.disabled = false;
+}
+
+// ── Stat mode toggle ──────────────────────────────────────────────────────────
+function setStatMode(mode) {
+  statMode = mode;
+  document.getElementById('mode-totals').className = mode === 'totals' ? 'compat-btn' : 'btn-ghost';
+  document.getElementById('mode-p90').className    = mode === 'p90'    ? 'compat-btn' : 'btn-ghost';
+  refreshAxisLabels();
+  if (playerData) renderChart();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(name, autoRender) {
+  activeTab = name;
+  ['attacking', 'passing', 'defensive'].forEach(t => {
+    const btn = document.getElementById('tab-' + t);
+    btn.className = t === name ? 'compat-btn' : 'btn-ghost';
+  });
+  const def = TAB_DEFAULTS[name];
+  setSelectVal('x-axis-select', def.x);
+  setSelectVal('y-axis-select', def.y);
+  if (autoRender !== false && playerData) renderChart();
+}
+
+function setSelectVal(id, val) {
+  const sel = document.getElementById(id);
+  const opt = Array.from(sel.options).find(o => o.value === val);
+  if (opt) sel.value = val;
+}
+
+// ── Top N selection ─────────────────────────────────────────────────────────
+function selectTopN(candidates, xKey, yKey) {
+  const valid = candidates.filter(p => {
+    const x = getStatVal(p, xKey);
+    const y = getStatVal(p, yKey);
+    return x !== undefined && x !== null && y !== undefined && y !== null;
+  });
+  if (valid.length === 0) return [];
+
+  let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+  valid.forEach(p => {
+    const x = getStatVal(p, xKey), y = getStatVal(p, yKey);
+    if (x < xMin) xMin = x; if (x > xMax) xMax = x;
+    if (y < yMin) yMin = y; if (y > yMax) yMax = y;
+  });
+  const xRange = xMax - xMin || 1;
+  const yRange = yMax - yMin || 1;
+
+  const scored = valid.map(p => ({
+    player: p,
+    score: (getStatVal(p, xKey) - xMin) / xRange + (getStatVal(p, yKey) - yMin) / yRange
+  }));
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, scatterTopN).map(s => s.player);
+}
+
+// ── Average lines plugin ──────────────────────────────────────────────────────
+const avgLinesPlugin = {
+  id: 'avgLines',
+  afterDraw(chart) {
+    if (!allQualifyingPoints.length) return;
+    const xVals = allQualifyingPoints.map(p => p.x).filter(v => v !== null && v !== undefined && !isNaN(v));
+    const yVals = allQualifyingPoints.map(p => p.y).filter(v => v !== null && v !== undefined && !isNaN(v));
+    if (!xVals.length || !yVals.length) return;
+    const avgX = xVals.reduce((s, v) => s + v, 0) / xVals.length;
+    const avgY = yVals.reduce((s, v) => s + v, 0) / yVals.length;
+    const ctx    = chart.ctx;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    const pixX   = Math.max(xScale.left, Math.min(xScale.right,  xScale.getPixelForValue(avgX)));
+    const pixY   = Math.max(yScale.top,  Math.min(yScale.bottom, yScale.getPixelForValue(avgY)));
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(110,110,110,0.40)';
+    ctx.lineWidth   = 1;
+    ctx.beginPath(); ctx.moveTo(pixX, yScale.top);    ctx.lineTo(pixX, yScale.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xScale.left, pixY);   ctx.lineTo(xScale.right, pixY);  ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font      = '10px "DM Mono", monospace';
+    ctx.fillStyle = 'rgba(130,130,130,0.75)';
+    ctx.fillText('avg \u00b7 ' + fmtNum2(avgX), pixX + 5, yScale.top + 13);
+    ctx.fillText('avg \u00b7 ' + fmtNum2(avgY), xScale.left + 5, pixY - 5);
+    ctx.restore();
+  }
+};
+Chart.register(avgLinesPlugin);
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+const labelPlugin = {
+  id: 'playerLabels',
+  afterDraw(chart) {
+    const ctx  = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    chart.data.datasets[0].data.forEach((point, i) => {
+      const el = meta.data[i];
+      if (!el) return;
+      let labelOffset = 10;
+      if (selectedSlug === null) {
+        if (currentClubMode && !point.inTop20) {
+          ctx.fillStyle = 'rgba(110,110,110,0.45)';
+          ctx.font      = '10px "DM Mono", monospace';
+        } else {
+          ctx.fillStyle = '#6E6E6E';
+          ctx.font      = '11px "DM Mono", monospace';
+        }
+      } else if (point.slug === selectedSlug) {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font      = 'bold 13px "DM Mono", monospace';
+        labelOffset   = 18;
+      } else {
+        ctx.fillStyle = 'rgba(110,110,110,0.25)';
+        ctx.font      = '11px "DM Mono", monospace';
+      }
+      ctx.fillText(point.label, el.x + labelOffset, el.y + 4);
+    });
+  }
+};
+Chart.register(labelPlugin);
+
+function renderChart() {
+  if (!playerData || !playerData.length) return;
+
+  isZoomed = false;
+  document.getElementById('sc-reset-zoom').disabled = true;
+
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  if (!xKey || !yKey) return;
+
+  // Position filter
+  const posFilter = document.getElementById('sc-position-filter').value;
+  let candidates  = playerData;
+  if (posFilter !== 'All') {
+    candidates = playerData.filter(p => posGroup(p.position) === posFilter);
+  }
+
+  // Club filter
+  const clubFilter = (document.getElementById('sc-club-filter') || {}).value || 'All';
+  currentClubMode  = clubFilter !== 'All';
+
+  // Age filter (players with age=null always pass through)
+  if (ageMin !== null || ageMax !== null) {
+    candidates = candidates.filter(p => {
+      if (p.age === null || p.age === undefined) return true;
+      if (ageMin !== null && p.age < ageMin) return false;
+      if (ageMax !== null && p.age > ageMax) return false;
+      return true;
+    });
+  }
+
+  // Contract year filter — players with no data (ts=0) kept but flagged noContractData
+  // Hard-exclude players whose contract year doesn't match (unless they have no data)
+  let _contractFilterActive = contractFilterYear !== null && !isNaN(contractFilterYear);
+  if (_contractFilterActive) {
+    candidates = candidates.filter(p => {
+      if (!p.contract_until_ts) return true; // no data → keep (will be dimmed)
+      return new Date(p.contract_until_ts * 1000).getUTCFullYear() === contractFilterYear;
+    });
+  }
+
+  // League-wide qualifying pool (before club filter) — used for avg line computation
+  allQualifyingPoints = candidates.filter(p => {
+    const x = getStatVal(p, xKey);
+    const y = getStatVal(p, yKey);
+    return x !== undefined && x !== null && y !== undefined && y !== null;
+  }).map(p => ({ x: getStatVal(p, xKey), y: getStatVal(p, yKey) }));
+
+  const points      = [];
+  let clubAvgPoint  = null;
+
+  if (!currentClubMode) {
+    // ── All Clubs: Top N behaviour ───────────────────────────────────────────
+    const topN = selectTopN(candidates, xKey, yKey);
+    // Force-include the imported player even if outside Top N (and with low minutes)
+    const imp = candidates.find(p => p.imported);
+    if (imp && !topN.some(p => p.player_slug === imp.player_slug)) {
+      const ix = getStatVal(imp, xKey), iy = getStatVal(imp, yKey);
+      if (ix !== undefined && ix !== null && iy !== undefined && iy !== null) topN.push(imp);
+    }
+    topN.forEach(p => {
+      const grp = posGroup(p.position);
+      points.push({
+        x:               getStatVal(p, xKey),
+        y:               getStatVal(p, yKey),
+        slug:              p.player_slug,
+        posGrp:            grp,
+        label:             p.player + ' \u00b7 ' + p.club,
+        player:            p.player,
+        club:              p.club,
+        clubSlug:          p.club_slug || '',
+        position:          p.position,
+        positionsDetailed: p.positionsDetailed || [],
+        nationality:       p.nationality || '',
+        marketValue:       p.market_value || null,
+        height:            p.height || null,
+        age:               p.age || null,
+        sofascoreUrl:      p.sofascore_slug && p.player_id ? 'https://www.sofascore.com/football/player/' + p.sofascore_slug + '/' + p.player_id : '',
+        minutesPlayed:     p.minutesPlayed,
+        appearances:       p.appearances,
+        rawX:              p.stats[xKey],
+        rawY:              p.stats[yKey],
+        p90X:              (p.stats_p90 && p.stats_p90[xKey] !== undefined) ? p.stats_p90[xKey] : null,
+        p90Y:              (p.stats_p90 && p.stats_p90[yKey] !== undefined) ? p.stats_p90[yKey] : null,
+        inTop20:           true,
+        imported:          p.imported || false,
+        contractUntilTs:   p.contract_until_ts || 0,
+        contractUntil:     p.contract_until    || '',
+        noContractData:    !p.contract_until_ts,
+      });
+    });
+  } else {
+    // ── Club mode: all club players, flagging those outside the league Top N ──
+    // Compute league Top N slugs for reference styling (uses full candidate pool)
+    const topNLeague = selectTopN(candidates, xKey, yKey);
+    const topNSlugs  = new Set(topNLeague.map(p => p.player_slug));
+
+    // All qualifying players from the selected club
+    const clubPlayers = candidates.filter(p => {
+      if (p.club !== clubFilter) return false;
+      const x = getStatVal(p, xKey);
+      const y = getStatVal(p, yKey);
+      return x !== undefined && x !== null && y !== undefined && y !== null;
+    });
+
+    clubPlayers.forEach(p => {
+      const grp = posGroup(p.position);
+      points.push({
+        x:               getStatVal(p, xKey),
+        y:               getStatVal(p, yKey),
+        slug:              p.player_slug,
+        posGrp:            grp,
+        label:             p.player + ' \u00b7 ' + p.club,
+        player:            p.player,
+        club:              p.club,
+        clubSlug:          p.club_slug || '',
+        position:          p.position,
+        positionsDetailed: p.positionsDetailed || [],
+        nationality:       p.nationality || '',
+        marketValue:       p.market_value || null,
+        height:            p.height || null,
+        age:               p.age || null,
+        sofascoreUrl:      p.sofascore_slug && p.player_id ? 'https://www.sofascore.com/football/player/' + p.sofascore_slug + '/' + p.player_id : '',
+        minutesPlayed:     p.minutesPlayed,
+        appearances:       p.appearances,
+        rawX:              p.stats[xKey],
+        rawY:              p.stats[yKey],
+        p90X:              (p.stats_p90 && p.stats_p90[xKey] !== undefined) ? p.stats_p90[xKey] : null,
+        p90Y:              (p.stats_p90 && p.stats_p90[yKey] !== undefined) ? p.stats_p90[yKey] : null,
+        inTop20:           topNSlugs.has(p.player_slug),
+        imported:          p.imported || false,
+        contractUntilTs:   p.contract_until_ts || 0,
+        contractUntil:     p.contract_until    || '',
+        noContractData:    !p.contract_until_ts,
+      });
+    });
+
+    // Club average marker
+    if (points.length > 0) {
+      const avgX = points.reduce((s, p) => s + p.x, 0) / points.length;
+      const avgY = points.reduce((s, p) => s + p.y, 0) / points.length;
+      clubAvgPoint = {
+        x:     Math.round(avgX * 100) / 100,
+        y:     Math.round(avgY * 100) / 100,
+        isAvg: true,
+        club:  clubFilter,
+        rawX:  Math.round(avgX * 100) / 100,
+        rawY:  Math.round(avgY * 100) / 100,
+      };
+    }
+  }
+
+  currentPoints = points;
+  selectedSlug  = null;
+
+  // ── Chip text ─────────────────────────────────────────────────────────────
+  const totalPool = candidates.filter(p => {
+    const x = getStatVal(p, xKey), y = getStatVal(p, yKey);
+    return x !== undefined && x !== null && y !== undefined && y !== null;
+  }).length;
+
+  let chipText;
+  if (!currentClubMode) {
+    chipText = 'Showing top ' + scatterTopN + ' of ' + totalPool + ' players \u00b7 ' + compLabel;
+  } else {
+    const inTopNCount = points.filter(p => p.inTop20).length;
+    chipText = 'Showing ' + points.length + ' player' + (points.length !== 1 ? 's' : '')
+             + ' \u00b7 ' + clubFilter + ' \u00b7 ' + compLabel;
+    if (inTopNCount > 0) chipText += ' \u00b7 ' + inTopNCount + ' in league top ' + scatterTopN;
+  }
+  if (statMode === 'p90') chipText += ' \u00b7 Per 90 mins';
+  // Age filter badge in chip
+  if (ageMin !== null || ageMax !== null) {
+    const presetLabels = { u21:'U21', u23:'U23', u25:'U25', prime:'Prime (25\u201329)', veteran:'Veteran (30+)' };
+    const pLabel = activeAgePreset && presetLabels[activeAgePreset];
+    if (pLabel) {
+      chipText += ' \u00b7 Age: ' + pLabel;
+    } else {
+      const lo = ageMin !== null ? ageMin : '\u2014';
+      const hi = ageMax !== null ? ageMax : '\u2014';
+      chipText += ' \u00b7 Age: ' + lo + '\u2013' + hi;
+    }
+  }
+  chipText += ' \u00b7 Min. ' + Math.round(minThreshold) + ' mins played';
+  document.getElementById('sc-chart-chip-text').textContent = chipText;
+  document.getElementById('sc-chart-chip').style.display = 'block';
+  const banner = document.getElementById('sc-threshold-banner');
+  banner.textContent = '\u25cf  Qualifying threshold: ' + Math.round(minThreshold) + ' min played (33rd pctl)';
+  banner.style.display = 'block';
+
+  if (chartInst) {
+    chartInst.destroy();
+    chartInst = null;
+  }
+
+  const xLabel         = labelFor(xKey);
+  const yLabel         = labelFor(yKey);
+  const xBase          = baseLabelFor(xKey);
+  const yBase          = baseLabelFor(yKey);
+  const xIsP90Eligible = P90_ELIGIBLE.has(xKey);
+  const yIsP90Eligible = P90_ELIGIBLE.has(yKey);
+
+  const { bgColors, borderColors, radii } = computePointColors(points);
+
+  // ── Datasets ──────────────────────────────────────────────────────────────
+  const datasets = [{
+    data:             points,
+    backgroundColor:  bgColors,
+    borderColor:      borderColors,
+    pointRadius:      radii,
+    pointHoverRadius: 10,
+    pointBorderWidth: 1.5,
+    hitRadius:        6,
+  }];
+
+  if (clubAvgPoint) {
+    datasets.push({
+      data:             [clubAvgPoint],
+      backgroundColor:  'rgba(255,255,255,0.15)',
+      borderColor:      '#FFFFFF',
+      pointStyle:       'crossRot',
+      pointRadius:      14,
+      pointHoverRadius: 16,
+      pointBorderWidth: 2.5,
+      hitRadius:        10,
+    });
+  }
+
+  const canvas = document.getElementById('scatter-canvas');
+  chartInst = new Chart(canvas, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      onClick: (evt, elements) => {
+        if (!elements.length) { highlightEntity(null); return; }
+        if (elements[0].datasetIndex === 1) return; // skip avg marker click
+        const idx = elements[0].index;
+        highlightEntity(currentPoints[idx].slug);
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const r = ctx.raw;
+              // Club average marker tooltip
+              if (r.isAvg) {
+                return [
+                  'Club Avg \u00b7 ' + r.club,
+                  xBase + ': ' + r.rawX,
+                  yBase + ': ' + r.rawY,
+                ];
+              }
+              const lines = [r.player + ' \u00b7 ' + r.club + ' \u00b7 ' + (r.position || '')];
+              if (currentClubMode && !r.inTop20) lines.push('\u25e6 Outside league top ' + scatterTopN);
+              // X axis
+              if (xIsP90Eligible && r.p90X !== null) {
+                lines.push(xBase + ': ' + r.rawX + ' (tot) / ' + r.p90X + ' p90');
+              } else {
+                lines.push(xBase + ': ' + r.rawX);
+              }
+              // Y axis
+              if (yIsP90Eligible && r.p90Y !== null) {
+                lines.push(yBase + ': ' + r.rawY + ' (tot) / ' + r.p90Y + ' p90');
+              } else {
+                lines.push(yBase + ': ' + r.rawY);
+              }
+              lines.push(r.minutesPlayed + ' mins \u00b7 ' + r.appearances + ' apps');
+              return lines;
+            }
+          }
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'xy',
+            onPan: onZoomOrPan,
+          },
+          zoom: {
+            wheel:  { enabled: true },
+            pinch:  { enabled: true },
+            mode:   'xy',
+            onZoom: onZoomOrPan,
+          },
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: xLabel, color: '#A8A8A8',
+                   font: { family: "'CoFoSans', monospace", size: 12 } },
+          grid:  { color: '#1F1F1F' },
+          ticks: { color: '#6E6E6E' }
+        },
+        y: {
+          title: { display: true, text: yLabel, color: '#A8A8A8',
+                   font: { family: "'CoFoSans', monospace", size: 12 } },
+          grid:  { color: '#1F1F1F' },
+          ticks: { color: '#6E6E6E' }
+        }
+      }
+    }
+  });
+
+  populateHighlightDropdown(points);
+  buildRankingTable(points, xKey, yKey);
+  updateAvgPanel();
+}
+
+// ── Point colors ──────────────────────────────────────────────────────────────
+function computePointColors(pts) {
+  const bgColors     = [];
+  const borderColors = [];
+  const radii        = [];
+  pts.forEach(pt => {
+    const cols    = POS_COLORS[pt.posGrp]     || POS_COLORS.MID;
+    const colsDim = POS_COLORS_DIM[pt.posGrp] || POS_COLORS_DIM.MID;
+    const isNonTop20      = currentClubMode && !pt.inTop20;
+    const isNoDimContract = contractFilterYear !== null && pt.noContractData;
+    if (pt.imported) {
+      // Imported player: always amber + prominent, regardless of selection
+      bgColors.push(pt.slug === selectedSlug ? 'rgba(245,158,11,0.95)' : 'rgba(245,158,11,0.85)');
+      borderColors.push('#F59E0B');
+      radii.push(pt.slug === selectedSlug ? 13 : 10);
+      return;
+    }
+    if (selectedSlug === null) {
+      if (isNonTop20 || isNoDimContract) {
+        bgColors.push(colsDim.bg);
+        borderColors.push(colsDim.border);
+        radii.push(5);
+      } else {
+        bgColors.push(cols.bg);
+        borderColors.push(cols.border);
+        radii.push(currentClubMode ? 8 : 7);
+      }
+    } else if (pt.slug === selectedSlug) {
+      bgColors.push('rgba(255,255,255,0.92)');
+      borderColors.push('#FFFFFF');
+      radii.push(13);
+    } else {
+      bgColors.push('rgba(58,58,58,0.12)');
+      borderColors.push('rgba(110,110,110,0.22)');
+      radii.push(5);
+    }
+  });
+  return { bgColors, borderColors, radii };
+}
+
+// ── Highlight entity ──────────────────────────────────────────────────────────
+function highlightEntity(slug) {
+  selectedSlug = (slug !== null && slug === selectedSlug) ? null : slug;
+  if (!chartInst) return;
+  const { bgColors, borderColors, radii } = computePointColors(currentPoints);
+  chartInst.data.datasets[0].backgroundColor = bgColors;
+  chartInst.data.datasets[0].borderColor     = borderColors;
+  chartInst.data.datasets[0].pointRadius     = radii;
+  chartInst.update('none');
+  const sel = document.getElementById('sc-highlight-select');
+  if (sel) sel.value = selectedSlug || '';
+  updateEntityCard();
+  renderRankingTable();
+}
+
+function clearHighlight() {
+  selectedSlug = null;
+  if (chartInst) {
+    const { bgColors, borderColors, radii } = computePointColors(currentPoints);
+    chartInst.data.datasets[0].backgroundColor = bgColors;
+    chartInst.data.datasets[0].borderColor     = borderColors;
+    chartInst.data.datasets[0].pointRadius     = radii;
+    chartInst.update('none');
+  }
+  const sel = document.getElementById('sc-highlight-select');
+  if (sel) sel.value = '';
+  updateEntityCard();
+  renderRankingTable();
+}
+
+// ── Entity info card ───────────────────────────────────────────────────────────
+function calcPercentile(val, allVals) {
+  const valid = allVals.filter(v => v !== null && v !== undefined && !isNaN(v));
+  if (valid.length <= 1 || val === null || val === undefined) return null;
+  const below = valid.filter(v => v < val).length;
+  return Math.round(below / (valid.length - 1) * 100);
+}
+
+function pctColor(pct) {
+  if (pct >= 75) return '#FACC15';
+  if (pct >= 50) return '#FFFFFF';
+  return '#6E6E6E';
+}
+
+function ordinal(n) {
+  const v = n % 100;
+  const sfx = v === 11 || v === 12 || v === 13 ? 'th'
+    : n % 10 === 1 ? 'st'
+    : n % 10 === 2 ? 'nd'
+    : n % 10 === 3 ? 'rd' : 'th';
+  return n + sfx;
+}
+
+function calcRank(val, allVals) {
+  const valid = allVals.filter(v => v !== null && v !== undefined && !isNaN(v));
+  if (!valid.length || val === null || val === undefined) return null;
+  const rank = valid.filter(v => v > val).length + 1;
+  return { rank, total: valid.length };
+}
+
+function tierInfo(pct) {
+  if (pct >= 90) return { label: 'Elite',         bg: 'rgba(111,184,160,0.12)', color: '#6FB8A0' };
+  if (pct >= 75) return { label: 'Strong',        bg: 'rgba(95,168,110,0.12)',  color: '#5FA86E' };
+  if (pct >= 50) return { label: 'Above Average', bg: 'rgba(168,168,107,0.12)', color: '#A8A86B' };
+  if (pct >= 25) return { label: 'Average',       bg: 'rgba(156,163,175,0.12)', color: '#9CA3AF' };
+  return               { label: 'Below Average',  bg: 'rgba(199,123,123,0.12)', color: '#C77B7B' };
+}
+
+function updateEntityCard() {
+  const card = document.getElementById('sc-entity-card');
+  if (!card) return;
+  if (!selectedSlug) {
+    card.style.display = 'none';
+    return;
+  }
+  const pt = currentPoints.find(p => p.slug === selectedSlug);
+  if (!pt) { card.style.display = 'none'; return; }
+
+  const xKey          = document.getElementById('x-axis-select').value;
+  const yKey          = document.getElementById('y-axis-select').value;
+  const xBase         = baseLabelFor(xKey);
+  const yBase         = baseLabelFor(yKey);
+  const xIsP90Elig    = P90_ELIGIBLE.has(xKey);
+  const yIsP90Elig    = P90_ELIGIBLE.has(yKey);
+
+  const bc   = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+  const badge = '<span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span>';
+
+  document.getElementById('sc-ec-name').innerHTML = escHtml(pt.player) + '&nbsp;&nbsp;' + badge;
+  document.getElementById('sc-ec-meta').textContent =
+    escHtml(pt.club) + '  \u00b7  ' + pt.minutesPlayed + ' mins  \u00b7  ' + pt.appearances + ' apps' +
+    (pt.positionsDetailed && pt.positionsDetailed.length
+      ? '  \u00b7  ' + pt.positionsDetailed.join(' / ')
+      : (pt.position ? '  \u00b7  ' + pt.position : ''));
+
+  // Respect p90 mode: pick display value and build comparison pool accordingly
+  const xDisplayVal = (statMode === 'p90' && xIsP90Elig && pt.p90X !== null) ? pt.p90X : pt.rawX;
+  const yDisplayVal = (statMode === 'p90' && yIsP90Elig && pt.p90Y !== null) ? pt.p90Y : pt.rawY;
+  const xAltVal     = xIsP90Elig ? (statMode === 'p90' ? pt.rawX : pt.p90X) : null;
+  const yAltVal     = yIsP90Elig ? (statMode === 'p90' ? pt.rawY : pt.p90Y) : null;
+  const altLabel    = statMode === 'p90' ? 'tot' : 'p90';
+
+  const allXVals = currentPoints.map(p => (statMode === 'p90' && xIsP90Elig && p.p90X !== null) ? p.p90X : p.rawX);
+  const allYVals = currentPoints.map(p => (statMode === 'p90' && yIsP90Elig && p.p90Y !== null) ? p.p90Y : p.rawY);
+  const xPct  = calcPercentile(xDisplayVal, allXVals);
+  const yPct  = calcPercentile(yDisplayVal, allYVals);
+  const xRank = calcRank(xDisplayVal, allXVals);
+  const yRank = calcRank(yDisplayVal, allYVals);
+
+  function statBlock(label, displayVal, altVal, altLbl, pct, rankObj) {
+    const valStr = (displayVal !== undefined && displayVal !== null) ? displayVal : '\u2014';
+    const altStr = (altVal !== null && altVal !== undefined) ? altVal + '\u00a0' + altLbl : '';
+    let rankHtml = '';
+    if (pct !== null && pct !== undefined && rankObj) {
+      const tier     = tierInfo(pct);
+      const barColor = pctColor(pct);
+      rankHtml =
+        '<div class="sc-pct-wrap">'
+        + '<div class="sc-pct-bar-track"><div class="sc-pct-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>'
+        + '<span class="sc-tier-badge" style="background:' + tier.bg + ';color:' + tier.color + ';">' + tier.label + '</span>'
+        + '<span class="sc-rank-text">Ranked ' + rankObj.rank + ' of ' + rankObj.total + ' players</span>'
+        + '</div>';
+    }
+    return '<div class="sc-entity-stat">'
+      + '<span class="sc-entity-stat-label">' + escHtml(label) + '</span>'
+      + '<span class="sc-entity-stat-value">' + escHtml(String(valStr)) + '</span>'
+      + (altStr ? '<span class="sc-entity-stat-p90">' + escHtml(altStr) + '</span>' : '')
+      + rankHtml
+      + '</div>';
+  }
+
+  // Contract expiry block
+  function contractBlock(ts, displayStr) {
+    const nowTs   = Date.now() / 1000;
+    let badgeHtml = '';
+    if (!ts) {
+      badgeHtml = '<span style="font-size:10px;color:var(--text3);font-style:italic;">No data</span>';
+    } else {
+      const remaining = (ts - nowTs) / 86400;
+      let bgC, fgC, lbl;
+      if (ts < nowTs)        { bgC = 'rgba(199,123,123,0.12)';  fgC = '#C77B7B'; lbl = 'Expired';     }
+      else if (remaining <= 182) { bgC = 'rgba(199,123,123,0.12)';  fgC = '#C77B7B'; lbl = 'Expiring Soon'; }
+      else if (remaining <= 365) { bgC = 'rgba(250,204,21,0.15)';  fgC = '#FACC15'; lbl = 'This Year';    }
+      else                   { bgC = 'rgba(34,197,94,0.15)';   fgC = '#22C55E'; lbl = 'Contracted';   }
+      badgeHtml = '<span class="sc-tier-badge" style="background:' + bgC + ';color:' + fgC + ';">' + lbl + '</span>';
+    }
+    return '<div class="sc-entity-stat">'
+      + '<span class="sc-entity-stat-label">Contract Until</span>'
+      + '<span class="sc-entity-stat-value" style="font-size:14px;">' + escHtml(displayStr || '\u2014') + '</span>'
+      + '<div style="margin-top:4px;">' + badgeHtml + '</div>'
+      + '</div>';
+  }
+
+  document.getElementById('sc-ec-stats').innerHTML =
+    statBlock(xBase, xDisplayVal, xAltVal, altLabel, xPct, xRank) +
+    statBlock(yBase, yDisplayVal, yAltVal, altLabel, yPct, yRank) +
+    contractBlock(pt.contractUntilTs, pt.contractUntil);
+
+  card.style.display = 'block';
+}
+
+// ── Highlight dropdown ────────────────────────────────────────────────────────
+function populateHighlightDropdown(pts) {
+  const sel = document.getElementById('sc-highlight-select');
+  if (!sel) return;
+  const sorted = pts.slice().sort((a, b) => a.player.localeCompare(b.player));
+  sel.innerHTML = '<option value="">-- select a player --</option>';
+  sorted.forEach(pt => {
+    const opt = document.createElement('option');
+    opt.value       = pt.slug;
+    opt.textContent = pt.player + ' \u00b7 ' + pt.club;
+    sel.appendChild(opt);
+  });
+  sel.value = selectedSlug || '';
+}
+
+function onHighlightSelect() {
+  const val = document.getElementById('sc-highlight-select').value;
+  highlightEntity(val || null);
+}
+
+// ── Ranking table ─────────────────────────────────────────────────────────────
+const POS_BADGE_COLORS = {
+  GK:  { bg: 'rgba(250,204,21,0.20)',  color: '#FACC15' },
+  DEF: { bg: 'rgba(59,130,246,0.20)',  color: '#3B82F6' },
+  MID: { bg: 'rgba(34,197,94,0.20)',   color: '#22C55E' },
+  FWD: { bg: 'rgba(244,63,94,0.20)',   color: '#F43F5E' },
+};
+
+function buildRankingTable(pts, xKey, yKey) {
+  rankXKey    = xKey;
+  rankYKey    = yKey;
+  rankSortCol = 'x';
+  rankSortDir = 'desc';
+  const nInput = document.getElementById('sc-rank-n');
+  rankTopN = nInput ? Math.max(1, parseInt(nInput.value) || 10) : 10;
+
+  const thead = document.getElementById('sc-rank-thead');
+  thead.innerHTML =
+    '<tr>' +
+    '<th style="width:40px;">#</th>' +
+    '<th id="sc-th-name" onclick="onRankHeaderClick(\'name\')">Player</th>' +
+    '<th id="sc-th-club" style="width:180px;" onclick="onRankHeaderClick(\'club\')">Club</th>' +
+    '<th id="sc-th-country" style="width:120px;" onclick="onRankHeaderClick(\'country\')">Country</th>' +
+    '<th style="width:55px;">Pos</th>' +
+    '<th style="width:100px; color:var(--text2);">Positions</th>' +
+    '<th id="sc-th-x" class="sc-rank-stat sort-desc" style="width:150px;" onclick="onRankHeaderClick(\'x\')"> ' + labelFor(xKey) + '</th>' +
+    '<th id="sc-th-y" class="sc-rank-stat" style="width:150px;" onclick="onRankHeaderClick(\'y\')"> ' + labelFor(yKey) + '</th>' +
+    '<th style="width:140px; color:var(--text2);">Contract</th>' +
+    '<th id="sc-th-mv" class="sc-rank-stat" style="width:110px;" onclick="onRankHeaderClick(\'mv\')">Market Value</th>' +
+    '<th id="sc-th-height" class="sc-rank-stat" style="width:70px;" onclick="onRankHeaderClick(\'height\')">Height</th>' +
+    '<th id="sc-th-age" class="sc-rank-stat" style="width:55px;" onclick="onRankHeaderClick(\'age\')">Age</th>' +
+    '</tr>';
+
+  document.getElementById('sc-ranking-area').style.display = 'block';
+  renderRankingTable();
+}
+
+function renderRankingTable() {
+  const tbody = document.getElementById('sc-rank-tbody');
+  if (!tbody || !currentPoints.length) return;
+
+  const pts = currentPoints.slice().sort((a, b) => {
+    if (rankSortCol === 'name') {
+      return rankSortDir === 'asc'
+        ? a.player.localeCompare(b.player)
+        : b.player.localeCompare(a.player);
+    }
+    if (rankSortCol === 'club') {
+      return rankSortDir === 'asc'
+        ? a.club.localeCompare(b.club)
+        : b.club.localeCompare(a.club);
+    }
+    if (rankSortCol === 'country') {
+      const ca = a.nationality || '', cb = b.nationality || '';
+      return rankSortDir === 'asc' ? ca.localeCompare(cb) : cb.localeCompare(ca);
+    }
+    if (rankSortCol === 'mv') {
+      const va = a.marketValue || 0, vb = b.marketValue || 0;
+      return rankSortDir === 'desc' ? vb - va : va - vb;
+    }
+    if (rankSortCol === 'height') {
+      const va = a.height || 0, vb = b.height || 0;
+      return rankSortDir === 'desc' ? vb - va : va - vb;
+    }
+    if (rankSortCol === 'age') {
+      const va = a.age || 0, vb = b.age || 0;
+      return rankSortDir === 'asc' ? va - vb : vb - va;
+    }
+    const va = rankSortCol === 'x' ? a.x : a.y;
+    const vb = rankSortCol === 'x' ? b.x : b.y;
+    return rankSortDir === 'desc' ? vb - va : va - vb;
+  });
+  const visible = pts.slice(0, rankTopN);
+
+  ['sc-th-name', 'sc-th-club', 'sc-th-country', 'sc-th-x', 'sc-th-y', 'sc-th-mv', 'sc-th-height', 'sc-th-age'].forEach(id => {
+    const th = document.getElementById(id);
+    if (!th) return;
+    const col  = id === 'sc-th-name' ? 'name' : id === 'sc-th-club' ? 'club' : id === 'sc-th-country' ? 'country' : id === 'sc-th-x' ? 'x' : id === 'sc-th-y' ? 'y' : id === 'sc-th-mv' ? 'mv' : id === 'sc-th-height' ? 'height' : 'age';
+    const base = (col === 'x' || col === 'y' || col === 'mv' || col === 'height' || col === 'age') ? 'sc-rank-stat' : '';
+    th.className = (base + (rankSortCol === col ? ' sort-' + rankSortDir : '')).trim();
+  });
+
+  tbody.innerHTML = visible.map((pt, i) => {
+    const isSelected  = pt.slug === selectedSlug;
+    const isNotTop20  = currentClubMode && !pt.inTop20;
+    const rowClass    = isSelected ? 'rank-selected' : (isNotTop20 ? 'rank-not-top20' : '');
+    const xVal = typeof pt.x === 'number' ? fmtNum2(pt.x) : '\u2014';
+    const yVal = typeof pt.y === 'number' ? fmtNum2(pt.y) : '\u2014';
+    const bc   = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+    const badge = '<span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span>';
+    const notTop20Badge = isNotTop20 ? '<span class="sc-not-top20-badge">outside top ' + scatterTopN + '</span>' : '';
+    // Contract cell
+    let contractCell = '<td style="font-size:12px; color:var(--text3);">' + (pt.contractUntil ? escHtml(pt.contractUntil) : '\u2014') + '</td>';
+    if (pt.contractUntilTs) {
+      const nowTs = Date.now() / 1000;
+      const rem   = (pt.contractUntilTs - nowTs) / 86400;
+      let fgC;
+      if (pt.contractUntilTs < nowTs)  fgC = '#C77B7B';
+      else if (rem <= 182)             fgC = '#C77B7B';
+      else if (rem <= 365)             fgC = '#FACC15';
+      else                             fgC = '#22C55E';
+      contractCell = '<td style="font-size:12px; color:' + fgC + '; font-variant-numeric:tabular-nums;">' + escHtml(pt.contractUntil) + '</td>';
+    }
+    return '<tr class="' + rowClass + '" data-slug="' + escHtml(pt.slug) + '" onclick="onRankRowClick(this.dataset.slug)">' +
+      '<td class="sc-rank-num">' + (i + 1) + '</td>' +
+      '<td class="sc-rank-name"><a href="/player/' + currentCountry + '/' + currentComp + '/' + pt.clubSlug + '/' + pt.slug + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;" onmouseover="this.style.textDecoration=\x27underline\x27" onmouseout="this.style.textDecoration=\x27none\x27">' + escHtml(pt.player) + '</a>' + notTop20Badge + '</td>' +
+      '<td style="color:var(--text2);">' + escHtml(pt.club) + '</td>' +
+      '<td style="color:var(--text3); font-size:12px;">' + escHtml(pt.nationality || '\u2014') + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td style="font-size:11px; color:var(--text2);">' + escHtml((pt.positionsDetailed && pt.positionsDetailed.length) ? pt.positionsDetailed.join(' / ') : '—') + '</td>' +
+      '<td class="sc-rank-stat">' + xVal + '</td>' +
+      '<td class="sc-rank-stat">' + yVal + '</td>' +
+      contractCell +
+      '<td class="sc-rank-stat" style="font-size:12px; color:var(--text2); font-variant-numeric:tabular-nums;">' + fmtMV(pt.marketValue) + '</td>' +
+      '<td class="sc-rank-stat" style="font-size:12px; color:var(--text2);">' + (pt.height ? pt.height + ' cm' : '\u2014') + '</td>' +
+      '<td class="sc-rank-stat" style="font-size:12px; color:var(--text2);">' + (pt.age !== null ? pt.age : '\u2014') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function onRankHeaderClick(col) {
+  if (col === rankSortCol) {
+    rankSortDir = rankSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    rankSortCol = col;
+    rankSortDir = (col === 'name' || col === 'club' || col === 'country' || col === 'age') ? 'asc' : 'desc';
+    // height and mv default desc (taller/higher value first)
+  }
+  renderRankingTable();
+}
+
+function onRankTopNChange() {
+  const nInput = document.getElementById('sc-rank-n');
+  rankTopN = nInput ? Math.max(1, parseInt(nInput.value) || 10) : 10;
+  renderRankingTable();
+}
+
+function onRankRowClick(slug) {
+  highlightEntity(slug);
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function onScatterTopNChange() {
+  const inp = document.getElementById('sc-scatter-n');
+  scatterTopN = Math.max(5, Math.min(200, parseInt(inp.value) || 30));
+  if (playerData) renderChart();
+}
+
+function onPlayerSearch() {
+  const q   = (document.getElementById('sc-player-search').value || '').toLowerCase().trim();
+  const sel = document.getElementById('sc-highlight-select');
+  if (!sel) return;
+  let matches = [];
+  Array.from(sel.options).forEach(opt => {
+    if (!opt.value) return;
+    const hit = !q || opt.textContent.toLowerCase().includes(q);
+    opt.hidden = !hit;
+    if (hit) matches.push(opt.value);
+  });
+  // Auto-highlight when exactly one player matches
+  if (matches.length === 1) {
+    highlightEntity(matches[0]);
+  } else if (!q) {
+    clearHighlight();
+  }
+}
+
+function showScError(msg) {
+  const el = document.getElementById('sc-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── Market value formatter ──────────────────────────────────────────────
+function fmtMV(v) {
+  if (!v) return '\u2014';
+  if (v >= 1000000) {
+    const s = (v / 1000000).toFixed(1).replace(/\.0$/, '');
+    return '\u20ac' + s + 'M';
+  }
+  if (v >= 1000) return '\u20ac' + Math.round(v / 1000) + 'K';
+  return '\u20ac' + v;
+}
+
+// 2 decimals for fractional values, whole integers stay whole (3.82 / 12 / 7.50)
+function fmtNum2(v) {
+  if (v === null || v === undefined) return '\u2014';
+  if (typeof v !== 'number' || isNaN(v)) return '\u2014';
+  return Number.isInteger(v) ? String(v) : v.toFixed(2);
+}
+
+// ── Excel Export ──────────────────────────────────────────────────────────────
+function exportPlayerScatterXlsx() {
+  if (!playerData || !currentComp) return;
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  if (!xKey || !yKey) return;
+  const params = new URLSearchParams({
+    competition: currentComp,
+    country:     currentCountry,
+    x_key:       xKey,
+    y_key:       yKey,
+    stat_mode:   statMode,
+    top_n:       scatterTopN,
+  });
+  // Pass active filters so export respects what's visible
+  const posFilter = document.getElementById('sc-position-filter');
+  if (posFilter && posFilter.value && posFilter.value !== 'All') {
+    params.set('position', posFilter.value);
+  }
+  const clubFilterEl = document.getElementById('sc-club-filter');
+  if (clubFilterEl && clubFilterEl.value && clubFilterEl.value !== 'All') {
+    params.set('club', clubFilterEl.value);
+  }
+  if (ageMin !== null) params.set('age_min', ageMin);
+  if (ageMax !== null) params.set('age_max', ageMax);
+  if (contractFilterYear !== null) params.set('contract_year', contractFilterYear);
+  window.location.href = '/api/player_scatter_export_xlsx?' + params.toString();
+}
+</script>
+{% endblock %}

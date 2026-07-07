@@ -1,0 +1,124 @@
+{
+  "provider": "Sofascore",
+  "position": "Target Forward",
+  "core_10_model": {
+    "weight_distribution": {
+      "aerial_dominance": 0.35,
+      "hold_up_link_play": 0.25,
+      "box_finishing": 0.20,
+      "physical_duels": 0.10,
+      "pressing_output": 0.10
+    },
+    "metrics": [
+      {
+        "name": "Aerial duels per 90",
+        "sofascore_key": ["aerialDuelsWon", "aerialLost"],
+        "computation": "(aerialDuelsWon + aerialLost) / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Aerial duels contested per 90 minutes",
+        "category": "aerial_dominance"
+      },
+      {
+        "name": "Aerial duels won, %",
+        "sofascore_key": "aerialDuelsWonPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of aerial duels won",
+        "category": "aerial_dominance"
+      },
+      {
+        "name": "Shots on target per 90",
+        "sofascore_key": "shotsOnTarget",
+        "computation": "shotsOnTarget / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Shots on target per 90 minutes (proxy for aerial shots on goal)",
+        "category": "aerial_dominance"
+      },
+      {
+        "name": "Passes per 90",
+        "sofascore_key": "totalPasses",
+        "computation": "totalPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total passes per 90 minutes",
+        "category": "hold_up_link_play"
+      },
+      {
+        "name": "Accurate passes, %",
+        "sofascore_key": "accuratePassesPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Pass completion percentage",
+        "category": "hold_up_link_play"
+      },
+      {
+        "name": "Long passes per 90",
+        "sofascore_key": "totalLongBalls",
+        "computation": "totalLongBalls / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Long pass attempts per 90 minutes (proxy for long balls received and held up)",
+        "category": "hold_up_link_play"
+      },
+      {
+        "name": "Pass to assist per 90",
+        "sofascore_key": "passToAssist",
+        "computation": "passToAssist / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Passes directly leading to a goal assist per 90 minutes",
+        "category": "hold_up_link_play"
+      },
+      {
+        "name": "Shots per 90",
+        "sofascore_key": "totalShots",
+        "computation": "totalShots / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total shots attempted per 90 minutes",
+        "category": "box_finishing"
+      },
+      {
+        "name": "Goals per 90",
+        "sofascore_key": "goals",
+        "computation": "goals / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Goals scored per 90 minutes",
+        "category": "box_finishing"
+      },
+      {
+        "name": "Goal conversion, %",
+        "sofascore_key": "goalConversionPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots converted into goals (proxy for expected goals quality)",
+        "category": "box_finishing"
+      },
+      {
+        "name": "Total duels won, %",
+        "sofascore_key": "totalDuelsWonPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of all duels won (proxy for offensive physical duel success)",
+        "category": "physical_duels"
+      },
+      {
+        "name": "Total duels per 90",
+        "sofascore_key": ["totalDuelsWon", "duelLost"],
+        "computation": "(totalDuelsWon + duelLost) / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total duels engaged per 90 minutes (proxy for pressing effort)",
+        "category": "pressing_output"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

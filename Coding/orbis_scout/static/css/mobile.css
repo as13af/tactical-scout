@@ -1,0 +1,170 @@
+/* ============================================================================
+   mobile.css — smartphone usability layer
+   ----------------------------------------------------------------------------
+   Loaded LAST in base.html so it overrides desktop rules on small screens only.
+   Scope: "make it usable" — no horizontal overflow, scrollable tables, tappable
+   controls, images that scale, and a hamburger nav (no more stacked bar).
+   Desktop (>820px) is untouched. Applies to both webapp and orbis_scout.
+   ========================================================================== */
+
+/* ── Global guards (all viewports) ─────────────────────────────────────────── */
+img, svg, canvas, video { max-width: 100%; height: auto; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Hamburger button: hidden on desktop, shown on mobile. */
+.nav-hamburger { display: none; }
+
+/* ── Tablet / large phone ──────────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  html, body { overflow-x: hidden; max-width: 100%; }
+
+  body.ui2 .container,
+  .container { padding: 16px 14px !important; }
+
+  /* ── Navigation → single compact bar + hamburger-toggled panel ──────────── */
+  /* The nav is a normal grid on desktop; here we flatten it to a wrapping flex
+     row. .nav-left is dissolved (display:contents) so the brand and search
+     become direct flex items we can reorder. */
+  nav {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto !important;
+    min-height: 52px;
+    padding: 6px 12px !important;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    row-gap: 0;
+  }
+  .nav-left { display: contents !important; }
+
+  /* Top row: brand on the left, hamburger pushed to the right. */
+  .nav-brand { order: 0; flex: 0 0 auto; }
+  .nav-hamburger {
+    order: 1;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    margin-left: auto;
+    width: 44px; height: 44px;
+    padding: 10px;
+    background: none;
+    border: 1px solid var(--border, #333);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .nav-hamburger span {
+    display: block; height: 2px; width: 100%;
+    background: var(--text2, #ccc); border-radius: 2px;
+    transition: transform .2s, opacity .2s;
+  }
+  /* Animate to an X when open. */
+  nav.nav-open .nav-hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  nav.nav-open .nav-hamburger span:nth-child(2) { opacity: 0; }
+  nav.nav-open .nav-hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Everything else wraps onto full-width rows below and is hidden until open. */
+  .nav-search-container,
+  .nav-links,
+  .nav-right {
+    order: 2;
+    flex: 0 0 100%;
+    display: none;
+  }
+  .nav-search-container { margin: 8px 0 4px; }
+  .nav-search-wrapper, .nav-search-input { width: 100%; box-sizing: border-box; }
+
+  nav.nav-open .nav-search-container { display: block; }
+  nav.nav-open .nav-links { display: flex; }
+  nav.nav-open .nav-right { display: flex; }
+
+  /* Links + account become a flat, scrollable, tappable list (no hover). */
+  .nav-links, .nav-right {
+    flex-direction: column;
+    align-items: stretch;
+    justify-self: stretch !important;
+    width: 100%;
+    gap: 0;
+    border-top: 1px solid var(--border, #333);
+    margin-top: 6px;
+    padding-top: 4px;
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-links .nav-item, .nav-right .nav-item { display: block; width: 100%; }
+  .nav-links > a,
+  .nav-links .nav-trigger,
+  .nav-right .nav-trigger {
+    display: block;
+    padding: 12px 6px;
+    font-size: 14px;
+  }
+  .nav-links .nav-trigger, .nav-right .nav-trigger {
+    font-weight: 700;
+    color: var(--text2, #ccc);
+    border-top: 1px solid var(--border, #2a2a2a);
+  }
+  /* Flatten dropdowns: static + always visible inside the open panel. */
+  .nav-links .nav-dropdown,
+  .nav-right .nav-dropdown {
+    position: static !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    min-width: 0 !important;
+    padding: 0 0 4px 12px !important;
+    margin: 0 !important;
+  }
+  .nav-links .nav-dropdown a,
+  .nav-right .nav-dropdown a {
+    display: block;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  /* ── Player header stacks ───────────────────────────────────────────────── */
+  body.ui2 .player-header { flex-direction: column; align-items: flex-start; }
+  body.ui2 .player-header img { align-self: center; }
+
+  /* ── Stat tiles: at most 2 across ───────────────────────────────────────── */
+  body.ui2 .stat-grid,
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* ── Carousel never pushes the page sideways ────────────────────────────── */
+  body.ui2 .stat-carousel,
+  .stat-carousel { max-width: 100%; overflow: hidden; }
+  .carousel-viewport { overflow-x: hidden; }
+  .carousel-slide { min-width: 0; }
+
+  /* ── Team Contribution rows fit narrow screens ──────────────────────────── */
+  .contrib-label { min-width: 82px !important; font-size: 10px !important; }
+  .contrib-pct   { min-width: 36px !important; }
+  .contrib-raw   { min-width: 52px !important; }
+
+  /* ── Tap targets ────────────────────────────────────────────────────────── */
+  .p90-switch { transform: scale(1.15); transform-origin: left center; }
+  button:not(.nav-hamburger), .btn, .club-action-btn,
+  input[type="submit"] { min-height: 40px; }
+  .p90-toggle-wrap, #pos-avg-toggle-wrap { padding: 6px 0; }
+}
+
+/* ── Small phone ───────────────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  body.ui2 .stat-grid,
+  .stat-grid { grid-template-columns: 1fr !important; }
+
+  body.ui2 .container,
+  .container { padding: 12px 10px !important; }
+
+  .breadcrumb { font-size: 10px; }
+  .contrib-row { flex-wrap: wrap; }
+  .contrib-track { flex: 1 1 60%; }
+}

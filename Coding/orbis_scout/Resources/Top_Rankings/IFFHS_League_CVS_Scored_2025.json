@@ -1,0 +1,2479 @@
+{
+  "source": "IFFHS",
+  "ranking_name": "Strongest National League in the World",
+  "year": 2025,
+  "scoring_period": "1st January 2025 - 31st December 2025",
+  "parameters": {
+    "max_points": 2359,
+    "delta_base": 0.55,
+    "alpha": 0.2,
+    "cvs_formula": "S_country * retention^(tier-1)  where  retention = 1 - (delta_base - alpha * S_country/100)"
+  },
+  "rankings": [
+    {
+      "rank": 1,
+      "country": "England",
+      "confederation": "UEFA",
+      "points": 2359.0,
+      "s_country": 100.0,
+      "retention": 0.65,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 100.0
+        },
+        {
+          "tier": 2,
+          "name": "EFL Championship",
+          "cvs": 65.0
+        },
+        {
+          "tier": 3,
+          "name": "EFL League One",
+          "cvs": 42.25
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "country": "Spain",
+      "confederation": "UEFA",
+      "points": 2073.0,
+      "s_country": 87.8762,
+      "retention": 0.625752,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "La Liga",
+          "cvs": 87.8762
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 54.9887
+        },
+        {
+          "tier": 3,
+          "name": "Primera Federación",
+          "cvs": 34.4093
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "country": "Brazil",
+      "confederation": "CONMEBOL",
+      "points": 1999.0,
+      "s_country": 84.7393,
+      "retention": 0.619479,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Série A",
+          "cvs": 84.7393
+        },
+        {
+          "tier": 2,
+          "name": "Série B",
+          "cvs": 52.4942
+        },
+        {
+          "tier": 3,
+          "name": "Série C",
+          "cvs": 32.5191
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "country": "Italy",
+      "confederation": "UEFA",
+      "points": 1972.0,
+      "s_country": 83.5947,
+      "retention": 0.617189,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Serie A",
+          "cvs": 83.5947
+        },
+        {
+          "tier": 2,
+          "name": "Serie B",
+          "cvs": 51.5937
+        },
+        {
+          "tier": 3,
+          "name": "Serie C",
+          "cvs": 31.8431
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "country": "Germany",
+      "confederation": "UEFA",
+      "points": 1880.0,
+      "s_country": 79.6948,
+      "retention": 0.60939,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Bundesliga",
+          "cvs": 79.6948
+        },
+        {
+          "tier": 2,
+          "name": "2. Bundesliga",
+          "cvs": 48.5652
+        },
+        {
+          "tier": 3,
+          "name": "3. Liga",
+          "cvs": 29.5952
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "country": "France",
+      "confederation": "UEFA",
+      "points": 1502.0,
+      "s_country": 63.671,
+      "retention": 0.577342,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 63.671
+        },
+        {
+          "tier": 2,
+          "name": "Ligue 2",
+          "cvs": 36.7599
+        },
+        {
+          "tier": 3,
+          "name": "National",
+          "cvs": 21.2231
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "country": "Portugal",
+      "confederation": "UEFA",
+      "points": 1145.0,
+      "s_country": 48.5375,
+      "retention": 0.547075,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primeira Liga",
+          "cvs": 48.5375
+        },
+        {
+          "tier": 2,
+          "name": "Liga Portugal 2",
+          "cvs": 26.5537
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 14.5268
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "country": "Argentina",
+      "confederation": "CONMEBOL",
+      "points": 1089.0,
+      "s_country": 46.1636,
+      "retention": 0.542327,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Profesional de Fútbol",
+          "cvs": 46.1636
+        },
+        {
+          "tier": 2,
+          "name": "Primera Nacional",
+          "cvs": 25.0358
+        },
+        {
+          "tier": 3,
+          "name": "Primera B Metropolitana",
+          "cvs": 13.5776
+        }
+      ]
+    },
+    {
+      "rank": 9,
+      "country": "Netherlands",
+      "confederation": "UEFA",
+      "points": 1067.0,
+      "s_country": 45.231,
+      "retention": 0.540462,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Eredivisie",
+          "cvs": 45.231
+        },
+        {
+          "tier": 2,
+          "name": "Eerste Divisie",
+          "cvs": 24.4456
+        },
+        {
+          "tier": 3,
+          "name": "Tweede Divisie",
+          "cvs": 13.2119
+        }
+      ]
+    },
+    {
+      "rank": 10,
+      "country": "Colombia",
+      "confederation": "CONMEBOL",
+      "points": 1025.5,
+      "s_country": 43.4718,
+      "retention": 0.536944,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Categoría Primera A",
+          "cvs": 43.4718
+        },
+        {
+          "tier": 2,
+          "name": "Categoría Primera B",
+          "cvs": 23.3419
+        },
+        {
+          "tier": 3,
+          "name": "Torneo Federal",
+          "cvs": 12.5333
+        }
+      ]
+    },
+    {
+      "rank": 11,
+      "country": "Turkey",
+      "confederation": "UEFA",
+      "points": 980.0,
+      "s_country": 41.543,
+      "retention": 0.533086,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Süper Lig",
+          "cvs": 41.543
+        },
+        {
+          "tier": 2,
+          "name": "TFF First League",
+          "cvs": 22.146
+        },
+        {
+          "tier": 3,
+          "name": "TFF Second League",
+          "cvs": 11.8057
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "country": "Belgium",
+      "confederation": "UEFA",
+      "points": 957.5,
+      "s_country": 40.5892,
+      "retention": 0.531178,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "First Division A",
+          "cvs": 40.5892
+        },
+        {
+          "tier": 2,
+          "name": "First Division B",
+          "cvs": 21.5601
+        },
+        {
+          "tier": 3,
+          "name": "National Division 1",
+          "cvs": 11.4522
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "country": "Saudi Arabia",
+      "confederation": "AFC",
+      "points": 868.75,
+      "s_country": 36.827,
+      "retention": 0.523654,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Roshn Saudi League",
+          "cvs": 36.827
+        },
+        {
+          "tier": 2,
+          "name": "First Division League",
+          "cvs": 19.2846
+        },
+        {
+          "tier": 3,
+          "name": "Second Division",
+          "cvs": 10.0985
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "country": "Ecuador",
+      "confederation": "CONMEBOL",
+      "points": 817.5,
+      "s_country": 34.6545,
+      "retention": 0.519309,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "LigaPro Serie A",
+          "cvs": 34.6545
+        },
+        {
+          "tier": 2,
+          "name": "LigaPro Serie B",
+          "cvs": 17.9964
+        },
+        {
+          "tier": 3,
+          "name": "Segunda Categoría",
+          "cvs": 9.3457
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "country": "Greece",
+      "confederation": "UEFA",
+      "points": 748.25,
+      "s_country": 31.7189,
+      "retention": 0.513438,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League 1",
+          "cvs": 31.7189
+        },
+        {
+          "tier": 2,
+          "name": "Super League 2",
+          "cvs": 16.2857
+        },
+        {
+          "tier": 3,
+          "name": "Gamma Ethniki",
+          "cvs": 8.3617
+        }
+      ]
+    },
+    {
+      "rank": 16,
+      "country": "Egypt",
+      "confederation": "CAF",
+      "points": 721.5,
+      "s_country": 30.585,
+      "retention": 0.51117,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Egyptian Premier League",
+          "cvs": 30.585
+        },
+        {
+          "tier": 2,
+          "name": "Egyptian Second Division",
+          "cvs": 15.6341
+        },
+        {
+          "tier": 3,
+          "name": "Egyptian Third Division",
+          "cvs": 7.9917
+        }
+      ]
+    },
+    {
+      "rank": 17,
+      "country": "Czech Republic",
+      "confederation": "UEFA",
+      "points": 716.0,
+      "s_country": 30.3518,
+      "retention": 0.510704,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Czech First League",
+          "cvs": 30.3518
+        },
+        {
+          "tier": 2,
+          "name": "Czech National Football League",
+          "cvs": 15.5008
+        },
+        {
+          "tier": 3,
+          "name": "Czech Football League",
+          "cvs": 7.9163
+        }
+      ]
+    },
+    {
+      "rank": 18,
+      "country": "Japan",
+      "confederation": "AFC",
+      "points": 700.75,
+      "s_country": 29.7054,
+      "retention": 0.509411,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "J1 League",
+          "cvs": 29.7054
+        },
+        {
+          "tier": 2,
+          "name": "J2 League",
+          "cvs": 15.1323
+        },
+        {
+          "tier": 3,
+          "name": "J3 League",
+          "cvs": 7.7085
+        }
+      ]
+    },
+    {
+      "rank": 19,
+      "country": "Paraguay",
+      "confederation": "CONMEBOL",
+      "points": 670.0,
+      "s_country": 28.4019,
+      "retention": 0.506804,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "División Profesional",
+          "cvs": 28.4019
+        },
+        {
+          "tier": 2,
+          "name": "División Intermedia",
+          "cvs": 14.3942
+        },
+        {
+          "tier": 3,
+          "name": "Primera División B",
+          "cvs": 7.295
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "country": "Cyprus",
+      "confederation": "UEFA",
+      "points": 652.5,
+      "s_country": 27.66,
+      "retention": 0.50532,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "First Division",
+          "cvs": 27.66
+        },
+        {
+          "tier": 2,
+          "name": "Second Division",
+          "cvs": 13.9772
+        },
+        {
+          "tier": 3,
+          "name": "Third Division",
+          "cvs": 7.0629
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "country": "Uruguay",
+      "confederation": "CONMEBOL",
+      "points": 648.25,
+      "s_country": 27.4799,
+      "retention": 0.50496,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera División",
+          "cvs": 27.4799
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 13.8763
+        },
+        {
+          "tier": 3,
+          "name": "Tercera División",
+          "cvs": 7.007
+        }
+      ]
+    },
+    {
+      "rank": 22,
+      "country": "Mexico",
+      "confederation": "CONCACAF",
+      "points": 646.5,
+      "s_country": 27.4057,
+      "retention": 0.504811,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga MX",
+          "cvs": 27.4057
+        },
+        {
+          "tier": 2,
+          "name": "Liga de Expansión MX",
+          "cvs": 13.8347
+        },
+        {
+          "tier": 3,
+          "name": "Liga Premier de México",
+          "cvs": 6.9839
+        }
+      ]
+    },
+    {
+      "rank": 23,
+      "country": "Poland",
+      "confederation": "UEFA",
+      "points": 644.5,
+      "s_country": 27.3209,
+      "retention": 0.504642,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ekstraklasa",
+          "cvs": 27.3209
+        },
+        {
+          "tier": 2,
+          "name": "I liga",
+          "cvs": 13.7873
+        },
+        {
+          "tier": 3,
+          "name": "II liga",
+          "cvs": 6.9576
+        }
+      ]
+    },
+    {
+      "rank": 24,
+      "country": "Scotland",
+      "confederation": "UEFA",
+      "points": 630.5,
+      "s_country": 26.7274,
+      "retention": 0.503455,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Scottish Premiership",
+          "cvs": 26.7274
+        },
+        {
+          "tier": 2,
+          "name": "Scottish Championship",
+          "cvs": 13.456
+        },
+        {
+          "tier": 3,
+          "name": "Scottish League One",
+          "cvs": 6.7745
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "country": "Denmark",
+      "confederation": "UEFA",
+      "points": 576.25,
+      "s_country": 24.4277,
+      "retention": 0.498855,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Superliga",
+          "cvs": 24.4277
+        },
+        {
+          "tier": 2,
+          "name": "1st Division",
+          "cvs": 12.1859
+        },
+        {
+          "tier": 3,
+          "name": "2nd Division",
+          "cvs": 6.079
+        }
+      ]
+    },
+    {
+      "rank": 26,
+      "country": "Romania",
+      "confederation": "UEFA",
+      "points": 539.5,
+      "s_country": 22.8699,
+      "retention": 0.49574,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "SuperLiga",
+          "cvs": 22.8699
+        },
+        {
+          "tier": 2,
+          "name": "Liga II",
+          "cvs": 11.3375
+        },
+        {
+          "tier": 3,
+          "name": "Liga III",
+          "cvs": 5.6205
+        }
+      ]
+    },
+    {
+      "rank": 27,
+      "country": "Croatia",
+      "confederation": "UEFA",
+      "points": 536.25,
+      "s_country": 22.7321,
+      "retention": 0.495464,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Hrvatska nogometna liga",
+          "cvs": 22.7321
+        },
+        {
+          "tier": 2,
+          "name": "Druga HNL",
+          "cvs": 11.2629
+        },
+        {
+          "tier": 3,
+          "name": "Treća HNL",
+          "cvs": 5.5804
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "country": "Costa Rica",
+      "confederation": "CONCACAF",
+      "points": 521.5,
+      "s_country": 22.1068,
+      "retention": 0.494214,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera División",
+          "cvs": 22.1068
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 10.9255
+        },
+        {
+          "tier": 3,
+          "name": "Tercera División",
+          "cvs": 5.3995
+        }
+      ]
+    },
+    {
+      "rank": 29,
+      "country": "Switzerland",
+      "confederation": "UEFA",
+      "points": 502.5,
+      "s_country": 21.3014,
+      "retention": 0.492603,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Swiss Super League",
+          "cvs": 21.3014
+        },
+        {
+          "tier": 2,
+          "name": "Swiss Challenge League",
+          "cvs": 10.4931
+        },
+        {
+          "tier": 3,
+          "name": "Swiss Promotion League",
+          "cvs": 5.1689
+        }
+      ]
+    },
+    {
+      "rank": 30,
+      "country": "Norway",
+      "confederation": "UEFA",
+      "points": 499.75,
+      "s_country": 21.1848,
+      "retention": 0.49237,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Eliteserien",
+          "cvs": 21.1848
+        },
+        {
+          "tier": 2,
+          "name": "1. divisjon",
+          "cvs": 10.4308
+        },
+        {
+          "tier": 3,
+          "name": "2. divisjon",
+          "cvs": 5.1358
+        }
+      ]
+    },
+    {
+      "rank": 31,
+      "country": "Chile",
+      "confederation": "CONMEBOL",
+      "points": 487.75,
+      "s_country": 20.6761,
+      "retention": 0.491352,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera División",
+          "cvs": 20.6761
+        },
+        {
+          "tier": 2,
+          "name": "Primera B",
+          "cvs": 10.1592
+        },
+        {
+          "tier": 3,
+          "name": "Segunda División",
+          "cvs": 4.9918
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "country": "Serbia",
+      "confederation": "UEFA",
+      "points": 487.0,
+      "s_country": 20.6443,
+      "retention": 0.491289,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "SuperLiga Srbije",
+          "cvs": 20.6443
+        },
+        {
+          "tier": 2,
+          "name": "Prva liga Srbije",
+          "cvs": 10.1423
+        },
+        {
+          "tier": 3,
+          "name": "Srpska liga",
+          "cvs": 4.9828
+        }
+      ]
+    },
+    {
+      "rank": 32,
+      "country": "Ukraine",
+      "confederation": "UEFA",
+      "points": 487.0,
+      "s_country": 20.6443,
+      "retention": 0.491289,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ukrainian Premier League",
+          "cvs": 20.6443
+        },
+        {
+          "tier": 2,
+          "name": "Ukrainian First League",
+          "cvs": 10.1423
+        },
+        {
+          "tier": 3,
+          "name": "Ukrainian Second League",
+          "cvs": 4.9828
+        }
+      ]
+    },
+    {
+      "rank": 34,
+      "country": "Peru",
+      "confederation": "CONMEBOL",
+      "points": 470.0,
+      "s_country": 19.9237,
+      "retention": 0.489847,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga 1",
+          "cvs": 19.9237
+        },
+        {
+          "tier": 2,
+          "name": "Liga 2",
+          "cvs": 9.7596
+        },
+        {
+          "tier": 3,
+          "name": "Copa Perú",
+          "cvs": 4.7807
+        }
+      ]
+    },
+    {
+      "rank": 35,
+      "country": "Austria",
+      "confederation": "UEFA",
+      "points": 468.75,
+      "s_country": 19.8707,
+      "retention": 0.489741,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Austrian Football Bundesliga",
+          "cvs": 19.8707
+        },
+        {
+          "tier": 2,
+          "name": "2. Liga",
+          "cvs": 9.7315
+        },
+        {
+          "tier": 3,
+          "name": "Regionalliga",
+          "cvs": 4.7659
+        }
+      ]
+    },
+    {
+      "rank": 36,
+      "country": "Bulgaria",
+      "confederation": "UEFA",
+      "points": 464.25,
+      "s_country": 19.6799,
+      "retention": 0.48936,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "First Professional Football League",
+          "cvs": 19.6799
+        },
+        {
+          "tier": 2,
+          "name": "Second Professional Football League",
+          "cvs": 9.6306
+        },
+        {
+          "tier": 3,
+          "name": "Third Amateur Football League",
+          "cvs": 4.7128
+        }
+      ]
+    },
+    {
+      "rank": 37,
+      "country": "Azerbaijan",
+      "confederation": "UEFA",
+      "points": 454.25,
+      "s_country": 19.256,
+      "retention": 0.488512,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premyer Liqa",
+          "cvs": 19.256
+        },
+        {
+          "tier": 2,
+          "name": "Birinci Liqa",
+          "cvs": 9.4068
+        },
+        {
+          "tier": 3,
+          "name": "İkinci Liqa",
+          "cvs": 4.5953
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "country": "Korea Republic",
+      "confederation": "AFC",
+      "points": 438.75,
+      "s_country": 18.599,
+      "retention": 0.487198,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "K League 1",
+          "cvs": 18.599
+        },
+        {
+          "tier": 2,
+          "name": "K League 2",
+          "cvs": 9.0614
+        },
+        {
+          "tier": 3,
+          "name": "K3 League",
+          "cvs": 4.4147
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "country": "Morocco",
+      "confederation": "CAF",
+      "points": 432.75,
+      "s_country": 18.3446,
+      "retention": 0.486689,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Botola Pro",
+          "cvs": 18.3446
+        },
+        {
+          "tier": 2,
+          "name": "Botola 2",
+          "cvs": 8.9281
+        },
+        {
+          "tier": 3,
+          "name": "National Honour Division",
+          "cvs": 4.3452
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "country": "USA",
+      "confederation": "CONCACAF",
+      "points": 426.75,
+      "s_country": 18.0903,
+      "retention": 0.486181,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Major League Soccer",
+          "cvs": 18.0903
+        },
+        {
+          "tier": 2,
+          "name": "USL Championship",
+          "cvs": 8.7952
+        },
+        {
+          "tier": 3,
+          "name": "USL League One",
+          "cvs": 4.276
+        }
+      ]
+    },
+    {
+      "rank": 41,
+      "country": "Hungary",
+      "confederation": "UEFA",
+      "points": 418.5,
+      "s_country": 17.7406,
+      "retention": 0.485481,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Nemzeti Bajnokság I",
+          "cvs": 17.7406
+        },
+        {
+          "tier": 2,
+          "name": "Nemzeti Bajnokság II",
+          "cvs": 8.6127
+        },
+        {
+          "tier": 3,
+          "name": "Nemzeti Bajnokság III",
+          "cvs": 4.1813
+        }
+      ]
+    },
+    {
+      "rank": 42,
+      "country": "United Arab Emirates",
+      "confederation": "AFC",
+      "points": 406.0,
+      "s_country": 17.2107,
+      "retention": 0.484421,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "UAE Pro League",
+          "cvs": 17.2107
+        },
+        {
+          "tier": 2,
+          "name": "UAE First Division League",
+          "cvs": 8.3372
+        },
+        {
+          "tier": 3,
+          "name": "UAE Second Division",
+          "cvs": 4.0387
+        }
+      ]
+    },
+    {
+      "rank": 43,
+      "country": "Israel",
+      "confederation": "UEFA",
+      "points": 401.75,
+      "s_country": 17.0305,
+      "retention": 0.484061,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Israeli Premier League",
+          "cvs": 17.0305
+        },
+        {
+          "tier": 2,
+          "name": "Liga Leumit",
+          "cvs": 8.2438
+        },
+        {
+          "tier": 3,
+          "name": "Liga Alef",
+          "cvs": 3.9905
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "country": "Slovenia",
+      "confederation": "UEFA",
+      "points": 394.0,
+      "s_country": 16.702,
+      "retention": 0.483404,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Slovenian PrvaLiga",
+          "cvs": 16.702
+        },
+        {
+          "tier": 2,
+          "name": "Slovenian 1. SNL",
+          "cvs": 8.0738
+        },
+        {
+          "tier": 3,
+          "name": "Slovenian 2. SNL",
+          "cvs": 3.9029
+        }
+      ]
+    },
+    {
+      "rank": 45,
+      "country": "South Africa",
+      "confederation": "CAF",
+      "points": 366.5,
+      "s_country": 15.5362,
+      "retention": 0.481072,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "DStv Premiership",
+          "cvs": 15.5362
+        },
+        {
+          "tier": 2,
+          "name": "Motsepe Foundation Championship",
+          "cvs": 7.474
+        },
+        {
+          "tier": 3,
+          "name": "ABC Motsepe League",
+          "cvs": 3.5955
+        }
+      ]
+    },
+    {
+      "rank": 46,
+      "country": "Algeria",
+      "confederation": "CAF",
+      "points": 363.0,
+      "s_country": 15.3879,
+      "retention": 0.480776,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue Professionnelle 1",
+          "cvs": 15.3879
+        },
+        {
+          "tier": 2,
+          "name": "Ligue Professionnelle 2",
+          "cvs": 7.3981
+        },
+        {
+          "tier": 3,
+          "name": "Ligue Nationale Amateur",
+          "cvs": 3.5568
+        }
+      ]
+    },
+    {
+      "rank": 47,
+      "country": "Thailand",
+      "confederation": "AFC",
+      "points": 361.5,
+      "s_country": 15.3243,
+      "retention": 0.480649,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Thai League 1",
+          "cvs": 15.3243
+        },
+        {
+          "tier": 2,
+          "name": "Thai League 2",
+          "cvs": 7.3656
+        },
+        {
+          "tier": 3,
+          "name": "Thai League 3",
+          "cvs": 3.5403
+        }
+      ]
+    },
+    {
+      "rank": 48,
+      "country": "Bosnia and Herzegovina",
+      "confederation": "UEFA",
+      "points": 355.0,
+      "s_country": 15.0487,
+      "retention": 0.480097,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier liga BiH",
+          "cvs": 15.0487
+        },
+        {
+          "tier": 2,
+          "name": "Prva liga Federacije BiH",
+          "cvs": 7.2248
+        },
+        {
+          "tier": 3,
+          "name": "Druga liga Federacije BiH",
+          "cvs": 3.4686
+        }
+      ]
+    },
+    {
+      "rank": 49,
+      "country": "Bolivia",
+      "confederation": "CONMEBOL",
+      "points": 354.25,
+      "s_country": 15.017,
+      "retention": 0.480034,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "División Profesional",
+          "cvs": 15.017
+        },
+        {
+          "tier": 2,
+          "name": "Liga de Fútbol Profesional B",
+          "cvs": 7.2087
+        },
+        {
+          "tier": 3,
+          "name": "Asociaciones Departamentales",
+          "cvs": 3.4604
+        }
+      ]
+    },
+    {
+      "rank": 50,
+      "country": "Republic of Ireland",
+      "confederation": "UEFA",
+      "points": 340.0,
+      "s_country": 14.4129,
+      "retention": 0.478826,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "League of Ireland Premier Division",
+          "cvs": 14.4129
+        },
+        {
+          "tier": 2,
+          "name": "League of Ireland First Division",
+          "cvs": 6.9013
+        },
+        {
+          "tier": 3,
+          "name": "League of Ireland Second Division",
+          "cvs": 3.3045
+        }
+      ]
+    },
+    {
+      "rank": 51,
+      "country": "Tunisia",
+      "confederation": "CAF",
+      "points": 337.5,
+      "s_country": 14.3069,
+      "retention": 0.478614,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue Professionnelle 1",
+          "cvs": 14.3069
+        },
+        {
+          "tier": 2,
+          "name": "Ligue Professionnelle 2",
+          "cvs": 6.8475
+        },
+        {
+          "tier": 3,
+          "name": "Ligue Amateur 1",
+          "cvs": 3.2773
+        }
+      ]
+    },
+    {
+      "rank": 52,
+      "country": "China",
+      "confederation": "AFC",
+      "points": 318.0,
+      "s_country": 13.4803,
+      "retention": 0.476961,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Chinese Super League",
+          "cvs": 13.4803
+        },
+        {
+          "tier": 2,
+          "name": "China League One",
+          "cvs": 6.4296
+        },
+        {
+          "tier": 3,
+          "name": "China League Two",
+          "cvs": 3.0667
+        }
+      ]
+    },
+    {
+      "rank": 53,
+      "country": "Kosovo",
+      "confederation": "UEFA",
+      "points": 315.5,
+      "s_country": 13.3743,
+      "retention": 0.476749,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Football Superleague of Kosovo",
+          "cvs": 13.3743
+        },
+        {
+          "tier": 2,
+          "name": "Football First League of Kosovo",
+          "cvs": 6.3762
+        },
+        {
+          "tier": 3,
+          "name": "Football Second League of Kosovo",
+          "cvs": 3.0398
+        }
+      ]
+    },
+    {
+      "rank": 54,
+      "country": "Tanzania",
+      "confederation": "CAF",
+      "points": 308.5,
+      "s_country": 13.0776,
+      "retention": 0.476155,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "NBC Premier League",
+          "cvs": 13.0776
+        },
+        {
+          "tier": 2,
+          "name": "First Division League",
+          "cvs": 6.227
+        },
+        {
+          "tier": 3,
+          "name": "Second Division League",
+          "cvs": 2.965
+        }
+      ]
+    },
+    {
+      "rank": 55,
+      "country": "Nicaragua",
+      "confederation": "CONCACAF",
+      "points": 307.5,
+      "s_country": 13.0352,
+      "retention": 0.47607,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera División",
+          "cvs": 13.0352
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 6.2057
+        }
+      ]
+    },
+    {
+      "rank": 56,
+      "country": "Latvia",
+      "confederation": "UEFA",
+      "points": 304.5,
+      "s_country": 12.908,
+      "retention": 0.475816,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "SynotTip Virsliga",
+          "cvs": 12.908
+        },
+        {
+          "tier": 2,
+          "name": "1. Liga",
+          "cvs": 6.1418
+        },
+        {
+          "tier": 3,
+          "name": "2. Liga",
+          "cvs": 2.9224
+        }
+      ]
+    },
+    {
+      "rank": 57,
+      "country": "Honduras",
+      "confederation": "CONCACAF",
+      "points": 297.5,
+      "s_country": 12.6113,
+      "retention": 0.475223,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Nacional de Fútbol Profesional",
+          "cvs": 12.6113
+        },
+        {
+          "tier": 2,
+          "name": "Liga de Ascenso",
+          "cvs": 5.9932
+        },
+        {
+          "tier": 3,
+          "name": "Liga Mayor",
+          "cvs": 2.8481
+        }
+      ]
+    },
+    {
+      "rank": 58,
+      "country": "Estonia",
+      "confederation": "UEFA",
+      "points": 297.0,
+      "s_country": 12.5901,
+      "retention": 0.47518,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Meistriliiga",
+          "cvs": 12.5901
+        },
+        {
+          "tier": 2,
+          "name": "Esiliiga",
+          "cvs": 5.9826
+        },
+        {
+          "tier": 3,
+          "name": "Esiliiga B",
+          "cvs": 2.8428
+        }
+      ]
+    },
+    {
+      "rank": 59,
+      "country": "Sweden",
+      "confederation": "UEFA",
+      "points": 287.0,
+      "s_country": 12.1662,
+      "retention": 0.474332,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Allsvenskan",
+          "cvs": 12.1662
+        },
+        {
+          "tier": 2,
+          "name": "Superettan",
+          "cvs": 5.7708
+        },
+        {
+          "tier": 3,
+          "name": "Ettan",
+          "cvs": 2.7373
+        }
+      ]
+    },
+    {
+      "rank": 60,
+      "country": "Armenia",
+      "confederation": "UEFA",
+      "points": 285.5,
+      "s_country": 12.1026,
+      "retention": 0.474205,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Armenian Premier League",
+          "cvs": 12.1026
+        },
+        {
+          "tier": 2,
+          "name": "Armenian First League",
+          "cvs": 5.7391
+        },
+        {
+          "tier": 3,
+          "name": "Armenian Second League",
+          "cvs": 2.7215
+        }
+      ]
+    },
+    {
+      "rank": 61,
+      "country": "Northern Ireland",
+      "confederation": "UEFA",
+      "points": 284.5,
+      "s_country": 12.0602,
+      "retention": 0.47412,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "NIFL Premiership",
+          "cvs": 12.0602
+        },
+        {
+          "tier": 2,
+          "name": "NIFL Championship",
+          "cvs": 5.718
+        },
+        {
+          "tier": 3,
+          "name": "NIFL League One",
+          "cvs": 2.711
+        }
+      ]
+    },
+    {
+      "rank": 62,
+      "country": "Iran",
+      "confederation": "AFC",
+      "points": 280.5,
+      "s_country": 11.8906,
+      "retention": 0.473781,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Persian Gulf Pro League",
+          "cvs": 11.8906
+        },
+        {
+          "tier": 2,
+          "name": "Azadegan League",
+          "cvs": 5.6335
+        },
+        {
+          "tier": 3,
+          "name": "Division Two",
+          "cvs": 2.6691
+        }
+      ]
+    },
+    {
+      "rank": 63,
+      "country": "Belarus",
+      "confederation": "UEFA",
+      "points": 260.0,
+      "s_country": 11.0216,
+      "retention": 0.472043,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Vysheyshaya Liga",
+          "cvs": 11.0216
+        },
+        {
+          "tier": 2,
+          "name": "Pershaya Liga",
+          "cvs": 5.2027
+        },
+        {
+          "tier": 3,
+          "name": "Druhaya Liga",
+          "cvs": 2.4559
+        }
+      ]
+    },
+    {
+      "rank": 64,
+      "country": "North Macedonia",
+      "confederation": "UEFA",
+      "points": 257.0,
+      "s_country": 10.8944,
+      "retention": 0.471789,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Makedonska fudbalska liga",
+          "cvs": 10.8944
+        },
+        {
+          "tier": 2,
+          "name": "Vtora liga",
+          "cvs": 5.1399
+        },
+        {
+          "tier": 3,
+          "name": "Treta liga",
+          "cvs": 2.4249
+        }
+      ]
+    },
+    {
+      "rank": 65,
+      "country": "Guatemala",
+      "confederation": "CONCACAF",
+      "points": 248.25,
+      "s_country": 10.5235,
+      "retention": 0.471047,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Nacional de Fútbol de Guatemala",
+          "cvs": 10.5235
+        },
+        {
+          "tier": 2,
+          "name": "Primera División de Ascenso",
+          "cvs": 4.9571
+        },
+        {
+          "tier": 3,
+          "name": "Segunda División",
+          "cvs": 2.335
+        }
+      ]
+    },
+    {
+      "rank": 66,
+      "country": "Finland",
+      "confederation": "UEFA",
+      "points": 241.5,
+      "s_country": 10.2374,
+      "retention": 0.470475,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Veikkausliiga",
+          "cvs": 10.2374
+        },
+        {
+          "tier": 2,
+          "name": "Ykkönen",
+          "cvs": 4.8164
+        },
+        {
+          "tier": 3,
+          "name": "Kakkonen",
+          "cvs": 2.266
+        }
+      ]
+    },
+    {
+      "rank": 67,
+      "country": "Venezuela",
+      "confederation": "CONMEBOL",
+      "points": 241.0,
+      "s_country": 10.2162,
+      "retention": 0.470432,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga FUTVE",
+          "cvs": 10.2162
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 4.806
+        },
+        {
+          "tier": 3,
+          "name": "Tercera División",
+          "cvs": 2.2609
+        }
+      ]
+    },
+    {
+      "rank": 68,
+      "country": "Congo DR",
+      "confederation": "CAF",
+      "points": 238.0,
+      "s_country": 10.089,
+      "retention": 0.470178,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Linafoot",
+          "cvs": 10.089
+        },
+        {
+          "tier": 2,
+          "name": "Division 1",
+          "cvs": 4.7436
+        },
+        {
+          "tier": 3,
+          "name": "Division 2",
+          "cvs": 2.2303
+        }
+      ]
+    },
+    {
+      "rank": 69,
+      "country": "Jamaica",
+      "confederation": "CONCACAF",
+      "points": 236.0,
+      "s_country": 10.0042,
+      "retention": 0.470008,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "National Premier League",
+          "cvs": 10.0042
+        },
+        {
+          "tier": 2,
+          "name": "Super League",
+          "cvs": 4.7021
+        },
+        {
+          "tier": 3,
+          "name": "Premier League",
+          "cvs": 2.21
+        }
+      ]
+    },
+    {
+      "rank": 70,
+      "country": "Qatar",
+      "confederation": "AFC",
+      "points": 228.25,
+      "s_country": 9.6757,
+      "retention": 0.469351,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Qatar Stars League",
+          "cvs": 9.6757
+        },
+        {
+          "tier": 2,
+          "name": "Qatar First Division",
+          "cvs": 4.5413
+        },
+        {
+          "tier": 3,
+          "name": "Qatar Second Division",
+          "cvs": 2.1315
+        }
+      ]
+    },
+    {
+      "rank": 71,
+      "country": "Albania",
+      "confederation": "UEFA",
+      "points": 228.0,
+      "s_country": 9.6651,
+      "retention": 0.46933,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kategoria Superiore",
+          "cvs": 9.6651
+        },
+        {
+          "tier": 2,
+          "name": "Kategoria e Parë",
+          "cvs": 4.5361
+        },
+        {
+          "tier": 3,
+          "name": "Kategoria e Dytë",
+          "cvs": 2.1289
+        }
+      ]
+    },
+    {
+      "rank": 72,
+      "country": "Iceland",
+      "confederation": "UEFA",
+      "points": 220.25,
+      "s_country": 9.3366,
+      "retention": 0.468673,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Úrvalsdeild karla",
+          "cvs": 9.3366
+        },
+        {
+          "tier": 2,
+          "name": "1. deild karla",
+          "cvs": 4.3758
+        },
+        {
+          "tier": 3,
+          "name": "2. deild karla",
+          "cvs": 2.0508
+        }
+      ]
+    },
+    {
+      "rank": 73,
+      "country": "Australia",
+      "confederation": "AFC",
+      "points": 211.25,
+      "s_country": 8.9551,
+      "retention": 0.46791,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "A-League Men",
+          "cvs": 8.9551
+        },
+        {
+          "tier": 2,
+          "name": "National Second Tier",
+          "cvs": 4.1902
+        },
+        {
+          "tier": 3,
+          "name": "State League",
+          "cvs": 1.9606
+        }
+      ]
+    },
+    {
+      "rank": 74,
+      "country": "Kazakhstan",
+      "confederation": "UEFA",
+      "points": 204.5,
+      "s_country": 8.6689,
+      "retention": 0.467338,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kazakhstan Premier League",
+          "cvs": 8.6689
+        },
+        {
+          "tier": 2,
+          "name": "Kazakhstan First Division",
+          "cvs": 4.0513
+        },
+        {
+          "tier": 3,
+          "name": "Kazakhstan Second Division",
+          "cvs": 1.8933
+        }
+      ]
+    },
+    {
+      "rank": 75,
+      "country": "Faroe Islands",
+      "confederation": "UEFA",
+      "points": 200.5,
+      "s_country": 8.4994,
+      "retention": 0.466999,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Faroese Premier League",
+          "cvs": 8.4994
+        },
+        {
+          "tier": 2,
+          "name": "1. deild",
+          "cvs": 3.9692
+        },
+        {
+          "tier": 3,
+          "name": "2. deild",
+          "cvs": 1.8536
+        }
+      ]
+    },
+    {
+      "rank": 75,
+      "country": "Malta",
+      "confederation": "UEFA",
+      "points": 200.5,
+      "s_country": 8.4994,
+      "retention": 0.466999,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Maltese Premier League",
+          "cvs": 8.4994
+        },
+        {
+          "tier": 2,
+          "name": "Maltese First Division",
+          "cvs": 3.9692
+        },
+        {
+          "tier": 3,
+          "name": "Maltese Second Division",
+          "cvs": 1.8536
+        }
+      ]
+    },
+    {
+      "rank": 77,
+      "country": "Turkmenistan",
+      "confederation": "AFC",
+      "points": 197.5,
+      "s_country": 8.3722,
+      "retention": 0.466744,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ýokary Liga",
+          "cvs": 8.3722
+        },
+        {
+          "tier": 2,
+          "name": "Birinji Liga",
+          "cvs": 3.9077
+        }
+      ]
+    },
+    {
+      "rank": 78,
+      "country": "San Marino",
+      "confederation": "UEFA",
+      "points": 197.25,
+      "s_country": 8.3616,
+      "retention": 0.466723,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Campionato Sammarinese",
+          "cvs": 8.3616
+        }
+      ]
+    },
+    {
+      "rank": 79,
+      "country": "Moldova",
+      "confederation": "UEFA",
+      "points": 194.5,
+      "s_country": 8.245,
+      "retention": 0.46649,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Divizia Națională",
+          "cvs": 8.245
+        },
+        {
+          "tier": 2,
+          "name": "Divizia A",
+          "cvs": 3.8462
+        },
+        {
+          "tier": 3,
+          "name": "Divizia B",
+          "cvs": 1.7942
+        }
+      ]
+    },
+    {
+      "rank": 80,
+      "country": "Georgia",
+      "confederation": "UEFA",
+      "points": 194.25,
+      "s_country": 8.2344,
+      "retention": 0.466469,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Erovnuli Liga",
+          "cvs": 8.2344
+        },
+        {
+          "tier": 2,
+          "name": "Erovnuli Liga 2",
+          "cvs": 3.8411
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 1.7918
+        }
+      ]
+    },
+    {
+      "rank": 81,
+      "country": "Mali",
+      "confederation": "CAF",
+      "points": 193.75,
+      "s_country": 8.2132,
+      "retention": 0.466426,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Première Division",
+          "cvs": 8.2132
+        },
+        {
+          "tier": 2,
+          "name": "Deuxième Division",
+          "cvs": 3.8309
+        }
+      ]
+    },
+    {
+      "rank": 82,
+      "country": "Malaysia",
+      "confederation": "AFC",
+      "points": 191.75,
+      "s_country": 8.1284,
+      "retention": 0.466257,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League",
+          "cvs": 8.1284
+        },
+        {
+          "tier": 2,
+          "name": "Premier League",
+          "cvs": 3.7899
+        },
+        {
+          "tier": 3,
+          "name": "M3 League",
+          "cvs": 1.7671
+        }
+      ]
+    },
+    {
+      "rank": 83,
+      "country": "Iraq",
+      "confederation": "AFC",
+      "points": 191.0,
+      "s_country": 8.0967,
+      "retention": 0.466193,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Iraqi Premier League",
+          "cvs": 8.0967
+        },
+        {
+          "tier": 2,
+          "name": "Iraqi First Division",
+          "cvs": 3.7746
+        },
+        {
+          "tier": 3,
+          "name": "Iraqi Second Division",
+          "cvs": 1.7597
+        }
+      ]
+    },
+    {
+      "rank": 84,
+      "country": "Indonesia",
+      "confederation": "AFC",
+      "points": 190.25,
+      "s_country": 8.0649,
+      "retention": 0.46613,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga 1",
+          "cvs": 8.0649
+        },
+        {
+          "tier": 2,
+          "name": "Liga 2",
+          "cvs": 3.7593
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 1.7523
+        }
+      ]
+    },
+    {
+      "rank": 85,
+      "country": "Andorra",
+      "confederation": "UEFA",
+      "points": 186.25,
+      "s_country": 7.8953,
+      "retention": 0.465791,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera Divisió",
+          "cvs": 7.8953
+        },
+        {
+          "tier": 2,
+          "name": "Segona Divisió",
+          "cvs": 3.6776
+        }
+      ]
+    },
+    {
+      "rank": 86,
+      "country": "Angola",
+      "confederation": "CAF",
+      "points": 183.0,
+      "s_country": 7.7575,
+      "retention": 0.465515,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Girabola",
+          "cvs": 7.7575
+        },
+        {
+          "tier": 2,
+          "name": "Gira Angola",
+          "cvs": 3.6112
+        },
+        {
+          "tier": 3,
+          "name": "Terceira Divisão",
+          "cvs": 1.6811
+        }
+      ]
+    },
+    {
+      "rank": 87,
+      "country": "Côte d'Ivoire",
+      "confederation": "CAF",
+      "points": 180.75,
+      "s_country": 7.6621,
+      "retention": 0.465324,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 7.6621
+        },
+        {
+          "tier": 2,
+          "name": "Ligue 2",
+          "cvs": 3.5654
+        },
+        {
+          "tier": 3,
+          "name": "Ligue 3",
+          "cvs": 1.659
+        }
+      ]
+    },
+    {
+      "rank": 88,
+      "country": "Lithuania",
+      "confederation": "UEFA",
+      "points": 178.75,
+      "s_country": 7.5774,
+      "retention": 0.465155,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "A Lyga",
+          "cvs": 7.5774
+        },
+        {
+          "tier": 2,
+          "name": "1 Lyga",
+          "cvs": 3.5247
+        },
+        {
+          "tier": 3,
+          "name": "2 Lyga",
+          "cvs": 1.6395
+        }
+      ]
+    },
+    {
+      "rank": 89,
+      "country": "Slovakia",
+      "confederation": "UEFA",
+      "points": 178.0,
+      "s_country": 7.5456,
+      "retention": 0.465091,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Niké liga",
+          "cvs": 7.5456
+        },
+        {
+          "tier": 2,
+          "name": "2. liga",
+          "cvs": 3.5094
+        },
+        {
+          "tier": 3,
+          "name": "3. liga",
+          "cvs": 1.6322
+        }
+      ]
+    },
+    {
+      "rank": 90,
+      "country": "Zambia",
+      "confederation": "CAF",
+      "points": 172.0,
+      "s_country": 7.2912,
+      "retention": 0.464582,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League of Zambia",
+          "cvs": 7.2912
+        },
+        {
+          "tier": 2,
+          "name": "FAZ National Division One",
+          "cvs": 3.3874
+        },
+        {
+          "tier": 3,
+          "name": "FAZ Regional Leagues",
+          "cvs": 1.5737
+        }
+      ]
+    },
+    {
+      "rank": 91,
+      "country": "Nigeria",
+      "confederation": "CAF",
+      "points": 171.75,
+      "s_country": 7.2806,
+      "retention": 0.464561,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Nigeria Premier Football League",
+          "cvs": 7.2806
+        },
+        {
+          "tier": 2,
+          "name": "Nigeria National League",
+          "cvs": 3.3823
+        },
+        {
+          "tier": 3,
+          "name": "Nigeria Amateur Football League",
+          "cvs": 1.5713
+        }
+      ]
+    },
+    {
+      "rank": 92,
+      "country": "Botswana",
+      "confederation": "CAF",
+      "points": 171.25,
+      "s_country": 7.2594,
+      "retention": 0.464519,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Botswana Premier League",
+          "cvs": 7.2594
+        },
+        {
+          "tier": 2,
+          "name": "First Division",
+          "cvs": 3.3721
+        },
+        {
+          "tier": 3,
+          "name": "Second Division",
+          "cvs": 1.5664
+        }
+      ]
+    },
+    {
+      "rank": 93,
+      "country": "Uzbekistan",
+      "confederation": "AFC",
+      "points": 168.75,
+      "s_country": 7.1535,
+      "retention": 0.464307,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Uzbekistan Super League",
+          "cvs": 7.1535
+        },
+        {
+          "tier": 2,
+          "name": "Uzbekistan Pro League",
+          "cvs": 3.3214
+        },
+        {
+          "tier": 3,
+          "name": "Uzbekistan First Division",
+          "cvs": 1.5422
+        }
+      ]
+    },
+    {
+      "rank": 94,
+      "country": "Kuwait",
+      "confederation": "AFC",
+      "points": 168.0,
+      "s_country": 7.1217,
+      "retention": 0.464243,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kuwait Premier League",
+          "cvs": 7.1217
+        },
+        {
+          "tier": 2,
+          "name": "Kuwait First Division",
+          "cvs": 3.3062
+        },
+        {
+          "tier": 3,
+          "name": "Kuwait Second Division",
+          "cvs": 1.5349
+        }
+      ]
+    },
+    {
+      "rank": 95,
+      "country": "Montenegro",
+      "confederation": "UEFA",
+      "points": 167.75,
+      "s_country": 7.1111,
+      "retention": 0.464222,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Montenegrin First Football League",
+          "cvs": 7.1111
+        },
+        {
+          "tier": 2,
+          "name": "Montenegrin Second Football League",
+          "cvs": 3.3011
+        },
+        {
+          "tier": 3,
+          "name": "Montenegrin Third Football League",
+          "cvs": 1.5325
+        }
+      ]
+    },
+    {
+      "rank": 96,
+      "country": "Luxembourg",
+      "confederation": "UEFA",
+      "points": 167.25,
+      "s_country": 7.0899,
+      "retention": 0.46418,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "BGL Ligue",
+          "cvs": 7.0899
+        },
+        {
+          "tier": 2,
+          "name": "Division of Honour",
+          "cvs": 3.291
+        },
+        {
+          "tier": 3,
+          "name": "Promotion of Honour",
+          "cvs": 1.5276
+        }
+      ]
+    },
+    {
+      "rank": 97,
+      "country": "Singapore",
+      "confederation": "AFC",
+      "points": 165.75,
+      "s_country": 7.0263,
+      "retention": 0.464053,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Singapore Premier League",
+          "cvs": 7.0263
+        },
+        {
+          "tier": 2,
+          "name": "National Football League",
+          "cvs": 3.2606
+        }
+      ]
+    },
+    {
+      "rank": 98,
+      "country": "Panama",
+      "confederation": "CONCACAF",
+      "points": 162.0,
+      "s_country": 6.8673,
+      "retention": 0.463735,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Panameña de Fútbol",
+          "cvs": 6.8673
+        },
+        {
+          "tier": 2,
+          "name": "Liga Nacional de Ascenso",
+          "cvs": 3.1846
+        },
+        {
+          "tier": 3,
+          "name": "Liga Regional",
+          "cvs": 1.4768
+        }
+      ]
+    },
+    {
+      "rank": 99,
+      "country": "Wales",
+      "confederation": "UEFA",
+      "points": 156.5,
+      "s_country": 6.6342,
+      "retention": 0.463268,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Cymru Premier",
+          "cvs": 6.6342
+        },
+        {
+          "tier": 2,
+          "name": "Cymru North",
+          "cvs": 3.0734
+        },
+        {
+          "tier": 3,
+          "name": "Cymru South",
+          "cvs": 1.4238
+        }
+      ]
+    },
+    {
+      "rank": 100,
+      "country": "Ghana",
+      "confederation": "CAF",
+      "points": 155.75,
+      "s_country": 6.6024,
+      "retention": 0.463205,
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ghana Premier League",
+          "cvs": 6.6024
+        },
+        {
+          "tier": 2,
+          "name": "Division One League",
+          "cvs": 3.0583
+        },
+        {
+          "tier": 3,
+          "name": "Division Two League",
+          "cvs": 1.4166
+        }
+      ]
+    }
+  ]
+}

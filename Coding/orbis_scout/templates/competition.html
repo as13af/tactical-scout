@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+{% block title %}{{ competition.replace('_',' ') }} — Scout{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/competitions">Competitions</a>
+  <span>/</span>
+  <span>{{ country.replace('_',' ') }}</span>
+  <span>/</span>
+  <span>{{ competition.replace('_',' ') }}</span>
+</div>
+
+<div class="page-header" id="comp-page-header"
+     data-comp-primary="{{ data.competition_colors.primary }}"
+     data-comp-secondary="{{ data.competition_colors.secondary }}">
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px;">
+    <h1 id="comp-h1">{{ competition.replace('_',' ') }}</h1>
+    {% if comp_type == 'cup_groups' %}
+      <span class="comp-type-badge comp-type-cup">Group Stage + Knockout</span>
+    {% elif comp_type == 'cup_knockout' %}
+      <span class="comp-type-badge comp-type-cup">Knockout</span>
+    {% else %}
+      <span class="comp-type-badge comp-type-league">League</span>
+    {% endif %}
+  </div>
+  <div class="sub">
+    {{ country.replace('_',' ') }} · {{ data.clubs|length }} teams
+    {% if cvs_score is defined and cvs_score %}
+      &nbsp;·&nbsp;
+      <span title="IFFHS Competitive Value Score — England Premier League = 100" style="
+        display:inline-flex; align-items:center; gap:4px;
+        background:var(--bg3); border:1px solid var(--border); border-radius:4px;
+        padding:1px 8px; font-size:11px; font-family:'CoFoSans',monospace;
+        color:{% if cvs_score >= 70 %}var(--green){% elif cvs_score >= 40 %}var(--amber){% else %}var(--text2){% endif %};">
+        CVS {{ cvs_score }}
+      </span>
+    {% endif %}
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
+    <a href="/competition/{{ country }}/{{ competition }}/playing-styles"
+       class="btn-update"
+       style="text-decoration:none; display:inline-block;">
+      ◈ Playing Styles
+    </a>
+  </div>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   LEAGUE LAYOUT — single standings table
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% if comp_type == 'league' %}
+
+<div class="grid-2" style="gap:24px; align-items:start;">
+
+  <!-- Standings -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Standings</div>
+      {% if data.standings_phases | length > 1 %}
+      <div class="standings-toggle" id="standings-toggle">
+        <button class="toggle-btn active" id="toggle-all" onclick="showStandingsView('all')">All Teams</button>
+        <button class="toggle-btn" id="toggle-phases" onclick="showStandingsView('phases')">By Phase</button>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if data.standings %}
+      <div id="standings-all-view">
+        {{ _standings_table(data.standings) }}
+      </div>
+      {% if data.standings_phases | length > 1 %}
+      <div id="standings-phase-view" style="display:none;">
+        {% for phase in data.standings_phases %}
+        <div class="phase-section" {% if not loop.first %}style="margin-top:20px;"{% endif %}>
+          <div class="phase-title">{{ phase.phase_name }}</div>
+          {{ _standings_table(phase.rows) }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% else %}
+      <div style="color:var(--text3); font-size:12px;">No standings data.</div>
+    {% endif %}
+  </div>
+
+  <!-- Clubs -->
+  <div>
+    <div class="card-title" style="margin-bottom:12px;">Clubs</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      {% for club in data.clubs %}
+        {{ _club_card(club, country, competition) }}
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   CUP GROUPS LAYOUT — groups grid + optional bracket + teams grouped by group
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% elif comp_type == 'cup_groups' %}
+
+{# Build a lookup: group_phase_name → list of team names for club grouping #}
+{% set group_team_names = {} %}
+{% for phase in data.standings_phases %}
+  {% set _ = group_team_names.update({phase.phase_name: []}) %}
+  {% for row in phase.rows %}
+    {% set _ = group_team_names[phase.phase_name].append(row.team.name) %}
+  {% endfor %}
+{% endfor %}
+
+<!-- Group Tables Grid -->
+<div style="margin-bottom:24px;">
+  <div class="card-title" style="margin-bottom:14px;">Group Stage</div>
+  <div class="group-grid">
+    {% for phase in data.standings_phases %}
+    <div class="group-card">
+      <div class="group-card-header">{{ phase.phase_name }}</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:28px">#</th>
+              <th>Team</th>
+              <th class="td-num">P</th>
+              <th class="td-num">W</th>
+              <th class="td-num">D</th>
+              <th class="td-num">L</th>
+              <th class="td-num">GD</th>
+              <th class="td-num">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in phase.rows %}
+              {% set promo = row.get('promotion', {}).get('text', '') %}
+              <tr>
+                <td class="standings-pos">
+                  {% if 'Promotion' in promo and 'Playoff' not in promo %}
+                    <span class="promotion-up">{{ row.position }}</span>
+                  {% elif 'Playoff' in promo %}
+                    <span class="promotion-play">{{ row.position }}</span>
+                  {% elif 'Relegation' in promo %}
+                    <span class="promotion-down">{{ row.position }}</span>
+                  {% else %}
+                    {{ row.position }}
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="/competition/{{ country }}/{{ competition }}/{{ row.team.name | replace(' ','_') }}"
+                     style="font-size:12px;">{{ row.team.name }}</a>
+                </td>
+                <td class="td-num">{{ row.matches }}</td>
+                <td class="td-num">{{ row.wins }}</td>
+                <td class="td-num">{{ row.draws }}</td>
+                <td class="td-num">{{ row.losses }}</td>
+                <td class="td-num">{{ row.scoreDiffFormatted }}</td>
+                <td class="td-num" style="font-weight:600;">{{ row.points }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Knockout Bracket -->
+{% if data.cup_trees %}
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-title">Knockout Stage</div>
+  {% for tree in data.cup_trees %}
+  <div class="bracket-tree" {% if not loop.first %}style="margin-top:20px;"{% endif %}>
+    {% if tree.name %}<div class="phase-title" style="margin-bottom:10px;">{{ tree.name }}</div>{% endif %}
+    {% for round in tree.rounds %}
+      <div class="bracket-round-label">{{ round.get('description', '') or 'Round' }}</div>
+      <div class="bracket-round-matches">
+      {% for block in round.blocks %}
+        {% if block.participants | length >= 2 %}
+        {% set p1 = block.participants[0] %}
+        {% set p2 = block.participants[1] %}
+        <div class="bracket-match-card">
+          <div class="bracket-team-row {% if p1.winner %}bracket-winner{% endif %}">
+            <span class="bracket-team-name">{{ p1.team.name if p1.team else '—' }}</span>
+          </div>
+          <div class="bracket-divider"></div>
+          <div class="bracket-team-row {% if p2.winner %}bracket-winner{% endif %}">
+            <span class="bracket-team-name">{{ p2.team.name if p2.team else '—' }}</span>
+          </div>
+          <div class="bracket-status-row">
+            {% if block.get('finished') %}
+              <span class="bracket-badge bracket-done">FT</span>
+            {% elif block.get('eventInProgress') %}
+              <span class="bracket-badge bracket-live">Live</span>
+            {% else %}
+              <span class="bracket-badge bracket-upcoming">Upcoming</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Teams grouped by group -->
+<div>
+  {% if data.standings_phases %}
+    {% for phase in data.standings_phases %}
+    <div style="margin-bottom:20px;">
+      <div class="card-title" style="margin-bottom:10px;">{{ phase.phase_name }} Teams</div>
+      <div class="group-clubs-grid">
+        {% set phase_team_names = [] %}
+        {% for row in phase.rows %}{% set _ = phase_team_names.append(row.team.name) %}{% endfor %}
+        {% for club in data.clubs %}
+          {% if club.name in phase_team_names %}
+            {{ _club_card(club, country, competition) }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    {# Teams not in any group (pulled from bracket only) #}
+    {% set all_group_teams = [] %}
+    {% for phase in data.standings_phases %}{% for row in phase.rows %}{% set _ = all_group_teams.append(row.team.name) %}{% endfor %}{% endfor %}
+    {% set ungrouped = data.clubs | rejectattr('name', 'in', all_group_teams) | list %}
+    {% if ungrouped %}
+    <div style="margin-bottom:20px;">
+      <div class="card-title" style="margin-bottom:10px;">Other Teams</div>
+      <div class="group-clubs-grid">
+        {% for club in ungrouped %}{{ _club_card(club, country, competition) }}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="group-clubs-grid">
+      {% for club in data.clubs %}{{ _club_card(club, country, competition) }}{% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   KNOCKOUT-ONLY LAYOUT — bracket is the hero, club grid below
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% else %}
+
+{% if data.cup_trees %}
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-title">Bracket</div>
+  {% for tree in data.cup_trees %}
+  <div class="bracket-tree" {% if not loop.first %}style="margin-top:20px;"{% endif %}>
+    {% if tree.name %}<div class="phase-title" style="margin-bottom:10px;">{{ tree.name }}</div>{% endif %}
+    {% for round in tree.rounds %}
+      <div class="bracket-round-label">{{ round.get('description', '') or 'Round' }}</div>
+      <div class="bracket-round-matches">
+      {% for block in round.blocks %}
+        {% if block.participants | length >= 2 %}
+        {% set p1 = block.participants[0] %}
+        {% set p2 = block.participants[1] %}
+        <div class="bracket-match-card">
+          <div class="bracket-team-row {% if p1.winner %}bracket-winner{% endif %}">
+            <span class="bracket-team-name">{{ p1.team.name if p1.team else '—' }}</span>
+          </div>
+          <div class="bracket-divider"></div>
+          <div class="bracket-team-row {% if p2.winner %}bracket-winner{% endif %}">
+            <span class="bracket-team-name">{{ p2.team.name if p2.team else '—' }}</span>
+          </div>
+          <div class="bracket-status-row">
+            {% if block.get('finished') %}
+              <span class="bracket-badge bracket-done">FT</span>
+            {% elif block.get('eventInProgress') %}
+              <span class="bracket-badge bracket-live">Live</span>
+            {% else %}
+              <span class="bracket-badge bracket-upcoming">Upcoming</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div>
+  <div class="card-title" style="margin-bottom:12px;">Teams</div>
+  <div class="group-clubs-grid">
+    {% for club in data.clubs %}{{ _club_card(club, country, competition) }}{% endfor %}
+  </div>
+</div>
+
+{% endif %}
+{# end layout branches #}
+
+{% endblock %}
+
+{# ── Reusable macros ─────────────────────────────────────────────────────── #}
+{% macro _standings_table(rows) %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px">#</th>
+        <th>Team</th>
+        <th class="td-num">P</th>
+        <th class="td-num">W</th>
+        <th class="td-num">D</th>
+        <th class="td-num">L</th>
+        <th class="td-num">GF</th>
+        <th class="td-num">GA</th>
+        <th class="td-num">GD</th>
+        <th class="td-num">Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        {% set promo = row.get('promotion', {}).get('text', '') %}
+        <tr>
+          <td class="standings-pos">
+            {% if 'Promotion' in promo and 'Playoff' not in promo %}
+              <span class="promotion-up">{{ row.position }}</span>
+            {% elif 'Playoff' in promo %}
+              <span class="promotion-play">{{ row.position }}</span>
+            {% elif 'Relegation' in promo %}
+              <span class="promotion-down">{{ row.position }}</span>
+            {% else %}
+              {{ row.position }}
+            {% endif %}
+          </td>
+          <td>
+            <a href="/competition/{{ country }}/{{ competition }}/{{ row.team.name | replace(' ','_') }}">
+              {{ row.team.name }}
+            </a>
+          </td>
+          <td class="td-num">{{ row.matches }}</td>
+          <td class="td-num">{{ row.wins }}</td>
+          <td class="td-num">{{ row.draws }}</td>
+          <td class="td-num">{{ row.losses }}</td>
+          <td class="td-num">{{ row.scoresFor }}</td>
+          <td class="td-num">{{ row.scoresAgainst }}</td>
+          <td class="td-num">{{ row.scoreDiffFormatted }}</td>
+          <td class="td-num" style="font-weight:600;">{{ row.points }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{% macro _club_card(club, country, competition) %}
+<a href="/competition/{{ country }}/{{ competition }}/{{ club.slug }}" class="competition-card" style="padding:12px 16px;"
+   data-tc-primary="{{ club.team_colors.primary }}"
+   data-tc-secondary="{{ club.team_colors.secondary }}">
+  <div class="flex-between">
+    <div>
+      <div class="name" style="font-size:13px;">{{ club.name }}</div>
+      <div class="meta">{{ club.player_count }} players</div>
+    </div>
+    {% if club.stats %}
+      <div style="text-align:right; font-size:11px; color:var(--text2);">
+        {% if club.stats.get('goals') %}
+          <div>{{ club.stats.goals }} goals</div>
+        {% endif %}
+        {% if club.stats.get('rating') %}
+          {%- set _cr = club.stats.rating|float -%}
+          {%- set _cc = '#2D3FC9' if _cr >= 9.0 else
+                       ('#008EA1' if _cr >= 8.0 else
+                       ('#00A01D' if _cr >= 7.0 else
+                       ('#B29000' if _cr >= 6.5 else
+                       ('#C26606' if _cr >= 6.0 else '#B50A00')))) -%}
+          <div style="color:{{ _cc }};">{{ "%.2f"|format(_cr) }} avg</div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</a>
+{% endmacro %}
+
+{% block scripts %}
+<script>
+/* ── Apply team & competition colors ── */
+(function () {
+  const header = document.getElementById('comp-page-header');
+  if (header && window.readableAccent) {
+    const ca = readableAccent(header.dataset.compPrimary, header.dataset.compSecondary);
+    const h1 = document.getElementById('comp-h1');
+    if (h1) { h1.style.borderLeft = `4px solid ${ca}`; h1.style.paddingLeft = '12px'; }
+  }
+  document.querySelectorAll('[data-tc-primary]').forEach(el => {
+    if (!window.readableAccent || !window.hexToRgba) return;
+    const accent = readableAccent(el.dataset.tcPrimary, el.dataset.tcSecondary);
+    el.style.borderLeft = `3px solid ${accent}`;
+    el.style.background = hexToRgba(accent, 0.06);
+  });
+})();
+</script>
+<script>
+function showStandingsView(mode) {
+  const allView    = document.getElementById('standings-all-view');
+  const phaseView  = document.getElementById('standings-phase-view');
+  const btnAll     = document.getElementById('toggle-all');
+  const btnPhases  = document.getElementById('toggle-phases');
+  if (!allView || !phaseView) return;
+  if (mode === 'phases') {
+    allView.style.display   = 'none';
+    phaseView.style.display = 'block';
+    btnAll.classList.remove('active');
+    btnPhases.classList.add('active');
+  } else {
+    allView.style.display   = 'block';
+    phaseView.style.display = 'none';
+    btnAll.classList.add('active');
+    btnPhases.classList.remove('active');
+  }
+}
+</script>
+<style>
+.standings-toggle { display:flex; gap:4px; }
+.toggle-btn {
+  background: var(--bg3, #2a2a2a);
+  border: 1px solid var(--border, #444);
+  color: var(--text2, #aaa);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.toggle-btn:hover { background: var(--bg2, #333); color: var(--text1, #eee); }
+.toggle-btn.active {
+  background: var(--green);
+  color: #000;
+  border-color: var(--green);
+}
+.phase-section { }
+.phase-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2, #aaa);
+  padding: 4px 0 6px;
+  border-bottom: 1px solid var(--border, #333);
+  margin-bottom: 6px;
+}
+/* ── Bracket styles ── */
+.bracket-tree { }
+.bracket-round-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  margin: 14px 0 6px;
+}
+.bracket-round-matches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.bracket-match-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-width: 180px;
+  overflow: hidden;
+}
+.bracket-team-row {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text2);
+  gap: 8px;
+}
+.bracket-team-row.bracket-winner {
+  color: var(--text);
+  font-weight: 700;
+  background: rgba(217,217,217,0.05);
+}
+.bracket-team-name { flex: 1; }
+.bracket-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+.bracket-status-row {
+  padding: 4px 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+.bracket-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+.bracket-done     { background: var(--bg2); color: var(--text3); border: 1px solid var(--border); }
+.bracket-live     { background: var(--red); color: #fff; }
+.bracket-upcoming { background: transparent; color: var(--amber); border: 1px solid var(--amber); }
+</style>
+{% endblock %}

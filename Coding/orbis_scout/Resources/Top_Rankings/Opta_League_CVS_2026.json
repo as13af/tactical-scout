@@ -1,0 +1,6323 @@
+{
+  "source": "Opta Power Rankings (The Analyst / Stats Perform)",
+  "endpoint": "https://dataviz.theanalyst.com/opta-power-rankings/league-meta.json",
+  "year": 2026,
+  "note": "cvs = seasonAverageRating (Opta, 0-100 scale). s_country / retention from IFFHS where available, otherwise derived: s_country = Opta tier-1 cvs; retention = 1 - (0.55 - 0.2 * s_country / 100).",
+  "total_leagues": 445,
+  "total_countries": 184,
+  "rankings": [
+    {
+      "rank": 1,
+      "country": "England",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "English Premier League",
+          "cvs": 90.8628,
+          "opta_top10": 93.6895,
+          "opta_top5": 95.4974,
+          "global_rank": 1,
+          "confederation_rank": 1,
+          "league_id": "2kwbbcootiqqgmrzs6o5inle5"
+        },
+        {
+          "tier": 2,
+          "name": "English Football League - Championship",
+          "cvs": 79.6868,
+          "opta_top10": 82.1277,
+          "opta_top5": 83.3982,
+          "global_rank": 10,
+          "confederation_rank": 8,
+          "league_id": "7ntvbsyq31jnzoqoa8850b9b8"
+        },
+        {
+          "tier": 3,
+          "name": "English Football League - League One",
+          "cvs": 73.8223,
+          "opta_top10": 76.0418,
+          "opta_top5": 77.1602,
+          "global_rank": 42,
+          "confederation_rank": 28,
+          "league_id": "3frp1zxrqulrlrnk503n6l4l"
+        },
+        {
+          "tier": 4,
+          "name": "English Football League - League Two",
+          "cvs": 67.9341,
+          "opta_top10": 70.792,
+          "opta_top5": 71.8147,
+          "global_rank": 78,
+          "confederation_rank": 47,
+          "league_id": "bgen5kjer2ytfp7lo9949t72g"
+        },
+        {
+          "tier": 5,
+          "name": "English National League",
+          "cvs": 59.0078,
+          "opta_top10": 62.5273,
+          "opta_top5": 64.5032,
+          "global_rank": 198,
+          "confederation_rank": 92,
+          "league_id": "b5udgm9vakjqz8dcmy5b2g0xt"
+        },
+        {
+          "tier": 6,
+          "name": "National League N / S",
+          "cvs": 50.549,
+          "opta_top10": 54.3786,
+          "opta_top5": 55.5503,
+          "global_rank": 293,
+          "confederation_rank": 130,
+          "league_id": "bockl24qpr7ryjl8b6obukga"
+        },
+        {
+          "tier": 7,
+          "name": "Non League Premier",
+          "cvs": 42.5981,
+          "opta_top10": 48.4641,
+          "opta_top5": 49.5903,
+          "global_rank": 379,
+          "confederation_rank": 166,
+          "league_id": "78wml3z5wrfxe5iky50tiotgu"
+        },
+        {
+          "tier": 8,
+          "name": "Non League Div One",
+          "cvs": 35.0267,
+          "opta_top10": 42.714,
+          "opta_top5": 43.3648,
+          "global_rank": 412,
+          "confederation_rank": 184,
+          "league_id": "2o6aygqek4rqvuzbj8nf2rk1u"
+        },
+        {
+          "tier": 9,
+          "name": "Counties Leagues",
+          "cvs": 27.0607,
+          "opta_top10": 36.7914,
+          "opta_top5": 38.1166,
+          "global_rank": 436,
+          "confederation_rank": 192,
+          "league_id": "3hxb75f3g7662yjtyf0x1im8k"
+        }
+      ],
+      "s_country": 100.0,
+      "retention": 0.65,
+      "iffhs_points": 2359.0,
+      "iffhs_rank": 1
+    },
+    {
+      "rank": 2,
+      "country": "Spain",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Spanish La Liga",
+          "cvs": 86.2973,
+          "opta_top10": 89.5093,
+          "opta_top5": 92.6247,
+          "global_rank": 2,
+          "confederation_rank": 2,
+          "league_id": "34pl8szyvrbwcmfkuocjm3r6t"
+        },
+        {
+          "tier": 2,
+          "name": "Spanish Segunda Division",
+          "cvs": 77.0159,
+          "opta_top10": 78.8329,
+          "opta_top5": 79.4852,
+          "global_rank": 20,
+          "confederation_rank": 15,
+          "league_id": "3is4bkgf3loxv9qfg3hm8zfqb"
+        },
+        {
+          "tier": 3,
+          "name": "Primera División RFEF",
+          "cvs": 71.897,
+          "opta_top10": 74.4658,
+          "opta_top5": 75.1642,
+          "global_rank": 48,
+          "confederation_rank": 30,
+          "league_id": "degxm4y6gmvp011ccyrev6z5p"
+        },
+        {
+          "tier": 4,
+          "name": "Spanish Segunda Division RFEF",
+          "cvs": 66.9846,
+          "opta_top10": 71.1541,
+          "opta_top5": 71.7936,
+          "global_rank": 90,
+          "confederation_rank": 52,
+          "league_id": "cegl2ivkc25blcatxp4jmk1ec"
+        },
+        {
+          "tier": 5,
+          "name": "Spanish Tercera Division RFEF",
+          "cvs": 59.7341,
+          "opta_top10": 67.6258,
+          "opta_top5": 68.1824,
+          "global_rank": 185,
+          "confederation_rank": 86,
+          "league_id": "54c65mhi143utomzvvv3q2avh"
+        },
+        {
+          "tier": 6,
+          "name": "Autonómicas",
+          "cvs": 48.5463,
+          "opta_top10": 57.5973,
+          "opta_top5": 58.8603,
+          "global_rank": 315,
+          "confederation_rank": 142,
+          "league_id": "4ad9sdnscsipc990sp5l5n1wq"
+        }
+      ],
+      "s_country": 87.8762,
+      "retention": 0.625752,
+      "iffhs_points": 2073.0,
+      "iffhs_rank": 2
+    },
+    {
+      "rank": 3,
+      "country": "Italy",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Italian Serie A",
+          "cvs": 85.129,
+          "opta_top10": 88.9878,
+          "opta_top5": 90.8357,
+          "global_rank": 3,
+          "confederation_rank": 3,
+          "league_id": "1r097lpxe0xn03ihb7wi98kao"
+        },
+        {
+          "tier": 2,
+          "name": "Italian Serie B",
+          "cvs": 74.6475,
+          "opta_top10": 76.7599,
+          "opta_top5": 78.7336,
+          "global_rank": 34,
+          "confederation_rank": 25,
+          "league_id": "8ey0ww2zsosdmwr8ehsorh6t7"
+        },
+        {
+          "tier": 3,
+          "name": "Serie C",
+          "cvs": 63.9995,
+          "opta_top10": 68.8173,
+          "opta_top5": 70.4203,
+          "global_rank": 132,
+          "confederation_rank": 70,
+          "league_id": "1zp1du9n4rj36p1ss9zbxtqfb"
+        },
+        {
+          "tier": 4,
+          "name": "Serie D",
+          "cvs": 56.4934,
+          "opta_top10": 62.9164,
+          "opta_top5": 63.6831,
+          "global_rank": 232,
+          "confederation_rank": 106,
+          "league_id": "2g6lybov5xk8rlb79ek8imri7"
+        },
+        {
+          "tier": 5,
+          "name": "Eccellenza",
+          "cvs": 50.1166,
+          "opta_top10": 56.913,
+          "opta_top5": 57.5843,
+          "global_rank": 297,
+          "confederation_rank": 131,
+          "league_id": "eu6p2aeg01japjsy3vxl2czro"
+        }
+      ],
+      "s_country": 83.5947,
+      "retention": 0.617189,
+      "iffhs_points": 1972.0,
+      "iffhs_rank": 4
+    },
+    {
+      "rank": 4,
+      "country": "Germany",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "German Bundesliga",
+          "cvs": 84.9947,
+          "opta_top10": 88.2257,
+          "opta_top5": 91.4778,
+          "global_rank": 4,
+          "confederation_rank": 4,
+          "league_id": "6by3h89i2eykc341oz7lv1ddd"
+        },
+        {
+          "tier": 2,
+          "name": "German Bundesliga Zwei",
+          "cvs": 75.953,
+          "opta_top10": 77.5852,
+          "opta_top5": 78.7758,
+          "global_rank": 25,
+          "confederation_rank": 17,
+          "league_id": "722fdbecxzcq9788l6jqclzlw"
+        },
+        {
+          "tier": 3,
+          "name": "German 3rd Liga",
+          "cvs": 69.5966,
+          "opta_top10": 72.0132,
+          "opta_top5": 72.9811,
+          "global_rank": 63,
+          "confederation_rank": 39,
+          "league_id": "dkarmrybx9vx10rg7cywumth0"
+        },
+        {
+          "tier": 4,
+          "name": "Regionalliga",
+          "cvs": 62.6635,
+          "opta_top10": 68.5923,
+          "opta_top5": 69.5283,
+          "global_rank": 150,
+          "confederation_rank": 77,
+          "league_id": "3iwftmprsznl6yribr11a8l9m"
+        },
+        {
+          "tier": 5,
+          "name": "Oberliga",
+          "cvs": 51.9871,
+          "opta_top10": 61.1486,
+          "opta_top5": 61.9891,
+          "global_rank": 279,
+          "confederation_rank": 120,
+          "league_id": "2sla6rn7prvvm7miswg39fwqz"
+        },
+        {
+          "tier": 6,
+          "name": "State Leagues",
+          "cvs": 40.9279,
+          "opta_top10": 50.0668,
+          "opta_top5": 50.7515,
+          "global_rank": 393,
+          "confederation_rank": 177,
+          "league_id": "1beh38q848j7v2pdt68sbkydw"
+        }
+      ],
+      "s_country": 79.6948,
+      "retention": 0.60939,
+      "iffhs_points": 1880.0,
+      "iffhs_rank": 5
+    },
+    {
+      "rank": 5,
+      "country": "France",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "French Ligue 1",
+          "cvs": 84.1647,
+          "opta_top10": 87.4165,
+          "opta_top5": 89.5022,
+          "global_rank": 5,
+          "confederation_rank": 5,
+          "league_id": "dm5ka0os1e3dxcp3vh05kmp33"
+        },
+        {
+          "tier": 2,
+          "name": "French Ligue 2",
+          "cvs": 74.1078,
+          "opta_top10": 75.9362,
+          "opta_top5": 76.9238,
+          "global_rank": 41,
+          "confederation_rank": 27,
+          "league_id": "4w7x0s5gfs5abasphlha5de8k"
+        },
+        {
+          "tier": 3,
+          "name": "French National 1",
+          "cvs": 68.4418,
+          "opta_top10": 70.3271,
+          "opta_top5": 71.3201,
+          "global_rank": 70,
+          "confederation_rank": 42,
+          "league_id": "1qd0wvt30rlswa4g6nu4na660"
+        },
+        {
+          "tier": 4,
+          "name": "National 2",
+          "cvs": 62.6801,
+          "opta_top10": 66.1657,
+          "opta_top5": 67.3201,
+          "global_rank": 149,
+          "confederation_rank": 79,
+          "league_id": "9rpro4x6j1xhkyijm18gkhmy4"
+        },
+        {
+          "tier": 5,
+          "name": "National 3",
+          "cvs": 58.4432,
+          "opta_top10": 62.844,
+          "opta_top5": 63.5293,
+          "global_rank": 209,
+          "confederation_rank": 98,
+          "league_id": "etl8yxjt7x3cyzduc6x5eg7ti"
+        }
+      ],
+      "s_country": 63.671,
+      "retention": 0.577342,
+      "iffhs_points": 1502.0,
+      "iffhs_rank": 6
+    },
+    {
+      "rank": 6,
+      "country": "Belgium",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Belgian Jupiler Pro League",
+          "cvs": 80.4005,
+          "opta_top10": 82.2867,
+          "opta_top5": 84.7515,
+          "global_rank": 6,
+          "confederation_rank": 6,
+          "league_id": "4zwgbb66rif2spcoeeol2motx"
+        },
+        {
+          "tier": 2,
+          "name": "Belgian Challenger Pro League",
+          "cvs": 67.9251,
+          "opta_top10": 70.3554,
+          "opta_top5": 72.8302,
+          "global_rank": 79,
+          "confederation_rank": 45,
+          "league_id": "af79lqrc0ntom74zq13ccjslo"
+        },
+        {
+          "tier": 3,
+          "name": "Belgian Division 1",
+          "cvs": 58.7309,
+          "opta_top10": 62.2523,
+          "opta_top5": 64.0636,
+          "global_rank": 201,
+          "confederation_rank": 93,
+          "league_id": "4qjmo9aphtgpboin0pldiwzc9"
+        },
+        {
+          "tier": 4,
+          "name": "Division 2",
+          "cvs": 52.1269,
+          "opta_top10": 56.1122,
+          "opta_top5": 57.2192,
+          "global_rank": 277,
+          "confederation_rank": 119,
+          "league_id": "58frfwi1ggvc2y45ux6a0t71b"
+        },
+        {
+          "tier": 5,
+          "name": "Division 3",
+          "cvs": 45.7603,
+          "opta_top10": 50.4541,
+          "opta_top5": 51.3894,
+          "global_rank": 346,
+          "confederation_rank": 153,
+          "league_id": "esxl38qxi3mp7hdznyxw1fx7v"
+        },
+        {
+          "tier": 6,
+          "name": "Provincial",
+          "cvs": 38.4222,
+          "opta_top10": 45.1761,
+          "opta_top5": 46.3607,
+          "global_rank": 405,
+          "confederation_rank": 181,
+          "league_id": "3a63db1h3skgftkxqy7ev4f4m"
+        }
+      ],
+      "s_country": 40.5892,
+      "retention": 0.531178,
+      "iffhs_points": 957.5,
+      "iffhs_rank": 12
+    },
+    {
+      "rank": 7,
+      "country": "Portugal",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Portuguese Primeira Liga",
+          "cvs": 80.1247,
+          "opta_top10": 83.7311,
+          "opta_top5": 88.3518,
+          "global_rank": 7,
+          "confederation_rank": 7,
+          "league_id": "8yi6ejjd1zudcqtbn07haahg6"
+        },
+        {
+          "tier": 2,
+          "name": "Portuguese Segunda Liga",
+          "cvs": 71.0368,
+          "opta_top10": 72.7131,
+          "opta_top5": 74.1204,
+          "global_rank": 53,
+          "confederation_rank": 35,
+          "league_id": "8sdpk4aerruf515yh76ezo7vi"
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 65.3701,
+          "opta_top10": 67.3316,
+          "opta_top5": 68.473,
+          "global_rank": 110,
+          "confederation_rank": 61,
+          "league_id": "4yzidekywejmxxp77gqmdgopg"
+        },
+        {
+          "tier": 4,
+          "name": "Campeonato de Portugal Prio",
+          "cvs": 59.0602,
+          "opta_top10": 62.5395,
+          "opta_top5": 63.7007,
+          "global_rank": 197,
+          "confederation_rank": 94,
+          "league_id": "d88wxnb1q9o8jhw9enklfy5ww"
+        }
+      ],
+      "s_country": 48.5375,
+      "retention": 0.547075,
+      "iffhs_points": 1145.0,
+      "iffhs_rank": 7
+    },
+    {
+      "rank": 8,
+      "country": "Argentina",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Profesional Argentina",
+          "cvs": 80.0034,
+          "opta_top10": 82.9204,
+          "opta_top5": 83.7178,
+          "global_rank": 8,
+          "confederation_rank": 1,
+          "league_id": "581t4mywybx21wcpmpykhyzr3"
+        },
+        {
+          "tier": 2,
+          "name": "Argentina Primera Nacional",
+          "cvs": 74.2078,
+          "opta_top10": 76.1891,
+          "opta_top5": 76.6047,
+          "global_rank": 38,
+          "confederation_rank": 15,
+          "league_id": "byu00jvt1j6csyv4y1lkt2fm2"
+        },
+        {
+          "tier": 3,
+          "name": "Torneo Federal A",
+          "cvs": 67.3574,
+          "opta_top10": 69.644,
+          "opta_top5": 70.4095,
+          "global_rank": 87,
+          "confederation_rank": 25.5,
+          "league_id": "a08z7wsz0uqx90wsj33g65fcd"
+        },
+        {
+          "tier": 4,
+          "name": "Argentina Primera B (Metropolitana)",
+          "cvs": 59.6799,
+          "opta_top10": 61.0747,
+          "opta_top5": 61.9729,
+          "global_rank": 186,
+          "confederation_rank": 32,
+          "league_id": "66nxwll8fur0rtp9q7wqaki1l"
+        },
+        {
+          "tier": 5,
+          "name": "Torneo Regional Federal Amateur",
+          "cvs": 52.1849,
+          "opta_top10": 63.306,
+          "opta_top5": 65.2652,
+          "global_rank": 275,
+          "confederation_rank": 25.5,
+          "league_id": "5zfudxcld0kr6bspk1jauq3t9"
+        },
+        {
+          "tier": 6,
+          "name": "Argentina Primera C (Metropolitana)",
+          "cvs": 45.3437,
+          "opta_top10": 48.2937,
+          "opta_top5": 49.1843,
+          "global_rank": 348,
+          "confederation_rank": 49,
+          "league_id": "2tyo5z2kcb5eiv8u53ne72yn4"
+        },
+        {
+          "tier": 7,
+          "name": "Torneo Promocional Amateur",
+          "cvs": 36.2716,
+          "opta_top10": 40.0206,
+          "opta_top5": 42.0728,
+          "global_rank": 411,
+          "confederation_rank": 50,
+          "league_id": "57cs3ewfi1ql2l6lrm29kf6dw"
+        }
+      ],
+      "s_country": 46.1636,
+      "retention": 0.542327,
+      "iffhs_points": 1089.0,
+      "iffhs_rank": 8
+    },
+    {
+      "rank": 9,
+      "country": "Brazil",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Brazilian Serie A",
+          "cvs": 79.9789,
+          "opta_top10": 81.8354,
+          "opta_top5": 83.6714,
+          "global_rank": 9,
+          "confederation_rank": null,
+          "league_id": "scf9p4y91yjvqvg5jndxzhxj"
+        },
+        {
+          "tier": 2,
+          "name": "Brazilian Serie B",
+          "cvs": 68.3491,
+          "opta_top10": 69.6677,
+          "opta_top5": 70.3365,
+          "global_rank": 72,
+          "confederation_rank": 21,
+          "league_id": "5zr0b05eyx25km7z1k03ca9jx"
+        },
+        {
+          "tier": 3,
+          "name": "Brazilian Paulista",
+          "cvs": 65.1567,
+          "opta_top10": 75.1767,
+          "opta_top5": 81.1935,
+          "global_rank": 114,
+          "confederation_rank": 5.5,
+          "league_id": "eo8sb5ohs5xw2s96ihfhbvgvy"
+        },
+        {
+          "tier": 4,
+          "name": "Brazilian Serie C",
+          "cvs": 59.2705,
+          "opta_top10": 61.8091,
+          "opta_top5": 65.016,
+          "global_rank": 193,
+          "confederation_rank": 38,
+          "league_id": "cfesxhzb83yl8b779uv3revz1"
+        },
+        {
+          "tier": 5,
+          "name": "Brazilian Carioca",
+          "cvs": 58.5297,
+          "opta_top10": 61.7727,
+          "opta_top5": 77.7317,
+          "global_rank": 206,
+          "confederation_rank": 5.5,
+          "league_id": "b0dgf9ig6lyl992efpblsg3o5"
+        },
+        {
+          "tier": 6,
+          "name": "Brazilian Mineiro",
+          "cvs": 55.372,
+          "opta_top10": 57.799,
+          "opta_top5": 70.0547,
+          "global_rank": 247,
+          "confederation_rank": 5.5,
+          "league_id": "craznzmzk01hn9gjbj3g3mjah"
+        },
+        {
+          "tier": 7,
+          "name": "Paranaense 1",
+          "cvs": 55.3545,
+          "opta_top10": 58.0999,
+          "opta_top5": 70.431,
+          "global_rank": 248,
+          "confederation_rank": 5.5,
+          "league_id": "3gjh0wh5rfu4yrnu6gilln9wl"
+        },
+        {
+          "tier": 8,
+          "name": "Brazilian Gaúcho",
+          "cvs": 55.243,
+          "opta_top10": 57.7085,
+          "opta_top5": 68.6582,
+          "global_rank": 249,
+          "confederation_rank": 5.5,
+          "league_id": "bv2uk1yawdco66ife2wxrzazm"
+        },
+        {
+          "tier": 9,
+          "name": "Catarinense 1",
+          "cvs": 54.6563,
+          "opta_top10": 57.4516,
+          "opta_top5": 67.0993,
+          "global_rank": 255,
+          "confederation_rank": 5.5,
+          "league_id": "4fujcptop9waua3f96go6c93a"
+        },
+        {
+          "tier": 10,
+          "name": "Pernambucano 1",
+          "cvs": 51.9414,
+          "opta_top10": 51.9414,
+          "opta_top5": 58.1094,
+          "global_rank": 280,
+          "confederation_rank": 21,
+          "league_id": "515zp8193llecturbp2mgpv81"
+        },
+        {
+          "tier": 11,
+          "name": "Goiano 1",
+          "cvs": 51.4684,
+          "opta_top10": 53.4885,
+          "opta_top5": 63.009,
+          "global_rank": 286,
+          "confederation_rank": 38,
+          "league_id": "960sty6j8g82423zpmtu7eaee"
+        },
+        {
+          "tier": 12,
+          "name": "Brazilian Cearense",
+          "cvs": 50.8866,
+          "opta_top10": 50.8866,
+          "opta_top5": 59.4076,
+          "global_rank": 290,
+          "confederation_rank": 51,
+          "league_id": "dwteofckcdxa41bxw5rzalt23"
+        },
+        {
+          "tier": 13,
+          "name": "Baiano 1",
+          "cvs": 50.6543,
+          "opta_top10": 50.6543,
+          "opta_top5": 59.4953,
+          "global_rank": 292,
+          "confederation_rank": 5.5,
+          "league_id": "4sdxtqddcbnckfbb59m1xdalj"
+        },
+        {
+          "tier": 14,
+          "name": "Alagoano 1",
+          "cvs": 48.2779,
+          "opta_top10": 48.2779,
+          "opta_top5": 52.8691,
+          "global_rank": 319,
+          "confederation_rank": 38,
+          "league_id": "u7lq7crm0r53b0xfmzz5rw5d"
+        },
+        {
+          "tier": 15,
+          "name": "Serie D",
+          "cvs": 48.2156,
+          "opta_top10": 53.8514,
+          "opta_top5": 56.3133,
+          "global_rank": 321,
+          "confederation_rank": 38,
+          "league_id": "9nbpdi9q3ywcm4q0j5u0ekwcq"
+        },
+        {
+          "tier": 16,
+          "name": "Paraense A1",
+          "cvs": 47.114,
+          "opta_top10": 48.6495,
+          "opta_top5": 55.6074,
+          "global_rank": 335,
+          "confederation_rank": 5.5,
+          "league_id": "56kbffapmubfiq7unbzc1re4n"
+        },
+        {
+          "tier": 17,
+          "name": "Matogrossense 1",
+          "cvs": 46.1734,
+          "opta_top10": 46.1734,
+          "opta_top5": 50.5198,
+          "global_rank": 341,
+          "confederation_rank": 21,
+          "league_id": "2udulamnbhyjqv4p4owbghmo8"
+        },
+        {
+          "tier": 18,
+          "name": "Sergipano 1",
+          "cvs": 45.8342,
+          "opta_top10": 45.8342,
+          "opta_top5": 50.9549,
+          "global_rank": 345,
+          "confederation_rank": 38,
+          "league_id": "4j8uz20iox42s82zs2d6zlswf"
+        },
+        {
+          "tier": 19,
+          "name": "Amazonense 1",
+          "cvs": 44.2157,
+          "opta_top10": 44.2157,
+          "opta_top5": 48.9547,
+          "global_rank": 361,
+          "confederation_rank": 52,
+          "league_id": "dlcz2yedcz5h74e96opmb8awx"
+        },
+        {
+          "tier": 20,
+          "name": "Paraibano 1",
+          "cvs": 43.9648,
+          "opta_top10": 43.9648,
+          "opta_top5": 47.9666,
+          "global_rank": 366,
+          "confederation_rank": 38,
+          "league_id": "47e4kf7on49r1j8tbl4lasp9p"
+        },
+        {
+          "tier": 21,
+          "name": "Maranhense 1",
+          "cvs": 43.2523,
+          "opta_top10": 43.2523,
+          "opta_top5": 47.5755,
+          "global_rank": 373,
+          "confederation_rank": 38,
+          "league_id": "73w1cmn2hulv1zybihv7mua26"
+        },
+        {
+          "tier": 22,
+          "name": "Brasiliense A",
+          "cvs": 42.9357,
+          "opta_top10": 42.9357,
+          "opta_top5": 45.7523,
+          "global_rank": 376,
+          "confederation_rank": 45,
+          "league_id": "823yw2xbtippuaqmli2fovpgs"
+        },
+        {
+          "tier": 23,
+          "name": "Piauiense",
+          "cvs": 42.1188,
+          "opta_top10": 42.1188,
+          "opta_top5": 44.6039,
+          "global_rank": 383,
+          "confederation_rank": 45,
+          "league_id": "8cb4lvjv76e5sd9o2fn2q2nnd"
+        },
+        {
+          "tier": 24,
+          "name": "Acreano",
+          "cvs": 40.618,
+          "opta_top10": 40.618,
+          "opta_top5": 42.3741,
+          "global_rank": 394,
+          "confederation_rank": 45,
+          "league_id": "9bhbv5iu5o9u3dt1h1xvqhbpw"
+        },
+        {
+          "tier": 25,
+          "name": "Amapaense",
+          "cvs": 40.5481,
+          "opta_top10": 40.5481,
+          "opta_top5": 43.084,
+          "global_rank": 395,
+          "confederation_rank": 45,
+          "league_id": "996mhhz95lye3ciuvchb06cv9"
+        },
+        {
+          "tier": 26,
+          "name": "Capixaba A",
+          "cvs": 40.2861,
+          "opta_top10": 40.2861,
+          "opta_top5": 43.45,
+          "global_rank": 396,
+          "confederation_rank": 45,
+          "league_id": "3rbuh3w1ahh5wbr0b1vjzdwru"
+        }
+      ],
+      "s_country": 84.7393,
+      "retention": 0.619479,
+      "iffhs_points": 1999.0,
+      "iffhs_rank": 3
+    },
+    {
+      "rank": 10,
+      "country": "Denmark",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Danish Superligaen",
+          "cvs": 78.9169,
+          "opta_top10": 79.8635,
+          "opta_top5": 82.0138,
+          "global_rank": 11,
+          "confederation_rank": 9,
+          "league_id": "29actv1ohj8r10kd9hu0jnb0n"
+        },
+        {
+          "tier": 2,
+          "name": "Danish 1. Division",
+          "cvs": 64.3453,
+          "opta_top10": 65.285,
+          "opta_top5": 67.0345,
+          "global_rank": 125,
+          "confederation_rank": 67,
+          "league_id": "6ifaeunfdelecgticvxanikzu"
+        },
+        {
+          "tier": 3,
+          "name": "2. Division",
+          "cvs": 55.4176,
+          "opta_top10": 56.148,
+          "opta_top5": 58.2839,
+          "global_rank": 246,
+          "confederation_rank": 112,
+          "league_id": "8vbck9a4mxjms783lf72779uu"
+        },
+        {
+          "tier": 4,
+          "name": "3. Division",
+          "cvs": 49.5177,
+          "opta_top10": 50.0876,
+          "opta_top5": 52.0105,
+          "global_rank": 302,
+          "confederation_rank": 134,
+          "league_id": "4vt0ldrcl6thpxpcs8zmpdq1g"
+        },
+        {
+          "tier": 5,
+          "name": "Denmark Series",
+          "cvs": 41.7491,
+          "opta_top10": 46.6793,
+          "opta_top5": 47.9202,
+          "global_rank": 386,
+          "confederation_rank": 175,
+          "league_id": "942hrw15c92ml9o2j88434z49"
+        }
+      ],
+      "s_country": 24.4277,
+      "retention": 0.498855,
+      "iffhs_points": 576.25,
+      "iffhs_rank": 25
+    },
+    {
+      "rank": 11,
+      "country": "Poland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Polish Ekstraklasa",
+          "cvs": 78.2507,
+          "opta_top10": 79.3821,
+          "opta_top5": 80.2789,
+          "global_rank": 12,
+          "confederation_rank": 10,
+          "league_id": "7hl0svs2hg225i2zud0g3xzp2"
+        },
+        {
+          "tier": 2,
+          "name": "I Liga",
+          "cvs": 67.0414,
+          "opta_top10": 68.7765,
+          "opta_top5": 69.8722,
+          "global_rank": 89,
+          "confederation_rank": 54,
+          "league_id": "8dn0w8zh7nbn2i904603eigwf"
+        },
+        {
+          "tier": 3,
+          "name": "II Liga",
+          "cvs": 60.608,
+          "opta_top10": 62.411,
+          "opta_top5": 63.3341,
+          "global_rank": 174,
+          "confederation_rank": 82,
+          "league_id": "663a54fmymndjeev47qm7d3nf"
+        },
+        {
+          "tier": 4,
+          "name": "III Liga",
+          "cvs": 54.1217,
+          "opta_top10": 59.3869,
+          "opta_top5": 60.5571,
+          "global_rank": 260,
+          "confederation_rank": 117,
+          "league_id": "4jieyfpyom8d011dgeqj77ojm"
+        },
+        {
+          "tier": 5,
+          "name": "IV Liga",
+          "cvs": 46.0584,
+          "opta_top10": 55.8722,
+          "opta_top5": 57.1856,
+          "global_rank": 343,
+          "confederation_rank": 154,
+          "league_id": "8b6pm41x365md8ojlb2y47v9w"
+        }
+      ],
+      "s_country": 27.3209,
+      "retention": 0.504642,
+      "iffhs_points": 644.5,
+      "iffhs_rank": 23
+    },
+    {
+      "rank": 12,
+      "country": "USA",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "US Major League Soccer",
+          "cvs": 77.9976,
+          "opta_top10": 81.4484,
+          "opta_top5": 83.0573,
+          "global_rank": 13,
+          "confederation_rank": 1,
+          "league_id": "287tckirbfj9nb8ar2k9r60vn"
+        },
+        {
+          "tier": 2,
+          "name": "USL Championship",
+          "cvs": 63.234,
+          "opta_top10": 65.9862,
+          "opta_top5": 67.5319,
+          "global_rank": 141,
+          "confederation_rank": 9,
+          "league_id": "c1d9p6b2e9zr5tqlzx3ktjplg"
+        },
+        {
+          "tier": 3,
+          "name": "USL League One",
+          "cvs": 56.2755,
+          "opta_top10": 57.7172,
+          "opta_top5": 59.1039,
+          "global_rank": 233,
+          "confederation_rank": 24,
+          "league_id": "jznihqxle06xych9ygwiwnsa"
+        },
+        {
+          "tier": 4,
+          "name": "MLS Next Pro",
+          "cvs": 54.7759,
+          "opta_top10": 57.342,
+          "opta_top5": 58.5949,
+          "global_rank": 252,
+          "confederation_rank": 26,
+          "league_id": "5qmjkpvi92vrzdcb2knassjkk"
+        },
+        {
+          "tier": 5,
+          "name": "USL League Two",
+          "cvs": 45.52,
+          "opta_top10": 56.2377,
+          "opta_top5": 57.1715,
+          "global_rank": 347,
+          "confederation_rank": 40,
+          "league_id": "enzlj1as2raqm4ids1zyb07y1"
+        },
+        {
+          "tier": 6,
+          "name": "NPSL",
+          "cvs": 43.664,
+          "opta_top10": 52.5564,
+          "opta_top5": 54.2008,
+          "global_rank": 367,
+          "confederation_rank": 42,
+          "league_id": "aw2pkmmbu8d4lggcw85yzrcdm"
+        }
+      ],
+      "s_country": 18.0903,
+      "retention": 0.486181,
+      "iffhs_points": 426.75,
+      "iffhs_rank": 40
+    },
+    {
+      "rank": 13,
+      "country": "Croatia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Croatia Prva HNL",
+          "cvs": 77.9329,
+          "opta_top10": 77.9329,
+          "opta_top5": 80.462,
+          "global_rank": 14,
+          "confederation_rank": 11,
+          "league_id": "1b70m6qtxrp75b4vtk8hxh8c3"
+        },
+        {
+          "tier": 2,
+          "name": "First NL",
+          "cvs": 65.7102,
+          "opta_top10": 66.1837,
+          "opta_top5": 67.3444,
+          "global_rank": 104,
+          "confederation_rank": 59,
+          "league_id": "esrunz7rjb0td98mx9e5cedoy"
+        },
+        {
+          "tier": 3,
+          "name": "Second NL",
+          "cvs": 51.8285,
+          "opta_top10": 53.9355,
+          "opta_top5": 55.7855,
+          "global_rank": 284,
+          "confederation_rank": 122,
+          "league_id": "4nconewk3ipq2ql9a41h40ff8"
+        },
+        {
+          "tier": 4,
+          "name": "Third NL",
+          "cvs": 44.965,
+          "opta_top10": 50.1011,
+          "opta_top5": 51.3876,
+          "global_rank": 355,
+          "confederation_rank": 156,
+          "league_id": "2cxbyioo1wh4qeq09kjdp3g10"
+        }
+      ],
+      "s_country": 22.7321,
+      "retention": 0.495464,
+      "iffhs_points": 536.25,
+      "iffhs_rank": 27
+    },
+    {
+      "rank": 14,
+      "country": "Norway",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Norwegian Eliteserien",
+          "cvs": 77.7768,
+          "opta_top10": 79.5843,
+          "opta_top5": 82.0497,
+          "global_rank": 15,
+          "confederation_rank": 12,
+          "league_id": "9ynnnx1qmkizq1o3qr3v0nsuk"
+        },
+        {
+          "tier": 2,
+          "name": "Norwegian 1. divisjon",
+          "cvs": 67.9023,
+          "opta_top10": 70.1927,
+          "opta_top5": 72.9832,
+          "global_rank": 80,
+          "confederation_rank": 50,
+          "league_id": "7r1f93t6ddrsa5n8v1nq6qlzm"
+        },
+        {
+          "tier": 3,
+          "name": "2. Division",
+          "cvs": 59.484,
+          "opta_top10": 63.7008,
+          "opta_top5": 64.8304,
+          "global_rank": 188,
+          "confederation_rank": 83,
+          "league_id": "3p81ltz6845appgkbgkzxueii"
+        },
+        {
+          "tier": 4,
+          "name": "3. Division",
+          "cvs": 49.9038,
+          "opta_top10": 57.2324,
+          "opta_top5": 58.008,
+          "global_rank": 298,
+          "confederation_rank": 138,
+          "league_id": "a4fgj2rfbpf4ejo1qi624fefo"
+        }
+      ],
+      "s_country": 21.1848,
+      "retention": 0.49237,
+      "iffhs_points": 499.75,
+      "iffhs_rank": 30
+    },
+    {
+      "rank": 15,
+      "country": "Turkey",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Turkish Super Lig",
+          "cvs": 77.3506,
+          "opta_top10": 80.3531,
+          "opta_top5": 83.7492,
+          "global_rank": 16,
+          "confederation_rank": 13,
+          "league_id": "482ofyysbdbeoxauk19yg7tdt"
+        },
+        {
+          "tier": 2,
+          "name": "Turkish 1. Lig",
+          "cvs": 65.1861,
+          "opta_top10": 67.9554,
+          "opta_top5": 69.7308,
+          "global_rank": 112,
+          "confederation_rank": 63,
+          "league_id": "2o9svokc5s7diish3ycrzk7jm"
+        },
+        {
+          "tier": 3,
+          "name": "2. Lig",
+          "cvs": 56.9693,
+          "opta_top10": 61.4386,
+          "opta_top5": 62.3828,
+          "global_rank": 228,
+          "confederation_rank": 105,
+          "league_id": "2nttcoriwf5co73vmz1vr8frm"
+        },
+        {
+          "tier": 4,
+          "name": "3. Lig",
+          "cvs": 49.4426,
+          "opta_top10": 55.3341,
+          "opta_top5": 56.974,
+          "global_rank": 303,
+          "confederation_rank": 136,
+          "league_id": "907l7wtxdvugdo9i2249wcmr0"
+        },
+        {
+          "tier": 5,
+          "name": "Bölgesel Amatör Lig",
+          "cvs": 41.5043,
+          "opta_top10": 48.8026,
+          "opta_top5": 49.9649,
+          "global_rank": 388,
+          "confederation_rank": 176,
+          "league_id": "eg9t4hey3lmbfhcsj5m4qnxbe"
+        }
+      ],
+      "s_country": 41.543,
+      "retention": 0.533086,
+      "iffhs_points": 980.0,
+      "iffhs_rank": 11
+    },
+    {
+      "rank": 16,
+      "country": "Netherlands",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Dutch Eredivisie",
+          "cvs": 77.3098,
+          "opta_top10": 80.609,
+          "opta_top5": 82.9874,
+          "global_rank": 17,
+          "confederation_rank": 14,
+          "league_id": "akmkihra9ruad09ljapsm84b3"
+        },
+        {
+          "tier": 2,
+          "name": "Dutch Eerste Divisie",
+          "cvs": 64.5825,
+          "opta_top10": 67.1525,
+          "opta_top5": 69.0494,
+          "global_rank": 123,
+          "confederation_rank": 65,
+          "league_id": "1gwajyt0pk2jm5fx5mu36v114"
+        },
+        {
+          "tier": 3,
+          "name": "Dutch Tweede Divisie",
+          "cvs": 58.2326,
+          "opta_top10": 59.9341,
+          "opta_top5": 61.3141,
+          "global_rank": 212,
+          "confederation_rank": 95,
+          "league_id": "913mb508il6jzwtlj28fl892h"
+        },
+        {
+          "tier": 4,
+          "name": "Derde Divisie",
+          "cvs": 48.7641,
+          "opta_top10": 52.1963,
+          "opta_top5": 52.9246,
+          "global_rank": 311,
+          "confederation_rank": 139,
+          "league_id": "cniic1ov3puzi4ij6qdin42zf"
+        },
+        {
+          "tier": 5,
+          "name": "Vierde Divisie",
+          "cvs": 42.2721,
+          "opta_top10": 46.5376,
+          "opta_top5": 47.3764,
+          "global_rank": 381,
+          "confederation_rank": 167,
+          "league_id": "wss36goxzn5vk5ezvpk4z7wl"
+        },
+        {
+          "tier": 6,
+          "name": "Eerste Klasse",
+          "cvs": 34.8983,
+          "opta_top10": 40.2621,
+          "opta_top5": 40.9842,
+          "global_rank": 414,
+          "confederation_rank": 186,
+          "league_id": "5nc1z8rz3f8uiip1qhdkgdf1x"
+        }
+      ],
+      "s_country": 45.231,
+      "retention": 0.540462,
+      "iffhs_points": 1067.0,
+      "iffhs_rank": 9
+    },
+    {
+      "rank": 17,
+      "country": "Ecuador",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ecuador Liga Pro",
+          "cvs": 77.2522,
+          "opta_top10": 78.9501,
+          "opta_top5": 81.188,
+          "global_rank": 18,
+          "confederation_rank": 10,
+          "league_id": "6lwpjhktjhl9g7x2w7njmzva6"
+        },
+        {
+          "tier": 2,
+          "name": "Liga Pro Serie B",
+          "cvs": 68.3132,
+          "opta_top10": 68.6935,
+          "opta_top5": 69.8652,
+          "global_rank": 73,
+          "confederation_rank": 24,
+          "league_id": "bq89wbdvedtov6auzuh6rsv7s"
+        },
+        {
+          "tier": 3,
+          "name": "Segunda Categoria",
+          "cvs": 61.1315,
+          "opta_top10": 66.1504,
+          "opta_top5": 67.5273,
+          "global_rank": 167,
+          "confederation_rank": null,
+          "league_id": "ddyci52f0zxfwi9qozf2k1fu2"
+        }
+      ],
+      "s_country": 34.6545,
+      "retention": 0.519309,
+      "iffhs_points": 817.5,
+      "iffhs_rank": 14
+    },
+    {
+      "rank": 18,
+      "country": "Colombia",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Colombia Primera A Apertura",
+          "cvs": 77.2127,
+          "opta_top10": 80.1241,
+          "opta_top5": 81.111,
+          "global_rank": 19,
+          "confederation_rank": 11,
+          "league_id": "2ty8ihceabty8yddmu31iuuej"
+        },
+        {
+          "tier": 2,
+          "name": "Primera B",
+          "cvs": 68.0475,
+          "opta_top10": 70.2668,
+          "opta_top5": 72.2495,
+          "global_rank": 76,
+          "confederation_rank": 23,
+          "league_id": "by5nibd18nkt40t0j8a0j5yzx"
+        }
+      ],
+      "s_country": 43.4718,
+      "retention": 0.536944,
+      "iffhs_points": 1025.5,
+      "iffhs_rank": 10
+    },
+    {
+      "rank": 19,
+      "country": "Japan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Japanese J1 League",
+          "cvs": 76.8216,
+          "opta_top10": 79.227,
+          "opta_top5": 80.6336,
+          "global_rank": 21,
+          "confederation_rank": 1,
+          "league_id": "8o5tv5viv4hy1qg9jp94k7ayb"
+        },
+        {
+          "tier": 2,
+          "name": "Japanese J2 League",
+          "cvs": 68.2471,
+          "opta_top10": 70.6787,
+          "opta_top5": 71.5986,
+          "global_rank": 75,
+          "confederation_rank": 7,
+          "league_id": "5z8v4mj6cjs9ex6hdrpourjzh"
+        },
+        {
+          "tier": 3,
+          "name": "Japanese J3 League",
+          "cvs": 61.352,
+          "opta_top10": 63.2694,
+          "opta_top5": 64.5544,
+          "global_rank": 164,
+          "confederation_rank": 23,
+          "league_id": "b1rveez5u792gess9w3e7v5le"
+        },
+        {
+          "tier": 4,
+          "name": "Japan Football League",
+          "cvs": 52.1524,
+          "opta_top10": 53.8756,
+          "opta_top5": 55.5114,
+          "global_rank": 276,
+          "confederation_rank": 44,
+          "league_id": "dugi7e4nkmsbhtaacqr27fd8z"
+        },
+        {
+          "tier": 5,
+          "name": "Regional Leagues",
+          "cvs": 41.3573,
+          "opta_top10": 52.193,
+          "opta_top5": 53.3573,
+          "global_rank": 390,
+          "confederation_rank": 64,
+          "league_id": "5hwvpu5kcvehmftkhf8m6bvje"
+        }
+      ],
+      "s_country": 29.7054,
+      "retention": 0.509411,
+      "iffhs_points": 700.75,
+      "iffhs_rank": 18
+    },
+    {
+      "rank": 20,
+      "country": "Switzerland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Brack Super League",
+          "cvs": 76.106,
+          "opta_top10": 77.0548,
+          "opta_top5": 78.642,
+          "global_rank": 22,
+          "confederation_rank": 16,
+          "league_id": "e0lck99w8meo9qoalfrxgo33o"
+        },
+        {
+          "tier": 2,
+          "name": "dieci Challenge League",
+          "cvs": 66.4684,
+          "opta_top10": 66.4684,
+          "opta_top5": 69.1021,
+          "global_rank": 94,
+          "confederation_rank": 56,
+          "league_id": "8v97rcbthsxmzqk4ufxws9mug"
+        },
+        {
+          "tier": 3,
+          "name": "1. Liga Promotion",
+          "cvs": 57.3877,
+          "opta_top10": 59.3945,
+          "opta_top5": 61.1387,
+          "global_rank": 224,
+          "confederation_rank": 101,
+          "league_id": "b8rae0ib0frjmwlca429bq19q"
+        },
+        {
+          "tier": 4,
+          "name": "1. Liga Classic",
+          "cvs": 50.6718,
+          "opta_top10": 54.8899,
+          "opta_top5": 56.7383,
+          "global_rank": 291,
+          "confederation_rank": 129,
+          "league_id": "cm3vqed635t5cxc113gkwm5vo"
+        },
+        {
+          "tier": 5,
+          "name": "2. Liga Interregional",
+          "cvs": 43.2335,
+          "opta_top10": 47.6527,
+          "opta_top5": 48.2067,
+          "global_rank": 374,
+          "confederation_rank": 163,
+          "league_id": "bwbb16bizglu0aqhv3uv7vdil"
+        }
+      ],
+      "s_country": 21.3014,
+      "retention": 0.492603,
+      "iffhs_points": 502.5,
+      "iffhs_rank": 29
+    },
+    {
+      "rank": 21,
+      "country": "Russia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Russian Premier League",
+          "cvs": 75.9765,
+          "opta_top10": 78.8325,
+          "opta_top5": 81.5887,
+          "global_rank": 23,
+          "confederation_rank": 20,
+          "league_id": "3ab1uwtoyjopdj1y1fynyy9jg"
+        },
+        {
+          "tier": 2,
+          "name": "First League",
+          "cvs": 66.7047,
+          "opta_top10": 68.4618,
+          "opta_top5": 69.4967,
+          "global_rank": 93,
+          "confederation_rank": 55,
+          "league_id": "bpo885893xeevnzypvifeaqru"
+        },
+        {
+          "tier": 3,
+          "name": "Second League A",
+          "cvs": 57.7595,
+          "opta_top10": 60.4847,
+          "opta_top5": 61.5257,
+          "global_rank": 217,
+          "confederation_rank": 102,
+          "league_id": "8fjt8o9z8pf6wwkng5exwbrx0"
+        },
+        {
+          "tier": 4,
+          "name": "Second League B",
+          "cvs": 48.4379,
+          "opta_top10": 54.4575,
+          "opta_top5": 55.4024,
+          "global_rank": 317,
+          "confederation_rank": 145,
+          "league_id": "1q6us4dsfxfecn66m2riyzh78"
+        },
+        {
+          "tier": 5,
+          "name": "Third League",
+          "cvs": 37.466,
+          "opta_top10": 50.6841,
+          "opta_top5": 52.8243,
+          "global_rank": 408,
+          "confederation_rank": 180,
+          "league_id": "1naivg39wk4egyb3xogzy8jx1"
+        }
+      ],
+      "s_country": 75.9765,
+      "retention": 0.601953
+    },
+    {
+      "rank": 22,
+      "country": "Paraguay",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Division Profesional",
+          "cvs": 75.9576,
+          "opta_top10": 76.8383,
+          "opta_top5": 78.7161,
+          "global_rank": 24,
+          "confederation_rank": 12,
+          "league_id": "5y0z0l2epprzbscvzsgldw8vu"
+        },
+        {
+          "tier": 2,
+          "name": "Division Intermedia",
+          "cvs": 65.9974,
+          "opta_top10": 67.3832,
+          "opta_top5": 69.2376,
+          "global_rank": 100,
+          "confederation_rank": 27,
+          "league_id": "6qitd9h242qkvjenaytfdnsf2"
+        }
+      ],
+      "s_country": 28.4019,
+      "retention": 0.506804,
+      "iffhs_points": 670.0,
+      "iffhs_rank": 19
+    },
+    {
+      "rank": 23,
+      "country": "Greece",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Greek Super League",
+          "cvs": 75.9288,
+          "opta_top10": 78.1469,
+          "opta_top5": 82.5964,
+          "global_rank": 26,
+          "confederation_rank": 19,
+          "league_id": "c0r21rtokgnbtc0o2rldjmkxu"
+        },
+        {
+          "tier": 2,
+          "name": "Super League 2",
+          "cvs": 58.1952,
+          "opta_top10": 61.6112,
+          "opta_top5": 64.4441,
+          "global_rank": 213,
+          "confederation_rank": 97,
+          "league_id": "4k8p8nmee0yjb7j7177474sx6"
+        },
+        {
+          "tier": 3,
+          "name": "Gamma Ethniki",
+          "cvs": 42.9863,
+          "opta_top10": 49.5413,
+          "opta_top5": 51.2642,
+          "global_rank": 375,
+          "confederation_rank": 169,
+          "league_id": "eejymql2i8u0rurwx7a60knkk"
+        }
+      ],
+      "s_country": 31.7189,
+      "retention": 0.513438,
+      "iffhs_points": 748.25,
+      "iffhs_rank": 15
+    },
+    {
+      "rank": 24,
+      "country": "Mexico",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga MX",
+          "cvs": 75.8051,
+          "opta_top10": 78.9281,
+          "opta_top5": 81.2503,
+          "global_rank": 27,
+          "confederation_rank": 2,
+          "league_id": "2hsidwomhjsaaytdy9u5niyi4"
+        },
+        {
+          "tier": 2,
+          "name": "Liga de Expansión MX",
+          "cvs": 67.7814,
+          "opta_top10": 69.4889,
+          "opta_top5": 70.763,
+          "global_rank": 81,
+          "confederation_rank": 6,
+          "league_id": "e1kxdivp5g4cpldgpwvnzl1vv"
+        },
+        {
+          "tier": 3,
+          "name": "Liga Premier Serie A",
+          "cvs": 51.4192,
+          "opta_top10": 56.7521,
+          "opta_top5": 58.6697,
+          "global_rank": 288,
+          "confederation_rank": 31,
+          "league_id": "87h32eza4zpxytxwtezfvzeji"
+        },
+        {
+          "tier": 4,
+          "name": "Liga Premier Serie B",
+          "cvs": 41.279,
+          "opta_top10": 41.279,
+          "opta_top5": 43.915,
+          "global_rank": 391,
+          "confederation_rank": 46,
+          "league_id": "bhz5sqbkzsfq3eghlq8764nl6"
+        },
+        {
+          "tier": 5,
+          "name": "Liga TDP",
+          "cvs": 29.0627,
+          "opta_top10": 40.6628,
+          "opta_top5": 41.793,
+          "global_rank": 433,
+          "confederation_rank": 51,
+          "league_id": "vu7xa99q5fiywp8wpvyn4owk"
+        }
+      ],
+      "s_country": 27.4057,
+      "retention": 0.504811,
+      "iffhs_points": 646.5,
+      "iffhs_rank": 22
+    },
+    {
+      "rank": 25,
+      "country": "Czech Republic",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Czech First League",
+          "cvs": 75.7428,
+          "opta_top10": 77.8196,
+          "opta_top5": 80.8664,
+          "global_rank": 28,
+          "confederation_rank": 21,
+          "league_id": "bu1l7ckihyr0errxw61p0m05"
+        },
+        {
+          "tier": 2,
+          "name": "FNL",
+          "cvs": 65.0977,
+          "opta_top10": 66.3095,
+          "opta_top5": 67.9257,
+          "global_rank": 116,
+          "confederation_rank": 62,
+          "league_id": "ddyrh5latwfhesgfh4w401n92"
+        },
+        {
+          "tier": 3,
+          "name": "3. liga",
+          "cvs": 55.9108,
+          "opta_top10": 61.3764,
+          "opta_top5": 62.742,
+          "global_rank": 239,
+          "confederation_rank": 110,
+          "league_id": "z3w7v4hqa7ssk5p6qkbpg9au"
+        },
+        {
+          "tier": 4,
+          "name": "4. liga",
+          "cvs": 45.1466,
+          "opta_top10": 51.0475,
+          "opta_top5": 51.7758,
+          "global_rank": 349,
+          "confederation_rank": 155,
+          "league_id": "9w8ydnoft05zow8l4wu9sxfq1"
+        }
+      ],
+      "s_country": 30.3518,
+      "retention": 0.510704,
+      "iffhs_points": 716.0,
+      "iffhs_rank": 17
+    },
+    {
+      "rank": 26,
+      "country": "Cyprus",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Cypriot Division 1",
+          "cvs": 75.6806,
+          "opta_top10": 77.9971,
+          "opta_top5": 81.5268,
+          "global_rank": 29,
+          "confederation_rank": 22,
+          "league_id": "btouq8t23agr62ij7e0ju5p6n"
+        },
+        {
+          "tier": 2,
+          "name": "2. Division",
+          "cvs": 60.388,
+          "opta_top10": 62.4911,
+          "opta_top5": 65.0974,
+          "global_rank": 175,
+          "confederation_rank": 85,
+          "league_id": "3za3jptdvgw580jjr9nhhhn6i"
+        },
+        {
+          "tier": 3,
+          "name": "3. Division",
+          "cvs": 47.4433,
+          "opta_top10": 49.8468,
+          "opta_top5": 52.5178,
+          "global_rank": 331,
+          "confederation_rank": 149,
+          "league_id": "9ywgewtyew2xdha6ihra8wr39"
+        }
+      ],
+      "s_country": 27.66,
+      "retention": 0.50532,
+      "iffhs_points": 652.5,
+      "iffhs_rank": 20
+    },
+    {
+      "rank": 27,
+      "country": "Uruguay",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga AUF",
+          "cvs": 75.0848,
+          "opta_top10": 76.816,
+          "opta_top5": 78.5675,
+          "global_rank": 30,
+          "confederation_rank": 13,
+          "league_id": "2wolc27r8z03itcvwp43e38c5"
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 63.187,
+          "opta_top10": 64.2291,
+          "opta_top5": 65.2655,
+          "global_rank": 142,
+          "confederation_rank": 28,
+          "league_id": "6jgwiu2gq3dllmrwt45pfdn2z"
+        },
+        {
+          "tier": 3,
+          "name": "Primera Divisional C",
+          "cvs": 48.5374,
+          "opta_top10": 53.3584,
+          "opta_top5": 56.0991,
+          "global_rank": 316,
+          "confederation_rank": 48,
+          "league_id": "6utr6bfbh7m3wjcy99s5ic9rr"
+        }
+      ],
+      "s_country": 27.4799,
+      "retention": 0.50496,
+      "iffhs_points": 648.25,
+      "iffhs_rank": 21
+    },
+    {
+      "rank": 28,
+      "country": "Hungary",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Hungarian Liga NB I",
+          "cvs": 74.9922,
+          "opta_top10": 75.8475,
+          "opta_top5": 78.0549,
+          "global_rank": 31,
+          "confederation_rank": 23,
+          "league_id": "47s2kt0e8m444ftqvsrqa3bvq"
+        },
+        {
+          "tier": 2,
+          "name": "NB II",
+          "cvs": 64.3316,
+          "opta_top10": 65.7393,
+          "opta_top5": 67.4339,
+          "global_rank": 126,
+          "confederation_rank": 68,
+          "league_id": "beqqnubkv05mamuwvimeum015"
+        },
+        {
+          "tier": 3,
+          "name": "NB III",
+          "cvs": 52.3301,
+          "opta_top10": 59.2916,
+          "opta_top5": 60.4181,
+          "global_rank": 273,
+          "confederation_rank": 123,
+          "league_id": "6w05j3xxw76an1jwkzr6a6m03"
+        }
+      ],
+      "s_country": 17.7406,
+      "retention": 0.485481,
+      "iffhs_points": 418.5,
+      "iffhs_rank": 41
+    },
+    {
+      "rank": 29,
+      "country": "Sweden",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Swedish Allsvenskan",
+          "cvs": 74.9518,
+          "opta_top10": 78.0404,
+          "opta_top5": 79.8985,
+          "global_rank": 32,
+          "confederation_rank": 18,
+          "league_id": "b60nisd3qn427jm0hrg9kvmab"
+        },
+        {
+          "tier": 2,
+          "name": "Swedish Superettan",
+          "cvs": 66.1651,
+          "opta_top10": 68.2598,
+          "opta_top5": 70.4254,
+          "global_rank": 98,
+          "confederation_rank": 58,
+          "league_id": "9chuiarcjofld1dkj9kysehmb"
+        },
+        {
+          "tier": 3,
+          "name": "Ettan",
+          "cvs": 57.5598,
+          "opta_top10": 62.5326,
+          "opta_top5": 64.1109,
+          "global_rank": 221,
+          "confederation_rank": 96,
+          "league_id": "ac112osli9fvox1epcg4ld3t6"
+        },
+        {
+          "tier": 4,
+          "name": "Division 2",
+          "cvs": 49.365,
+          "opta_top10": 55.4269,
+          "opta_top5": 56.0674,
+          "global_rank": 306,
+          "confederation_rank": 140,
+          "league_id": "1owhvvge4wlx7e0e431b4vhqx"
+        }
+      ],
+      "s_country": 12.1662,
+      "retention": 0.474332,
+      "iffhs_points": 287.0,
+      "iffhs_rank": 59
+    },
+    {
+      "rank": 30,
+      "country": "Austria",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Austrian Bundesliga",
+          "cvs": 74.7052,
+          "opta_top10": 75.4667,
+          "opta_top5": 77.4917,
+          "global_rank": 33,
+          "confederation_rank": 24,
+          "league_id": "5c96g1zm7vo5ons9c42uy2w3r"
+        },
+        {
+          "tier": 2,
+          "name": "Austrian 2. Liga",
+          "cvs": 62.851,
+          "opta_top10": 64.2477,
+          "opta_top5": 65.8009,
+          "global_rank": 146,
+          "confederation_rank": 73,
+          "league_id": "a7247po5qs29o3zsfmt222ydu"
+        },
+        {
+          "tier": 3,
+          "name": "Regionalliga",
+          "cvs": 53.5085,
+          "opta_top10": 58.4125,
+          "opta_top5": 59.4355,
+          "global_rank": 267,
+          "confederation_rank": 118,
+          "league_id": "ekyhmsfi4utkxvmak9pq8se0s"
+        },
+        {
+          "tier": 4,
+          "name": "Landesliga",
+          "cvs": 44.7667,
+          "opta_top10": 51.7492,
+          "opta_top5": 52.8622,
+          "global_rank": 357,
+          "confederation_rank": 158,
+          "league_id": "3e79p4eyu2prq96x39nt7djro"
+        }
+      ],
+      "s_country": 19.8707,
+      "retention": 0.489741,
+      "iffhs_points": 468.75,
+      "iffhs_rank": 35
+    },
+    {
+      "rank": 31,
+      "country": "Chile",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Chile Primera",
+          "cvs": 74.5397,
+          "opta_top10": 76.1639,
+          "opta_top5": 77.6063,
+          "global_rank": 35,
+          "confederation_rank": 14,
+          "league_id": "2y8bntiif3a9y6gtmauv30gt"
+        },
+        {
+          "tier": 2,
+          "name": "Chile Primera B",
+          "cvs": 68.8731,
+          "opta_top10": 69.9306,
+          "opta_top5": 70.4947,
+          "global_rank": 67,
+          "confederation_rank": 19,
+          "league_id": "bly7ema5au6j40i0grhl0pnub"
+        },
+        {
+          "tier": 3,
+          "name": "Segunda División",
+          "cvs": 59.894,
+          "opta_top10": 61.2091,
+          "opta_top5": 62.442,
+          "global_rank": 181,
+          "confederation_rank": 31,
+          "league_id": "aqyb0y2nlcd33ryq6k5eulr01"
+        },
+        {
+          "tier": 4,
+          "name": "Tercera A",
+          "cvs": 50.3733,
+          "opta_top10": 52.4131,
+          "opta_top5": 55.2902,
+          "global_rank": 294,
+          "confederation_rank": 42,
+          "league_id": "eeyp68fd9iwrv2hr69lode4zz"
+        }
+      ],
+      "s_country": 20.6761,
+      "retention": 0.491352,
+      "iffhs_points": 487.75,
+      "iffhs_rank": 31
+    },
+    {
+      "rank": 32,
+      "country": "Morocco",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Botola Pro",
+          "cvs": 74.4515,
+          "opta_top10": 76.5584,
+          "opta_top5": 79.51,
+          "global_rank": 36,
+          "confederation_rank": 1,
+          "league_id": "1eruend45vd20g9hbrpiggs5u"
+        },
+        {
+          "tier": 2,
+          "name": "Botola 2",
+          "cvs": 65.1705,
+          "opta_top10": 66.1181,
+          "opta_top5": 66.8737,
+          "global_rank": 113,
+          "confederation_rank": 12,
+          "league_id": "8najqkluatpaxvqws78b9s17c"
+        }
+      ],
+      "s_country": 18.3446,
+      "retention": 0.486689,
+      "iffhs_points": 432.75,
+      "iffhs_rank": 39
+    },
+    {
+      "rank": 33,
+      "country": "Saudi Arabia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Saudi Arabian League",
+          "cvs": 74.2817,
+          "opta_top10": 78.1358,
+          "opta_top5": 82.5998,
+          "global_rank": 37,
+          "confederation_rank": 2,
+          "league_id": "ea0h6cf3bhl698hkxhpulh2zz"
+        },
+        {
+          "tier": 2,
+          "name": "Saudi Arabian First Division League",
+          "cvs": 61.9171,
+          "opta_top10": 64.5897,
+          "opta_top5": 66.1464,
+          "global_rank": 158,
+          "confederation_rank": 22,
+          "league_id": "bfqezwfhot1l3p1cpk4oonh25"
+        },
+        {
+          "tier": 3,
+          "name": "Division 2",
+          "cvs": 54.3895,
+          "opta_top10": 58.0363,
+          "opta_top5": 59.5246,
+          "global_rank": 257,
+          "confederation_rank": 37,
+          "league_id": "2o2cd36zr8xa5rbxikn2v3cju"
+        }
+      ],
+      "s_country": 36.827,
+      "retention": 0.523654,
+      "iffhs_points": 868.75,
+      "iffhs_rank": 13
+    },
+    {
+      "rank": 34,
+      "country": "Romania",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Romania Liga I",
+          "cvs": 74.2069,
+          "opta_top10": 76.3727,
+          "opta_top5": 78.5173,
+          "global_rank": 39,
+          "confederation_rank": 29,
+          "league_id": "89ovpy1rarewwzqvi30bfdr8b"
+        },
+        {
+          "tier": 2,
+          "name": "Liga II",
+          "cvs": 62.9962,
+          "opta_top10": 66.2786,
+          "opta_top5": 68.0266,
+          "global_rank": 144,
+          "confederation_rank": 76,
+          "league_id": "awvkxs5trlg5e5e5kg4hq8f1"
+        },
+        {
+          "tier": 3,
+          "name": "Liga III",
+          "cvs": 48.6962,
+          "opta_top10": 55.8606,
+          "opta_top5": 57.617,
+          "global_rank": 312,
+          "confederation_rank": 143,
+          "league_id": "4qtsau8rkg0g5wt58wjw19rn1"
+        }
+      ],
+      "s_country": 22.8699,
+      "retention": 0.49574,
+      "iffhs_points": 539.5,
+      "iffhs_rank": 26
+    },
+    {
+      "rank": 35,
+      "country": "Scotland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Scottish Premiership",
+          "cvs": 74.1911,
+          "opta_top10": 75.1991,
+          "opta_top5": 78.8137,
+          "global_rank": 40,
+          "confederation_rank": 26,
+          "league_id": "e21cf135btr8t3upw0vl6n6x0"
+        },
+        {
+          "tier": 2,
+          "name": "Scottish Championship",
+          "cvs": 63.4294,
+          "opta_top10": 63.4294,
+          "opta_top5": 65.2595,
+          "global_rank": 138,
+          "confederation_rank": 72,
+          "league_id": "8t2o4huu2e48ij23dxnl9w5qx"
+        },
+        {
+          "tier": 3,
+          "name": "Scottish League One",
+          "cvs": 54.6899,
+          "opta_top10": 54.6899,
+          "opta_top5": 57.3085,
+          "global_rank": 254,
+          "confederation_rank": 113,
+          "league_id": "6sxm2iln2w45ux498pty9miw8"
+        },
+        {
+          "tier": 4,
+          "name": "Scottish League Two",
+          "cvs": 48.0311,
+          "opta_top10": 48.0311,
+          "opta_top5": 49.4167,
+          "global_rank": 325,
+          "confederation_rank": 144,
+          "league_id": "6321dlqv4ziuwqte4xpohijtw"
+        },
+        {
+          "tier": 5,
+          "name": "Highland / Lowland",
+          "cvs": 30.7599,
+          "opta_top10": 37.5622,
+          "opta_top5": 39.206,
+          "global_rank": 427,
+          "confederation_rank": 189,
+          "league_id": "6nm3h3xebzyrle00a2o87iopn"
+        },
+        {
+          "tier": 6,
+          "name": "Regional Leagues",
+          "cvs": 17.3565,
+          "opta_top10": 29.1288,
+          "opta_top5": 30.7349,
+          "global_rank": 443,
+          "confederation_rank": 194,
+          "league_id": "9edf0eouow31wxuyt4wzr4max"
+        }
+      ],
+      "s_country": 26.7274,
+      "retention": 0.503455,
+      "iffhs_points": 630.5,
+      "iffhs_rank": 24
+    },
+    {
+      "rank": 36,
+      "country": "Korea Republic",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Korean K-League 1",
+          "cvs": 73.8181,
+          "opta_top10": 74.3948,
+          "opta_top5": 75.8426,
+          "global_rank": 43,
+          "confederation_rank": 3,
+          "league_id": "avs3xposm3t9x1x2vzsoxzcbu"
+        },
+        {
+          "tier": 2,
+          "name": "Korean K-League 2",
+          "cvs": 64.1596,
+          "opta_top10": 66.6801,
+          "opta_top5": 67.9914,
+          "global_rank": 128,
+          "confederation_rank": 17,
+          "league_id": "b73zounsynk9d3u1p9nvpu7i2"
+        },
+        {
+          "tier": 3,
+          "name": "K3 League",
+          "cvs": 56.0154,
+          "opta_top10": 57.5512,
+          "opta_top5": 59.4902,
+          "global_rank": 236,
+          "confederation_rank": 31,
+          "league_id": "5dycj9wdhxh3n33qubw18ohlk"
+        },
+        {
+          "tier": 4,
+          "name": "K4 League",
+          "cvs": 47.682,
+          "opta_top10": 48.3858,
+          "opta_top5": 49.955,
+          "global_rank": 329,
+          "confederation_rank": 51,
+          "league_id": "2bn7fv6qaeqnlnbztnwyazk9s"
+        }
+      ],
+      "s_country": 18.599,
+      "retention": 0.487198,
+      "iffhs_points": 438.75,
+      "iffhs_rank": 38
+    },
+    {
+      "rank": 37,
+      "country": "Bolivia",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera División",
+          "cvs": 73.0407,
+          "opta_top10": 75.124,
+          "opta_top5": 77.863,
+          "global_rank": 44,
+          "confederation_rank": 16,
+          "league_id": "alpfd99yd3lfv7bhjo0biuq7b"
+        },
+        {
+          "tier": 2,
+          "name": "Nacional B",
+          "cvs": 58.0585,
+          "opta_top10": 60.5611,
+          "opta_top5": 62.3066,
+          "global_rank": 214,
+          "confederation_rank": 33,
+          "league_id": "2kottw7mwy3q6jsxj423z87yp"
+        }
+      ],
+      "s_country": 15.017,
+      "retention": 0.480034,
+      "iffhs_points": 354.25,
+      "iffhs_rank": 49
+    },
+    {
+      "rank": 38,
+      "country": "Algeria",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Algerian Ligue 1",
+          "cvs": 72.9595,
+          "opta_top10": 74.6803,
+          "opta_top5": 76.0008,
+          "global_rank": 45,
+          "confederation_rank": 2,
+          "league_id": "57nu0wygurzkp6fuy5hhrtaa2"
+        },
+        {
+          "tier": 2,
+          "name": "Ligue 2",
+          "cvs": 64.7736,
+          "opta_top10": 68.3756,
+          "opta_top5": 69.5193,
+          "global_rank": 120,
+          "confederation_rank": 18,
+          "league_id": "9hh6n2f84k31zmlcxyvmc1w2y"
+        }
+      ],
+      "s_country": 15.3879,
+      "retention": 0.480776,
+      "iffhs_points": 363.0,
+      "iffhs_rank": 46
+    },
+    {
+      "rank": 39,
+      "country": "Egypt",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Egyptian Premier League",
+          "cvs": 72.4481,
+          "opta_top10": 75.4756,
+          "opta_top5": 77.8552,
+          "global_rank": 46,
+          "confederation_rank": 3,
+          "league_id": "8k1xcsyvxapl4jlsluh3eomre"
+        },
+        {
+          "tier": 2,
+          "name": "Second Division A",
+          "cvs": 64.9552,
+          "opta_top10": 66.5559,
+          "opta_top5": 68.1584,
+          "global_rank": 117,
+          "confederation_rank": 16,
+          "league_id": "dy8zaksw5e9nwrs1p5ss4o1nu"
+        }
+      ],
+      "s_country": 30.585,
+      "retention": 0.51117,
+      "iffhs_points": 721.5,
+      "iffhs_rank": 16
+    },
+    {
+      "rank": 40,
+      "country": "Peru",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga 1",
+          "cvs": 72.0605,
+          "opta_top10": 74.7903,
+          "opta_top5": 76.7639,
+          "global_rank": 47,
+          "confederation_rank": 17,
+          "league_id": "a9vrdkelbgif0gtu3wxsr75xo"
+        },
+        {
+          "tier": 2,
+          "name": "Liga 2",
+          "cvs": 62.7449,
+          "opta_top10": 64.0921,
+          "opta_top5": 65.8723,
+          "global_rank": 148,
+          "confederation_rank": 29,
+          "league_id": "dwnygzozltaf27fec17gxayvr"
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 57.681,
+          "opta_top10": 60.3649,
+          "opta_top5": 61.2741,
+          "global_rank": 218,
+          "confederation_rank": 34,
+          "league_id": "580d5o01l5lqawc8hsdxxnz10"
+        }
+      ],
+      "s_country": 19.9237,
+      "retention": 0.489847,
+      "iffhs_points": 470.0,
+      "iffhs_rank": 34
+    },
+    {
+      "rank": 41,
+      "country": "Slovenia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Slovenia PrvaLiga",
+          "cvs": 71.8195,
+          "opta_top10": 71.8195,
+          "opta_top5": 75.6103,
+          "global_rank": 49,
+          "confederation_rank": 31,
+          "league_id": "7nmz249q89qg5ezcvzlheljji"
+        },
+        {
+          "tier": 2,
+          "name": "2. SNL",
+          "cvs": 59.1317,
+          "opta_top10": 61.4222,
+          "opta_top5": 64.3343,
+          "global_rank": 196,
+          "confederation_rank": 91,
+          "league_id": "5aw6uyw4pz2bpj24t5z8aacim"
+        },
+        {
+          "tier": 3,
+          "name": "3. SNL",
+          "cvs": 47.9016,
+          "opta_top10": 50.7422,
+          "opta_top5": 52.5135,
+          "global_rank": 328,
+          "confederation_rank": 146,
+          "league_id": "domsjww1z4ouovaj6qogatnrf"
+        }
+      ],
+      "s_country": 16.702,
+      "retention": 0.483404,
+      "iffhs_points": 394.0,
+      "iffhs_rank": 44
+    },
+    {
+      "rank": 42,
+      "country": "Israel",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Israeli Ligat Ha'al",
+          "cvs": 71.6134,
+          "opta_top10": 73.3843,
+          "opta_top5": 76.6671,
+          "global_rank": 50,
+          "confederation_rank": 32,
+          "league_id": "2xg0qvif1rh7du6wmk2eleku3"
+        },
+        {
+          "tier": 2,
+          "name": "Liga Leumit",
+          "cvs": 62.6417,
+          "opta_top10": 63.8055,
+          "opta_top5": 65.1388,
+          "global_rank": 151,
+          "confederation_rank": 78,
+          "league_id": "eu6kl6j2w2qg7dg1dlpzo20fc"
+        },
+        {
+          "tier": 3,
+          "name": "Liga Alef",
+          "cvs": 56.1179,
+          "opta_top10": 59.2029,
+          "opta_top5": 60.4335,
+          "global_rank": 235,
+          "confederation_rank": 108,
+          "league_id": "47ab9wtg48ksd11exck2122js"
+        },
+        {
+          "tier": 4,
+          "name": "Liga Bet",
+          "cvs": 47.25,
+          "opta_top10": 54.1094,
+          "opta_top5": 55.9414,
+          "global_rank": 333,
+          "confederation_rank": 151,
+          "league_id": "255lni1lapp38q1ce7pdkvkdl"
+        }
+      ],
+      "s_country": 17.0305,
+      "retention": 0.484061,
+      "iffhs_points": 401.75,
+      "iffhs_rank": 43
+    },
+    {
+      "rank": 43,
+      "country": "Azerbaijan",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Azerbaijan Premier League",
+          "cvs": 71.1832,
+          "opta_top10": 72.4979,
+          "opta_top5": 76.4181,
+          "global_rank": 51,
+          "confederation_rank": 33,
+          "league_id": "3428tckxcirwwh3o3jgc1m8ji"
+        },
+        {
+          "tier": 2,
+          "name": "Birinci Dasta",
+          "cvs": 55.936,
+          "opta_top10": 55.936,
+          "opta_top5": 58.4257,
+          "global_rank": 238,
+          "confederation_rank": 109,
+          "league_id": "1pz0ch210cun5hthsvq0lb7x3"
+        }
+      ],
+      "s_country": 19.256,
+      "retention": 0.488512,
+      "iffhs_points": 454.25,
+      "iffhs_rank": 37
+    },
+    {
+      "rank": 44,
+      "country": "Slovakia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Slovakia 1. liga",
+          "cvs": 71.0803,
+          "opta_top10": 71.8665,
+          "opta_top5": 74.6951,
+          "global_rank": 52,
+          "confederation_rank": 34,
+          "league_id": "1mpjd0vbxbtu9zw89yj09xk3z"
+        },
+        {
+          "tier": 2,
+          "name": "2. liga",
+          "cvs": 57.522,
+          "opta_top10": 58.8289,
+          "opta_top5": 60.4338,
+          "global_rank": 222,
+          "confederation_rank": 99,
+          "league_id": "4qehj8hfxmy6o2ohp4fxinnzo"
+        },
+        {
+          "tier": 3,
+          "name": "3. liga",
+          "cvs": 49.7204,
+          "opta_top10": 53.5363,
+          "opta_top5": 55.3341,
+          "global_rank": 300,
+          "confederation_rank": 133,
+          "league_id": "cc9zntdbef14p20gt4ekvnjvs"
+        },
+        {
+          "tier": 4,
+          "name": "4. liga",
+          "cvs": 41.4138,
+          "opta_top10": 47.2396,
+          "opta_top5": 48.2422,
+          "global_rank": 389,
+          "confederation_rank": 172,
+          "league_id": "9fwlwux9c3l4ih8wx2qbawqvo"
+        }
+      ],
+      "s_country": 7.5456,
+      "retention": 0.465091,
+      "iffhs_points": 178.0,
+      "iffhs_rank": 89
+    },
+    {
+      "rank": 45,
+      "country": "Ukraine",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ukraine Premier League",
+          "cvs": 70.5185,
+          "opta_top10": 72.9957,
+          "opta_top5": 75.9402,
+          "global_rank": 54,
+          "confederation_rank": 36,
+          "league_id": "6wubmo7di3kdpflluf6s8c7vs"
+        },
+        {
+          "tier": 2,
+          "name": "Persha Liga",
+          "cvs": 56.5789,
+          "opta_top10": 58.3028,
+          "opta_top5": 60.2814,
+          "global_rank": 230,
+          "confederation_rank": 107,
+          "league_id": "c5551zb2twbvyv8sh55bnht09"
+        },
+        {
+          "tier": 3,
+          "name": "Druha Liga",
+          "cvs": 41.8753,
+          "opta_top10": 45.3065,
+          "opta_top5": 46.8153,
+          "global_rank": 385,
+          "confederation_rank": 170,
+          "league_id": "24sqrnfysjbuzxsyz3pqbhc96"
+        }
+      ],
+      "s_country": 20.6443,
+      "retention": 0.491289,
+      "iffhs_points": 487.0,
+      "iffhs_rank": 32
+    },
+    {
+      "rank": 46,
+      "country": "Iran",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Persian Gulf Pro League",
+          "cvs": 70.4592,
+          "opta_top10": 72.247,
+          "opta_top5": 74.3775,
+          "global_rank": 55,
+          "confederation_rank": 4,
+          "league_id": "3btdfgw79qiz3jmyfudovtbu2"
+        },
+        {
+          "tier": 2,
+          "name": "Azadegan League",
+          "cvs": 62.5519,
+          "opta_top10": 64.4408,
+          "opta_top5": 65.9108,
+          "global_rank": 152,
+          "confederation_rank": 21,
+          "league_id": "abs7n2ae3oydilk0tgmpnsj89"
+        }
+      ],
+      "s_country": 11.8906,
+      "retention": 0.473781,
+      "iffhs_points": 280.5,
+      "iffhs_rank": 62
+    },
+    {
+      "rank": 47,
+      "country": "Bulgaria",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Bulgaria First League",
+          "cvs": 70.3946,
+          "opta_top10": 73.1531,
+          "opta_top5": 76.0519,
+          "global_rank": 56,
+          "confederation_rank": 37,
+          "league_id": "c0yqkbilbbg70ij2473xymmqv"
+        },
+        {
+          "tier": 2,
+          "name": "Second League",
+          "cvs": 54.848,
+          "opta_top10": 56.6753,
+          "opta_top5": 58.2107,
+          "global_rank": 251,
+          "confederation_rank": 114,
+          "league_id": "9sr54lwtg5hdlgmj2spz61cli"
+        },
+        {
+          "tier": 3,
+          "name": "Third League",
+          "cvs": 43.3528,
+          "opta_top10": 50.8095,
+          "opta_top5": 52.3807,
+          "global_rank": 372,
+          "confederation_rank": 165,
+          "league_id": "cxd19epii9ytygdn9f8ihzhze"
+        }
+      ],
+      "s_country": 19.6799,
+      "retention": 0.48936,
+      "iffhs_points": 464.25,
+      "iffhs_rank": 36
+    },
+    {
+      "rank": 48,
+      "country": "Venezuela",
+      "confederation": "South America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Venezuela Primera División",
+          "cvs": 70.2562,
+          "opta_top10": 71.7272,
+          "opta_top5": 74.1702,
+          "global_rank": 57,
+          "confederation_rank": 18,
+          "league_id": "46b141eaqq9q7o4gz5gtdpikk"
+        },
+        {
+          "tier": 2,
+          "name": "Segunda División",
+          "cvs": 60.8963,
+          "opta_top10": 62.4169,
+          "opta_top5": 64.2311,
+          "global_rank": 170,
+          "confederation_rank": 30,
+          "league_id": "b3khsmo41ntvf4fwzbsuvc1hm"
+        }
+      ],
+      "s_country": 10.2162,
+      "retention": 0.470432,
+      "iffhs_points": 241.0,
+      "iffhs_rank": 67
+    },
+    {
+      "rank": 49,
+      "country": "Australia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Australian A-League Men",
+          "cvs": 70.2452,
+          "opta_top10": 71.0725,
+          "opta_top5": 72.723,
+          "global_rank": 58,
+          "confederation_rank": 5,
+          "league_id": "xwnjb1az11zffwty3m6vn8y6"
+        },
+        {
+          "tier": 2,
+          "name": "Championship",
+          "cvs": 55.9506,
+          "opta_top10": 57.3831,
+          "opta_top5": 58.5363,
+          "global_rank": 237,
+          "confederation_rank": 32.5,
+          "league_id": "41hbf8hlc2hfpw0n9hnn1ow7o"
+        },
+        {
+          "tier": 3,
+          "name": "New South Wales NPL",
+          "cvs": 45.1323,
+          "opta_top10": 50.0181,
+          "opta_top5": 55.6277,
+          "global_rank": 351,
+          "confederation_rank": 66,
+          "league_id": "6g8hw3acenrw828la7gwx4mvs"
+        },
+        {
+          "tier": 4,
+          "name": "Victoria NPL",
+          "cvs": 44.8106,
+          "opta_top10": 47.9617,
+          "opta_top5": 55.6949,
+          "global_rank": 356,
+          "confederation_rank": 32.5,
+          "league_id": "2mdmx668tyhy4u4z9zszwjv5v"
+        },
+        {
+          "tier": 5,
+          "name": "Capital Territory NPL",
+          "cvs": 39.8594,
+          "opta_top10": 39.8594,
+          "opta_top5": 43.4665,
+          "global_rank": 398,
+          "confederation_rank": 73.5,
+          "league_id": "eqz64pn0qsp2y7aq4m9id3fn6"
+        },
+        {
+          "tier": 6,
+          "name": "Western Australia NPL",
+          "cvs": 39.8072,
+          "opta_top10": 40.9597,
+          "opta_top5": 45.2985,
+          "global_rank": 399,
+          "confederation_rank": 68,
+          "league_id": "ajm86skyzse4ym8g6fpgzncxa"
+        },
+        {
+          "tier": 7,
+          "name": "Queensland NPL",
+          "cvs": 39.0495,
+          "opta_top10": 40.3407,
+          "opta_top5": 44.7718,
+          "global_rank": 403,
+          "confederation_rank": 70,
+          "league_id": "61fzfjogstjuukzcehighq7mu"
+        },
+        {
+          "tier": 8,
+          "name": "Northern NSW NPL",
+          "cvs": 38.8853,
+          "opta_top10": 40.5973,
+          "opta_top5": 45.2356,
+          "global_rank": 404,
+          "confederation_rank": 72,
+          "league_id": "9u4pm8x0lfmfq3r0pypmrls71"
+        },
+        {
+          "tier": 9,
+          "name": "Western Australia State League 1",
+          "cvs": 32.176,
+          "opta_top10": 32.849,
+          "opta_top5": 34.3157,
+          "global_rank": 423,
+          "confederation_rank": 77,
+          "league_id": "2xkxwl03668hb7d7y63naupgq"
+        },
+        {
+          "tier": 10,
+          "name": "NSW League One",
+          "cvs": 31.5828,
+          "opta_top10": 33.2962,
+          "opta_top5": 34.4156,
+          "global_rank": 426,
+          "confederation_rank": 76,
+          "league_id": "5f4vmg8dv2d0y8fuw60f0kbca"
+        },
+        {
+          "tier": 11,
+          "name": "Victoria PL 1",
+          "cvs": 30.1406,
+          "opta_top10": 30.8773,
+          "opta_top5": 32.263,
+          "global_rank": 428,
+          "confederation_rank": 78,
+          "league_id": "1n9l0ex47bu0762qg574hzjtd"
+        },
+        {
+          "tier": 12,
+          "name": "Capital Territory NPL 2",
+          "cvs": 29.9442,
+          "opta_top10": 29.9442,
+          "opta_top5": 33.672,
+          "global_rank": 429,
+          "confederation_rank": 73.5,
+          "league_id": "3kzix5x6lqvik8xiw2242fmne"
+        },
+        {
+          "tier": 13,
+          "name": "Queensland Premier League",
+          "cvs": 29.8984,
+          "opta_top10": 30.8812,
+          "opta_top5": 33.2518,
+          "global_rank": 430,
+          "confederation_rank": 79,
+          "league_id": "9zvu736m8f9jzeyukisgey356"
+        },
+        {
+          "tier": 14,
+          "name": "Victoria PL 2",
+          "cvs": 23.8386,
+          "opta_top10": 24.3508,
+          "opta_top5": 24.7167,
+          "global_rank": 437,
+          "confederation_rank": 82,
+          "league_id": "demi2fsrdwddt2314p6j11lyi"
+        },
+        {
+          "tier": 15,
+          "name": "NSW League Two",
+          "cvs": 23.0682,
+          "opta_top10": 24.7444,
+          "opta_top5": 26.2101,
+          "global_rank": 439,
+          "confederation_rank": 84,
+          "league_id": "aed8nciihgj74iq4tv6mrq39w"
+        },
+        {
+          "tier": 16,
+          "name": "Queensland Premier League 2",
+          "cvs": 21.6621,
+          "opta_top10": 22.1809,
+          "opta_top5": 23.9772,
+          "global_rank": 440,
+          "confederation_rank": 85,
+          "league_id": "3a1kagik7bnoofrhr6qqp0dn8"
+        },
+        {
+          "tier": 17,
+          "name": "Western Australia State League 1 Reserves",
+          "cvs": 21.1875,
+          "opta_top10": 22.2641,
+          "opta_top5": 25.2618,
+          "global_rank": 442,
+          "confederation_rank": 86,
+          "league_id": "dxgcsf3azheuf3shs09myyqs4"
+        },
+        {
+          "tier": 18,
+          "name": "FQPL 3 Metro",
+          "cvs": 13.9642,
+          "opta_top10": 16.8062,
+          "opta_top5": 18.9223,
+          "global_rank": 445,
+          "confederation_rank": 87,
+          "league_id": "3jlffacre45qv9p155t1yr7je"
+        }
+      ],
+      "s_country": 8.9551,
+      "retention": 0.46791,
+      "iffhs_points": 211.25,
+      "iffhs_rank": 73
+    },
+    {
+      "rank": 50,
+      "country": "Guatemala",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Guatemala Liga Nacional Apertura\t",
+          "cvs": 70.219,
+          "opta_top10": 70.7156,
+          "opta_top5": 72.5649,
+          "global_rank": 59,
+          "confederation_rank": 4,
+          "league_id": "ae1wva3zrzcp2zd15gpvsntg6"
+        },
+        {
+          "tier": 2,
+          "name": "Primera Division",
+          "cvs": 59.8441,
+          "opta_top10": 64.1425,
+          "opta_top5": 64.9086,
+          "global_rank": 182,
+          "confederation_rank": 11,
+          "league_id": "aj9gichxp8i0muh2e22600h7a"
+        }
+      ],
+      "s_country": 10.5235,
+      "retention": 0.471047,
+      "iffhs_points": 248.25,
+      "iffhs_rank": 65
+    },
+    {
+      "rank": 51,
+      "country": "Costa Rica",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Costa Rica Primera Division Apertura",
+          "cvs": 70.1207,
+          "opta_top10": 70.8697,
+          "opta_top5": 73.1637,
+          "global_rank": 60,
+          "confederation_rank": 3,
+          "league_id": "civf31q1inxohs4a03y8reetf"
+        },
+        {
+          "tier": 2,
+          "name": "Liga de Ascenso",
+          "cvs": 58.5072,
+          "opta_top10": 60.8584,
+          "opta_top5": 63.0107,
+          "global_rank": 207,
+          "confederation_rank": 20,
+          "league_id": "2yyjcbbryf1r10apyzl7c7jvp"
+        }
+      ],
+      "s_country": 22.1068,
+      "retention": 0.494214,
+      "iffhs_points": 521.5,
+      "iffhs_rank": 28
+    },
+    {
+      "rank": 52,
+      "country": "South Africa",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "South Africa PSL",
+          "cvs": 70.0781,
+          "opta_top10": 71.8555,
+          "opta_top5": 74.1201,
+          "global_rank": 61,
+          "confederation_rank": 4,
+          "league_id": "yv73ms6v1995b5wny16jcfi3"
+        },
+        {
+          "tier": 2,
+          "name": "South Africa 1st Division",
+          "cvs": 60.0862,
+          "opta_top10": 61.1206,
+          "opta_top5": 62.3443,
+          "global_rank": 179,
+          "confederation_rank": 33,
+          "league_id": "ajxs0e0g6ryg5ol8qvw3evrcz"
+        }
+      ],
+      "s_country": 15.5362,
+      "retention": 0.481072,
+      "iffhs_points": 366.5,
+      "iffhs_rank": 45
+    },
+    {
+      "rank": 53,
+      "country": "Bosnia and Herzegovina",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Bosnia and Herzegovina Premijer Liga",
+          "cvs": 69.9164,
+          "opta_top10": 69.9164,
+          "opta_top5": 73.2641,
+          "global_rank": 62,
+          "confederation_rank": 38,
+          "league_id": "4yngyfinzd6bb1k7anqtqs0wt"
+        },
+        {
+          "tier": 2,
+          "name": "1st League",
+          "cvs": 55.4386,
+          "opta_top10": 58.1039,
+          "opta_top5": 59.414,
+          "global_rank": 245,
+          "confederation_rank": 115,
+          "league_id": "bq56xi6kc1626y8hxflp32ir3"
+        }
+      ],
+      "s_country": 15.0487,
+      "retention": 0.480097,
+      "iffhs_points": 355.0,
+      "iffhs_rank": 48
+    },
+    {
+      "rank": 54,
+      "country": "Serbia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Serbian Super Liga",
+          "cvs": 69.4803,
+          "opta_top10": 71.9102,
+          "opta_top5": 74.9961,
+          "global_rank": 64,
+          "confederation_rank": 40,
+          "league_id": "3ww12jab49q8q8mk9avdwjqgk"
+        },
+        {
+          "tier": 2,
+          "name": "Prva Liga",
+          "cvs": 59.4823,
+          "opta_top10": 60.8836,
+          "opta_top5": 62.2212,
+          "global_rank": 190,
+          "confederation_rank": 87,
+          "league_id": "d3gexg17t0wn9hpw12ww4poh5"
+        },
+        {
+          "tier": 3,
+          "name": "Srpska Liga",
+          "cvs": 51.8688,
+          "opta_top10": 56.6823,
+          "opta_top5": 57.8074,
+          "global_rank": 283,
+          "confederation_rank": 126,
+          "league_id": "ecput4u5i67t8xuzfveulvy8k"
+        }
+      ],
+      "s_country": 20.6443,
+      "retention": 0.491289,
+      "iffhs_points": 487.0,
+      "iffhs_rank": 32
+    },
+    {
+      "rank": 55,
+      "country": "Albania",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Albanian Kategoria Superiore",
+          "cvs": 69.3826,
+          "opta_top10": 69.3826,
+          "opta_top5": 71.7123,
+          "global_rank": 65,
+          "confederation_rank": 41,
+          "league_id": "1zcp6rnjil25rnsv1ttcz3dhx"
+        },
+        {
+          "tier": 2,
+          "name": "1st Division",
+          "cvs": 57.1014,
+          "opta_top10": 57.8521,
+          "opta_top5": 60.6507,
+          "global_rank": 227,
+          "confederation_rank": 104,
+          "league_id": "5laava24i9c121nm1hooqrubl"
+        },
+        {
+          "tier": 3,
+          "name": "2nd Division",
+          "cvs": 42.0852,
+          "opta_top10": 46.4052,
+          "opta_top5": 48.3636,
+          "global_rank": 384,
+          "confederation_rank": 174,
+          "league_id": "59d9gyqzygoewbix247fnbvpn"
+        }
+      ],
+      "s_country": 9.6651,
+      "retention": 0.46933,
+      "iffhs_points": 228.0,
+      "iffhs_rank": 71
+    },
+    {
+      "rank": 56,
+      "country": "United Arab Emirates",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "UAE Pro League",
+          "cvs": 69.1513,
+          "opta_top10": 70.9309,
+          "opta_top5": 74.451,
+          "global_rank": 66,
+          "confederation_rank": 6,
+          "league_id": "f39uq10c8xhg5e6rwwcf6lhgc"
+        },
+        {
+          "tier": 2,
+          "name": "Division 1",
+          "cvs": 53.159,
+          "opta_top10": 55.3011,
+          "opta_top5": 57.332,
+          "global_rank": 269,
+          "confederation_rank": 42,
+          "league_id": "cv3tuitw3ho3v0opjjxpn83b9"
+        }
+      ],
+      "s_country": 17.2107,
+      "retention": 0.484421,
+      "iffhs_points": 406.0,
+      "iffhs_rank": 42
+    },
+    {
+      "rank": 57,
+      "country": "Kosovo",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kosovan Superliga",
+          "cvs": 68.8278,
+          "opta_top10": 68.8278,
+          "opta_top5": 70.5087,
+          "global_rank": 68,
+          "confederation_rank": 48,
+          "league_id": "dwiqifdd70ytjytcs09vzosb3"
+        }
+      ],
+      "s_country": 13.3743,
+      "retention": 0.476749,
+      "iffhs_points": 315.5,
+      "iffhs_rank": 53
+    },
+    {
+      "rank": 58,
+      "country": "Honduras",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Honduras Liga Nacional Apertura",
+          "cvs": 68.4759,
+          "opta_top10": 69.0539,
+          "opta_top5": 72.7722,
+          "global_rank": 69,
+          "confederation_rank": 5,
+          "league_id": "1wwro3z1eb3fl601dju6inlc6"
+        }
+      ],
+      "s_country": 12.6113,
+      "retention": 0.475223,
+      "iffhs_points": 297.5,
+      "iffhs_rank": 57
+    },
+    {
+      "rank": 59,
+      "country": "Republic of Ireland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Irish Premier League",
+          "cvs": 68.3802,
+          "opta_top10": 68.3802,
+          "opta_top5": 71.1676,
+          "global_rank": 71,
+          "confederation_rank": 43,
+          "league_id": "4mbfidy8zum5u0aqjqo0vuqs2"
+        },
+        {
+          "tier": 2,
+          "name": "Irish First Division",
+          "cvs": 54.2276,
+          "opta_top10": 54.2276,
+          "opta_top5": 56.2765,
+          "global_rank": 258,
+          "confederation_rank": 116,
+          "league_id": "7cwemnr3vi40znjq451zxkus6"
+        },
+        {
+          "tier": 3,
+          "name": "Leinster Senior League",
+          "cvs": 44.1123,
+          "opta_top10": 45.6985,
+          "opta_top5": 47.4634,
+          "global_rank": 363,
+          "confederation_rank": 159,
+          "league_id": "3alyl4h2ug42jl1j67yj0owes"
+        },
+        {
+          "tier": 4,
+          "name": "Munster Senior League",
+          "cvs": 42.7567,
+          "opta_top10": 42.7567,
+          "opta_top5": 44.7888,
+          "global_rank": 378,
+          "confederation_rank": 168,
+          "league_id": "cuymsivavx4s1glq58beqjc44"
+        }
+      ],
+      "s_country": 14.4129,
+      "retention": 0.478826,
+      "iffhs_points": 340.0,
+      "iffhs_rank": 50
+    },
+    {
+      "rank": 60,
+      "country": "Kazakhstan",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kazakhstan Premier League",
+          "cvs": 68.2913,
+          "opta_top10": 70.2755,
+          "opta_top5": 72.9856,
+          "global_rank": 74,
+          "confederation_rank": 44,
+          "league_id": "9ikchyu9fb8bvx0s673jofj6s"
+        },
+        {
+          "tier": 2,
+          "name": "1. Division",
+          "cvs": 54.0392,
+          "opta_top10": 57.2055,
+          "opta_top5": 61.9823,
+          "global_rank": 262,
+          "confederation_rank": 127,
+          "league_id": "9xhmptx8yr16klvhfsss6drrw"
+        }
+      ],
+      "s_country": 8.6689,
+      "retention": 0.467338,
+      "iffhs_points": 204.5,
+      "iffhs_rank": 74
+    },
+    {
+      "rank": 61,
+      "country": "Tunisia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 67.9441,
+          "opta_top10": 70.6665,
+          "opta_top5": 74.0114,
+          "global_rank": 77,
+          "confederation_rank": 5,
+          "league_id": "f4jc2cc5nq7flaoptpi5ua4k4"
+        },
+        {
+          "tier": 2,
+          "name": "Ligue 2",
+          "cvs": 56.5285,
+          "opta_top10": 59.1504,
+          "opta_top5": 60.221,
+          "global_rank": 231,
+          "confederation_rank": 45,
+          "league_id": "8jh0jejuxfhrpawnoztz2jlv4"
+        }
+      ],
+      "s_country": 14.3069,
+      "retention": 0.478614,
+      "iffhs_points": 337.5,
+      "iffhs_rank": 51
+    },
+    {
+      "rank": 62,
+      "country": "Armenia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Armenian Premier League",
+          "cvs": 67.6487,
+          "opta_top10": 67.6487,
+          "opta_top5": 72.6193,
+          "global_rank": 82,
+          "confederation_rank": 51,
+          "league_id": "dn9kmfdbz74lzt3m8e9g0vwjq"
+        },
+        {
+          "tier": 2,
+          "name": "First League",
+          "cvs": 52.2515,
+          "opta_top10": 55.0904,
+          "opta_top5": 58.3901,
+          "global_rank": 274,
+          "confederation_rank": 124,
+          "league_id": "1be64lgp0chekkyu0iuyta8kc"
+        }
+      ],
+      "s_country": 12.1026,
+      "retention": 0.474205,
+      "iffhs_points": 285.5,
+      "iffhs_rank": 60
+    },
+    {
+      "rank": 63,
+      "country": "Ghana",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ghana Premier League",
+          "cvs": 67.6482,
+          "opta_top10": 69.1019,
+          "opta_top5": 69.7611,
+          "global_rank": 83,
+          "confederation_rank": 6,
+          "league_id": "4jg7he1n3rb5dniq6hf49xorq"
+        },
+        {
+          "tier": 2,
+          "name": "Division One",
+          "cvs": 57.2293,
+          "opta_top10": 60.7307,
+          "opta_top5": 61.8002,
+          "global_rank": 225,
+          "confederation_rank": 44,
+          "league_id": "1m4sxndpm5lnnc09qn84cu2vo"
+        }
+      ],
+      "s_country": 6.6024,
+      "retention": 0.463205,
+      "iffhs_points": 155.75,
+      "iffhs_rank": 100
+    },
+    {
+      "rank": 64,
+      "country": "Nigeria",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Nigerian Premier League",
+          "cvs": 67.6378,
+          "opta_top10": 68.6147,
+          "opta_top5": 69.3416,
+          "global_rank": 84,
+          "confederation_rank": 7,
+          "league_id": "ac42gi3penartj88fe9l6plpk"
+        }
+      ],
+      "s_country": 7.2806,
+      "retention": 0.464561,
+      "iffhs_points": 171.75,
+      "iffhs_rank": 91
+    },
+    {
+      "rank": 65,
+      "country": "Georgia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Georgian Premier League",
+          "cvs": 67.5024,
+          "opta_top10": 67.5024,
+          "opta_top5": 70.1993,
+          "global_rank": 85,
+          "confederation_rank": 49,
+          "league_id": "477yyajzheg2z8u7uick0e13e"
+        },
+        {
+          "tier": 2,
+          "name": "Erovnuli Liga 2",
+          "cvs": 55.5872,
+          "opta_top10": 55.5872,
+          "opta_top5": 56.6138,
+          "global_rank": 243,
+          "confederation_rank": 111,
+          "league_id": "9yoqgm185326gn01tql2b1gvf"
+        },
+        {
+          "tier": 3,
+          "name": "Liga 3",
+          "cvs": 42.5033,
+          "opta_top10": 44.8003,
+          "opta_top5": 46.837,
+          "global_rank": 380,
+          "confederation_rank": 171,
+          "league_id": "7akyohnbu1mlbn3gt5oovcaly"
+        }
+      ],
+      "s_country": 8.2344,
+      "retention": 0.466469,
+      "iffhs_points": 194.25,
+      "iffhs_rank": 80
+    },
+    {
+      "rank": 66,
+      "country": "Iraq",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Iraqi League",
+          "cvs": 67.4182,
+          "opta_top10": 70.5931,
+          "opta_top5": 72.565,
+          "global_rank": 86,
+          "confederation_rank": 9,
+          "league_id": "duuc1qczfnawwncru1ly6o66"
+        }
+      ],
+      "s_country": 8.0967,
+      "retention": 0.466193,
+      "iffhs_points": 191.0,
+      "iffhs_rank": 83
+    },
+    {
+      "rank": 67,
+      "country": "Finland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Finnish Veikkausliiga",
+          "cvs": 67.1194,
+          "opta_top10": 68.6452,
+          "opta_top5": 72.1528,
+          "global_rank": 88,
+          "confederation_rank": 46,
+          "league_id": "dvstmwnvw0mt5p38twn9yttyb"
+        },
+        {
+          "tier": 2,
+          "name": "Ykkösliiga",
+          "cvs": 57.6602,
+          "opta_top10": 57.6602,
+          "opta_top5": 61.0863,
+          "global_rank": 219,
+          "confederation_rank": 103,
+          "league_id": "6ihotpaocgiovlxw18e9r9prx"
+        },
+        {
+          "tier": 3,
+          "name": "Ykkönen",
+          "cvs": 49.4172,
+          "opta_top10": 50.0545,
+          "opta_top5": 52.1321,
+          "global_rank": 304,
+          "confederation_rank": 137,
+          "league_id": "7qdv1xae7ikfe8dft3oj29yqc"
+        },
+        {
+          "tier": 4,
+          "name": "Kakkonen",
+          "cvs": 43.9893,
+          "opta_top10": 47.5156,
+          "opta_top5": 48.6451,
+          "global_rank": 365,
+          "confederation_rank": 160.5,
+          "league_id": "du6jsenbjql5e8f3yk880ox4g"
+        },
+        {
+          "tier": 5,
+          "name": "Kolmonen",
+          "cvs": 34.1866,
+          "opta_top10": 42.1304,
+          "opta_top5": 42.6826,
+          "global_rank": 416,
+          "confederation_rank": 160.5,
+          "league_id": "uh2efgnjh0yxnyzte8f1da09"
+        }
+      ],
+      "s_country": 10.2374,
+      "retention": 0.470475,
+      "iffhs_points": 241.5,
+      "iffhs_rank": 66
+    },
+    {
+      "rank": 68,
+      "country": "Qatar",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Qatar Stars League",
+          "cvs": 66.9201,
+          "opta_top10": 67.7243,
+          "opta_top5": 70.0478,
+          "global_rank": 91,
+          "confederation_rank": 8,
+          "league_id": "xaouuwuk8qyhv1libkeexwjh"
+        },
+        {
+          "tier": 2,
+          "name": "Qatar Second Division",
+          "cvs": 60.3463,
+          "opta_top10": 60.3463,
+          "opta_top5": 61.8052,
+          "global_rank": 176,
+          "confederation_rank": 25,
+          "league_id": "3akazj2cmherl0b0hot94ezb8"
+        }
+      ],
+      "s_country": 9.6757,
+      "retention": 0.469351,
+      "iffhs_points": 228.25,
+      "iffhs_rank": 70
+    },
+    {
+      "rank": 69,
+      "country": "Belarus",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Belarus Premier League",
+          "cvs": 66.868,
+          "opta_top10": 68.9599,
+          "opta_top5": 70.6257,
+          "global_rank": 92,
+          "confederation_rank": 53,
+          "league_id": "8y29fg2s85ppcb8uugm5ee8s4"
+        },
+        {
+          "tier": 2,
+          "name": "1. Division",
+          "cvs": 51.6164,
+          "opta_top10": 55.8041,
+          "opta_top5": 59.6246,
+          "global_rank": 285,
+          "confederation_rank": 132,
+          "league_id": "zs18qaehvhg3w1208874zvfa"
+        }
+      ],
+      "s_country": 11.0216,
+      "retention": 0.472043,
+      "iffhs_points": 260.0,
+      "iffhs_rank": 63
+    },
+    {
+      "rank": 70,
+      "country": "Zambia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Zambia Super League",
+          "cvs": 66.441,
+          "opta_top10": 68.143,
+          "opta_top5": 69.5595,
+          "global_rank": 95,
+          "confederation_rank": 8,
+          "league_id": "dexr6wlw3e339z88f1qr74wt6"
+        }
+      ],
+      "s_country": 7.2912,
+      "retention": 0.464582,
+      "iffhs_points": 172.0,
+      "iffhs_rank": 90
+    },
+    {
+      "rank": 71,
+      "country": "Panama",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "LPF",
+          "cvs": 66.3499,
+          "opta_top10": 67.1667,
+          "opta_top5": 68.9162,
+          "global_rank": 96,
+          "confederation_rank": 7,
+          "league_id": "2ni5x4ta0fv1zxee9l10rp1bz"
+        },
+        {
+          "tier": 2,
+          "name": "Liga Prom",
+          "cvs": 58.4775,
+          "opta_top10": 63.2626,
+          "opta_top5": 64.3484,
+          "global_rank": 208,
+          "confederation_rank": 19,
+          "league_id": "cypecaqr5kw33zumn2tyo4vuq"
+        }
+      ],
+      "s_country": 6.8673,
+      "retention": 0.463735,
+      "iffhs_points": 162.0,
+      "iffhs_rank": 98
+    },
+    {
+      "rank": 72,
+      "country": "Uzbekistan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League",
+          "cvs": 66.1674,
+          "opta_top10": 67.8241,
+          "opta_top5": 69.9398,
+          "global_rank": 97,
+          "confederation_rank": 10,
+          "league_id": "1snn4i06dn6n11mrfc894snzm"
+        },
+        {
+          "tier": 2,
+          "name": "Pro League",
+          "cvs": 54.5363,
+          "opta_top10": 54.5363,
+          "opta_top5": 55.6222,
+          "global_rank": 256,
+          "confederation_rank": 45,
+          "league_id": "53bqtby283rqeils2kjnjy3g6"
+        }
+      ],
+      "s_country": 7.1535,
+      "retention": 0.464307,
+      "iffhs_points": 168.75,
+      "iffhs_rank": 93
+    },
+    {
+      "rank": 73,
+      "country": "Jordan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "League",
+          "cvs": 66.1329,
+          "opta_top10": 66.1329,
+          "opta_top5": 70.412,
+          "global_rank": 99,
+          "confederation_rank": 11,
+          "league_id": "145hkd59i6foieuwr4mwi6wlq"
+        },
+        {
+          "tier": 2,
+          "name": "1st Division",
+          "cvs": 54.0255,
+          "opta_top10": 55.7968,
+          "opta_top5": 57.09,
+          "global_rank": 263,
+          "confederation_rank": 38,
+          "league_id": "capnw9242hzut00ei9rgfco8n"
+        }
+      ],
+      "s_country": 66.1329,
+      "retention": 0.582266
+    },
+    {
+      "rank": 74,
+      "country": "Mali",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Première Division",
+          "cvs": 65.8284,
+          "opta_top10": 67.3469,
+          "opta_top5": 70.0495,
+          "global_rank": 101,
+          "confederation_rank": 9,
+          "league_id": "9rh1w6v2524luqs6gdkasyxso"
+        }
+      ],
+      "s_country": 8.2132,
+      "retention": 0.466426,
+      "iffhs_points": 193.75,
+      "iffhs_rank": 81
+    },
+    {
+      "rank": 75,
+      "country": "Iceland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Icelandic Besta deild",
+          "cvs": 65.7876,
+          "opta_top10": 66.5336,
+          "opta_top5": 68.4353,
+          "global_rank": 102,
+          "confederation_rank": 57,
+          "league_id": "zilopfej2h0n3vpan5tcynpo"
+        },
+        {
+          "tier": 2,
+          "name": "1. Deild",
+          "cvs": 58.6985,
+          "opta_top10": 60.4881,
+          "opta_top5": 62.7837,
+          "global_rank": 203,
+          "confederation_rank": 89,
+          "league_id": "3l29w00m506ex93t5bbh9cg2a"
+        },
+        {
+          "tier": 3,
+          "name": "2. Deild",
+          "cvs": 47.9385,
+          "opta_top10": 48.8609,
+          "opta_top5": 52.1598,
+          "global_rank": 327,
+          "confederation_rank": 148,
+          "league_id": "67uya58idol2eq18ljecsru5o"
+        },
+        {
+          "tier": 4,
+          "name": "3. Deild",
+          "cvs": 40.177,
+          "opta_top10": 41.2707,
+          "opta_top5": 43.483,
+          "global_rank": 397,
+          "confederation_rank": 178,
+          "league_id": "djlez26qpwpmgcptlhbxf8tzt"
+        },
+        {
+          "tier": 5,
+          "name": "4. Deild",
+          "cvs": 32.6534,
+          "opta_top10": 32.6534,
+          "opta_top5": 36.4106,
+          "global_rank": 422,
+          "confederation_rank": 188,
+          "league_id": "1cetls6ootnyudl191dsbtrcz"
+        }
+      ],
+      "s_country": 9.3366,
+      "retention": 0.468673,
+      "iffhs_points": 220.25,
+      "iffhs_rank": 72
+    },
+    {
+      "rank": 76,
+      "country": "Zimbabwe",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Zimbabwe Premier Soccer League",
+          "cvs": 65.733,
+          "opta_top10": 67.0107,
+          "opta_top5": 68.1984,
+          "global_rank": 103,
+          "confederation_rank": 13,
+          "league_id": "4azsryi40zahspm5h6d0f0pgl"
+        }
+      ],
+      "s_country": 65.733,
+      "retention": 0.581466
+    },
+    {
+      "rank": 77,
+      "country": "Kuwait",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 65.6663,
+          "opta_top10": 65.6663,
+          "opta_top5": 70.2161,
+          "global_rank": 105,
+          "confederation_rank": 12,
+          "league_id": "3j81qr7yc4gdnakfwnxf95ovh"
+        },
+        {
+          "tier": 2,
+          "name": "Division 1",
+          "cvs": 55.531,
+          "opta_top10": 55.531,
+          "opta_top5": 57.752,
+          "global_rank": 244,
+          "confederation_rank": 35,
+          "league_id": "ckop4ca4kxencvl9o279p4vdh"
+        }
+      ],
+      "s_country": 7.1217,
+      "retention": 0.464243,
+      "iffhs_points": 168.0,
+      "iffhs_rank": 94
+    },
+    {
+      "rank": 78,
+      "country": "Côte d'Ivoire",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 65.5621,
+          "opta_top10": 66.8599,
+          "opta_top5": 68.4326,
+          "global_rank": 106,
+          "confederation_rank": 11,
+          "league_id": "a55ij9w4hi8dmp55fi3dp0xzz"
+        }
+      ],
+      "s_country": 7.6621,
+      "retention": 0.465324,
+      "iffhs_points": 180.75,
+      "iffhs_rank": 87
+    },
+    {
+      "rank": 79,
+      "country": "Angola",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Angolan Girabola",
+          "cvs": 65.4352,
+          "opta_top10": 67.8307,
+          "opta_top5": 70.6952,
+          "global_rank": 107,
+          "confederation_rank": 15,
+          "league_id": "6c76ua2pykvzepkmpprq4i8kf"
+        }
+      ],
+      "s_country": 7.7575,
+      "retention": 0.465515,
+      "iffhs_points": 183.0,
+      "iffhs_rank": 86
+    },
+    {
+      "rank": 80,
+      "country": "Senegal",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 65.4149,
+          "opta_top10": 66.6764,
+          "opta_top5": 67.5047,
+          "global_rank": 108,
+          "confederation_rank": 10,
+          "league_id": "9u9j3f1oplv8p7wevlko5r8by"
+        }
+      ],
+      "s_country": 65.4149,
+      "retention": 0.58083
+    },
+    {
+      "rank": 81,
+      "country": "Lithuania",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Lithuanian Toplyga",
+          "cvs": 65.4146,
+          "opta_top10": 65.4146,
+          "opta_top5": 67.9919,
+          "global_rank": 109,
+          "confederation_rank": 60,
+          "league_id": "5cwsxtx37les6m10xj71htkgf"
+        },
+        {
+          "tier": 2,
+          "name": "1 Lyga",
+          "cvs": 49.2357,
+          "opta_top10": 51.3043,
+          "opta_top5": 53.7311,
+          "global_rank": 307,
+          "confederation_rank": 141,
+          "league_id": "7qf0jaayyxy3ruamsexv5p1kl"
+        }
+      ],
+      "s_country": 7.5774,
+      "retention": 0.465155,
+      "iffhs_points": 178.75,
+      "iffhs_rank": 88
+    },
+    {
+      "rank": 82,
+      "country": "Tanzania",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligi kuu Bara",
+          "cvs": 65.3532,
+          "opta_top10": 67.8282,
+          "opta_top5": 72.1946,
+          "global_rank": 111,
+          "confederation_rank": 14,
+          "league_id": "9z5643nd06afqu01ea2wt8y4g"
+        }
+      ],
+      "s_country": 13.0776,
+      "retention": 0.476155,
+      "iffhs_points": 308.5,
+      "iffhs_rank": 54
+    },
+    {
+      "rank": 83,
+      "country": "Thailand",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Thai League 1",
+          "cvs": 65.1076,
+          "opta_top10": 67.3535,
+          "opta_top5": 70.6902,
+          "global_rank": 115,
+          "confederation_rank": 13,
+          "league_id": "iu1vi94p4p28oozl1h9bvplr"
+        },
+        {
+          "tier": 2,
+          "name": "Thai League 2",
+          "cvs": 53.7516,
+          "opta_top10": 54.9671,
+          "opta_top5": 55.7666,
+          "global_rank": 265,
+          "confederation_rank": 39,
+          "league_id": "bt24epydr1s8zc2x5xb0n9noc"
+        },
+        {
+          "tier": 3,
+          "name": "Thai League 3",
+          "cvs": 46.2689,
+          "opta_top10": 52.3057,
+          "opta_top5": 52.9852,
+          "global_rank": 339,
+          "confederation_rank": 56,
+          "league_id": "bmmm8kjsbbl7izu0bsl2spyw9"
+        }
+      ],
+      "s_country": 15.3243,
+      "retention": 0.480649,
+      "iffhs_points": 361.5,
+      "iffhs_rank": 47
+    },
+    {
+      "rank": 84,
+      "country": "Vietnam",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "V.League 1",
+          "cvs": 64.9412,
+          "opta_top10": 66.2868,
+          "opta_top5": 69.2236,
+          "global_rank": 118,
+          "confederation_rank": 15,
+          "league_id": "aho73e5udydy96iun3tkzdzsi"
+        },
+        {
+          "tier": 2,
+          "name": "V.League 2",
+          "cvs": 53.6525,
+          "opta_top10": 54.3494,
+          "opta_top5": 55.877,
+          "global_rank": 266,
+          "confederation_rank": 40,
+          "league_id": "4mpgaqkdfgp3npm30m817krt7"
+        },
+        {
+          "tier": 3,
+          "name": "Second Division",
+          "cvs": 36.319,
+          "opta_top10": 42.7468,
+          "opta_top5": 44.6707,
+          "global_rank": 410,
+          "confederation_rank": 63,
+          "league_id": "6ioduwqo2523fsyczahnv48g0"
+        }
+      ],
+      "s_country": 64.9412,
+      "retention": 0.579882
+    },
+    {
+      "rank": 85,
+      "country": "China",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Chinese Super League",
+          "cvs": 64.8207,
+          "opta_top10": 67.3944,
+          "opta_top5": 70.1422,
+          "global_rank": 119,
+          "confederation_rank": 14,
+          "league_id": "82jkgccg7phfjpd0mltdl3pat"
+        },
+        {
+          "tier": 2,
+          "name": "Chinese Football League 1",
+          "cvs": 48.1257,
+          "opta_top10": 49.7998,
+          "opta_top5": 51.0281,
+          "global_rank": 324,
+          "confederation_rank": 50,
+          "league_id": "8r98daokeuzsamu5fmjtblqx5"
+        },
+        {
+          "tier": 3,
+          "name": "Chinese Football League 2",
+          "cvs": 39.2695,
+          "opta_top10": 41.3336,
+          "opta_top5": 42.0437,
+          "global_rank": 402,
+          "confederation_rank": 67,
+          "league_id": "3ymqchdzk8tt6lfphf26xfvh0"
+        }
+      ],
+      "s_country": 13.4803,
+      "retention": 0.476961,
+      "iffhs_points": 318.0,
+      "iffhs_rank": 52
+    },
+    {
+      "rank": 86,
+      "country": "North Macedonia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Macedonian First League",
+          "cvs": 64.7707,
+          "opta_top10": 65.9371,
+          "opta_top5": 69.4719,
+          "global_rank": 121,
+          "confederation_rank": 64,
+          "league_id": "dl5v19e4466jn4fuufhlae7jm"
+        },
+        {
+          "tier": 2,
+          "name": "Second League",
+          "cvs": 51.4521,
+          "opta_top10": 54.5808,
+          "opta_top5": 56.2245,
+          "global_rank": 287,
+          "confederation_rank": 128,
+          "league_id": "8te12r7tgvztvid6k5o2n6l9r"
+        }
+      ],
+      "s_country": 10.8944,
+      "retention": 0.471789,
+      "iffhs_points": 257.0,
+      "iffhs_rank": 64
+    },
+    {
+      "rank": 87,
+      "country": "Burkina Faso",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 64.734,
+          "opta_top10": 66.0353,
+          "opta_top5": 67.5552,
+          "global_rank": 122,
+          "confederation_rank": 17,
+          "league_id": "a3agf15089yvptkvldhuiel86"
+        }
+      ],
+      "s_country": 64.734,
+      "retention": 0.579468
+    },
+    {
+      "rank": 88,
+      "country": "Malta",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Maltese League",
+          "cvs": 64.5736,
+          "opta_top10": 65.8092,
+          "opta_top5": 68.4018,
+          "global_rank": 124,
+          "confederation_rank": 66,
+          "league_id": "5taraea6mqjjldg9zxswo825y"
+        },
+        {
+          "tier": 2,
+          "name": "Challenge League",
+          "cvs": 49.3666,
+          "opta_top10": 51.6209,
+          "opta_top5": 53.198,
+          "global_rank": 305,
+          "confederation_rank": 135,
+          "league_id": "87ztkb9xhjatuvee3i4nmpkym"
+        },
+        {
+          "tier": 3,
+          "name": "National Amateur League",
+          "cvs": 37.5341,
+          "opta_top10": 38.8326,
+          "opta_top5": 40.7594,
+          "global_rank": 407,
+          "confederation_rank": 183,
+          "league_id": "4ukiv0glt1ezmfisz34szht6v"
+        },
+        {
+          "tier": 4,
+          "name": "Gozo First Division",
+          "cvs": 21.2704,
+          "opta_top10": 21.2704,
+          "opta_top5": 22.9092,
+          "global_rank": 441,
+          "confederation_rank": 193,
+          "league_id": "d9fa6z8gr5geqojrggyxln3ys"
+        }
+      ],
+      "s_country": 8.4994,
+      "retention": 0.466999,
+      "iffhs_points": 200.5,
+      "iffhs_rank": 75
+    },
+    {
+      "rank": 89,
+      "country": "Bahrain",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 64.2635,
+          "opta_top10": 65.1661,
+          "opta_top5": 67.8014,
+          "global_rank": 127,
+          "confederation_rank": 16,
+          "league_id": "82wo38rqeizxlfjjhfjy4rx7u"
+        },
+        {
+          "tier": 2,
+          "name": "Second Division",
+          "cvs": 49.7846,
+          "opta_top10": 51.8483,
+          "opta_top5": 55.0161,
+          "global_rank": 299,
+          "confederation_rank": 47,
+          "league_id": "2z9rz5s0wn8de1nnrvxzddf2w"
+        }
+      ],
+      "s_country": 64.2635,
+      "retention": 0.578527
+    },
+    {
+      "rank": 90,
+      "country": "Latvia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Latvian Virsliga",
+          "cvs": 64.1092,
+          "opta_top10": 64.1092,
+          "opta_top5": 68.4104,
+          "global_rank": 129,
+          "confederation_rank": 69,
+          "league_id": "3w1hkk9k9gr8fwssyn4icvdfo"
+        },
+        {
+          "tier": 2,
+          "name": "1. Liga",
+          "cvs": 45.1351,
+          "opta_top10": 47.018,
+          "opta_top5": 49.6484,
+          "global_rank": 350,
+          "confederation_rank": 157,
+          "league_id": "3ri6juw2w6ma0jezszdlv1uqm"
+        }
+      ],
+      "s_country": 12.908,
+      "retention": 0.475816,
+      "iffhs_points": 304.5,
+      "iffhs_rank": 56
+    },
+    {
+      "rank": 91,
+      "country": "El Salvador",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "El Salvador Primera Division Apertura",
+          "cvs": 64.0836,
+          "opta_top10": 65.3769,
+          "opta_top5": 68.5791,
+          "global_rank": 130,
+          "confederation_rank": 8,
+          "league_id": "ein4fkggto3pdh5msp8huafiq"
+        }
+      ],
+      "s_country": 64.0836,
+      "retention": 0.578167
+    },
+    {
+      "rank": 92,
+      "country": "Togo",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Championnat National",
+          "cvs": 64.0104,
+          "opta_top10": 64.8717,
+          "opta_top5": 66.8452,
+          "global_rank": 131,
+          "confederation_rank": 19,
+          "league_id": "8t1t0tyumnnz6q87rvqqnnaw6"
+        }
+      ],
+      "s_country": 64.0104,
+      "retention": 0.578021
+    },
+    {
+      "rank": 93,
+      "country": "Oman",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Professional League",
+          "cvs": 63.9029,
+          "opta_top10": 65.6632,
+          "opta_top5": 68.4799,
+          "global_rank": 133,
+          "confederation_rank": 18,
+          "league_id": "1txej2dzohnydl21zc9pgx6hy"
+        },
+        {
+          "tier": 2,
+          "name": "First Division League",
+          "cvs": 52.446,
+          "opta_top10": 52.446,
+          "opta_top5": 54.0896,
+          "global_rank": 272,
+          "confederation_rank": 43,
+          "league_id": "dh2w1tsp79haiyet9ovq0wk5w"
+        }
+      ],
+      "s_country": 63.9029,
+      "retention": 0.577806
+    },
+    {
+      "rank": 94,
+      "country": "Guinea",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 63.598,
+          "opta_top10": 64.7971,
+          "opta_top5": 67.5092,
+          "global_rank": 134,
+          "confederation_rank": 20,
+          "league_id": "34txpgicm59r0bd60berrxhed"
+        }
+      ],
+      "s_country": 63.598,
+      "retention": 0.577196
+    },
+    {
+      "rank": 95,
+      "country": "Moldova",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Moldovan Super Liga",
+          "cvs": 63.5667,
+          "opta_top10": 63.5667,
+          "opta_top5": 67.8717,
+          "global_rank": 135,
+          "confederation_rank": 74.5,
+          "league_id": "1j4ehtrbry9depwt6oghaq3lu"
+        },
+        {
+          "tier": 2,
+          "name": "Liga 1",
+          "cvs": 47.4209,
+          "opta_top10": 48.5923,
+          "opta_top5": 51.4001,
+          "global_rank": 332,
+          "confederation_rank": 74.5,
+          "league_id": "90129kfnovrjd7v1lkzq7b144"
+        },
+        {
+          "tier": 3,
+          "name": "Liga 2",
+          "cvs": 31.9942,
+          "opta_top10": 36.2028,
+          "opta_top5": 38.8793,
+          "global_rank": 425,
+          "confederation_rank": 187,
+          "league_id": "7yu5v7m4l2hs3h352lohttyk0"
+        }
+      ],
+      "s_country": 8.245,
+      "retention": 0.46649,
+      "iffhs_points": 194.5,
+      "iffhs_rank": 79
+    },
+    {
+      "rank": 96,
+      "country": "Uganda",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Uganda Premier League",
+          "cvs": 63.5632,
+          "opta_top10": 66.2817,
+          "opta_top5": 68.6374,
+          "global_rank": 136,
+          "confederation_rank": 22,
+          "league_id": "1klyfth8tl6lu6ra7k8zmy2n2"
+        }
+      ],
+      "s_country": 63.5632,
+      "retention": 0.577126
+    },
+    {
+      "rank": 97,
+      "country": "Montenegro",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Montenegro First League",
+          "cvs": 63.4481,
+          "opta_top10": 63.4481,
+          "opta_top5": 65.8329,
+          "global_rank": 137,
+          "confederation_rank": 71,
+          "league_id": "77yifp2y2tvn80ndo3f0laav8"
+        },
+        {
+          "tier": 2,
+          "name": "Second League",
+          "cvs": 51.8886,
+          "opta_top10": 51.8886,
+          "opta_top5": 53.8837,
+          "global_rank": 282,
+          "confederation_rank": 125,
+          "league_id": "biac7kvkjh90b0iclv433am4a"
+        }
+      ],
+      "s_country": 7.1111,
+      "retention": 0.464222,
+      "iffhs_points": 167.75,
+      "iffhs_rank": 95
+    },
+    {
+      "rank": 98,
+      "country": "Nicaragua",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primera Division",
+          "cvs": 63.3954,
+          "opta_top10": 63.3954,
+          "opta_top5": 67.1146,
+          "global_rank": 139,
+          "confederation_rank": 10,
+          "league_id": "8usjlmziv3p2re0r2wwzezki9"
+        }
+      ],
+      "s_country": 13.0352,
+      "retention": 0.47607,
+      "iffhs_points": 307.5,
+      "iffhs_rank": 55
+    },
+    {
+      "rank": 99,
+      "country": "Syria",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 63.3128,
+          "opta_top10": 65.4568,
+          "opta_top5": 67.4825,
+          "global_rank": 140,
+          "confederation_rank": 19,
+          "league_id": "6g4vcneo8yvvf0f9cy38o3hy2"
+        }
+      ],
+      "s_country": 63.3128,
+      "retention": 0.576626
+    },
+    {
+      "rank": 100,
+      "country": "Mozambique",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Moçambola",
+          "cvs": 63.0132,
+          "opta_top10": 64.5143,
+          "opta_top5": 66.3541,
+          "global_rank": 143,
+          "confederation_rank": 21,
+          "league_id": "zk2f8f4dzjpxb47gdwsvpga8"
+        }
+      ],
+      "s_country": 63.0132,
+      "retention": 0.576026
+    },
+    {
+      "rank": 101,
+      "country": "Jamaica",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 62.8849,
+          "opta_top10": 64.717,
+          "opta_top5": 66.902,
+          "global_rank": 145,
+          "confederation_rank": 13,
+          "league_id": "6lrwyoy74oz0t5udrnmuyql6a"
+        }
+      ],
+      "s_country": 10.0042,
+      "retention": 0.470008,
+      "iffhs_points": 236.0,
+      "iffhs_rank": 69
+    },
+    {
+      "rank": 102,
+      "country": "Libya",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 62.7832,
+          "opta_top10": 68.8374,
+          "opta_top5": 71.4911,
+          "global_rank": 147,
+          "confederation_rank": 23,
+          "league_id": "83ib9ygyuj24tov28t0ihv2le"
+        }
+      ],
+      "s_country": 62.7832,
+      "retention": 0.575566
+    },
+    {
+      "rank": 103,
+      "country": "Luxembourg",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Luxembourg Division Nationale",
+          "cvs": 62.4254,
+          "opta_top10": 64.6853,
+          "opta_top5": 67.066,
+          "global_rank": 153,
+          "confederation_rank": 80,
+          "league_id": "48pg4xminsjxun5x4yp5ng8v"
+        },
+        {
+          "tier": 2,
+          "name": "Promotion d'Honneur",
+          "cvs": 47.1197,
+          "opta_top10": 48.7151,
+          "opta_top5": 49.5053,
+          "global_rank": 334,
+          "confederation_rank": 147,
+          "league_id": "4nb99fz6gr6kh4swz9290rx2n"
+        },
+        {
+          "tier": 3,
+          "name": "1. Division",
+          "cvs": 37.381,
+          "opta_top10": 41.6,
+          "opta_top5": 42.5322,
+          "global_rank": 409,
+          "confederation_rank": 182,
+          "league_id": "41qm8wjhfr4ur2nc0hfiaysuj"
+        }
+      ],
+      "s_country": 7.0899,
+      "retention": 0.46418,
+      "iffhs_points": 167.25,
+      "iffhs_rank": 96
+    },
+    {
+      "rank": 104,
+      "country": "Mauritania",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 62.2707,
+          "opta_top10": 63.7784,
+          "opta_top5": 65.9718,
+          "global_rank": 154,
+          "confederation_rank": 25,
+          "league_id": "bd105ypde78dpxxxmsyc8ggaf"
+        }
+      ],
+      "s_country": 62.2707,
+      "retention": 0.574541
+    },
+    {
+      "rank": 105,
+      "country": "Indonesia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Indonesia Super League",
+          "cvs": 62.1613,
+          "opta_top10": 64.4965,
+          "opta_top5": 66.392,
+          "global_rank": 155,
+          "confederation_rank": 20,
+          "league_id": "117yqo02rs8dykkxpm274w3bd"
+        },
+        {
+          "tier": 2,
+          "name": "Championship",
+          "cvs": 50.2046,
+          "opta_top10": 52.71,
+          "opta_top5": 53.5947,
+          "global_rank": 296,
+          "confederation_rank": 46,
+          "league_id": "4ean4fk01vvwgq1cywi6d3t4s"
+        },
+        {
+          "tier": 3,
+          "name": "Liga Nusantara",
+          "cvs": 44.6796,
+          "opta_top10": 46.5277,
+          "opta_top5": 47.2631,
+          "global_rank": 359,
+          "confederation_rank": 58,
+          "league_id": "3rgsage2x9nj6c7220m08ll3o"
+        }
+      ],
+      "s_country": 8.0649,
+      "retention": 0.46613,
+      "iffhs_points": 190.25,
+      "iffhs_rank": 84
+    },
+    {
+      "rank": 106,
+      "country": "Canada",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Canadian Premier League",
+          "cvs": 62.1393,
+          "opta_top10": 62.1393,
+          "opta_top5": 64.529,
+          "global_rank": 156,
+          "confederation_rank": 12,
+          "league_id": "6lkj3o21cr4g7bql6tb3fk222"
+        },
+        {
+          "tier": 2,
+          "name": "British Columbia Premier League",
+          "cvs": 45.0153,
+          "opta_top10": 45.0153,
+          "opta_top5": 46.6302,
+          "global_rank": 354,
+          "confederation_rank": 41,
+          "league_id": "dsjp66d8c97bclbw357cex53o"
+        },
+        {
+          "tier": 3,
+          "name": "Alberta Premier League",
+          "cvs": 44.689,
+          "opta_top10": 44.689,
+          "opta_top5": 47.2461,
+          "global_rank": 358,
+          "confederation_rank": 43,
+          "league_id": "3gb0ae74ikiz9vv6hg4q0rwno"
+        },
+        {
+          "tier": 4,
+          "name": "Ligue 1 Québec",
+          "cvs": 43.5614,
+          "opta_top10": 43.5614,
+          "opta_top5": 46.2531,
+          "global_rank": 369,
+          "confederation_rank": 44,
+          "league_id": "2d4nlocc9asxxco093qt2y7vu"
+        },
+        {
+          "tier": 5,
+          "name": "Ontario Premier League",
+          "cvs": 43.497,
+          "opta_top10": 44.1322,
+          "opta_top5": 46.9855,
+          "global_rank": 370,
+          "confederation_rank": 45,
+          "league_id": "5ntkz5lqu047zxq6kds0q8qju"
+        },
+        {
+          "tier": 6,
+          "name": "PCSL",
+          "cvs": 34.5732,
+          "opta_top10": 34.5732,
+          "opta_top5": 36.7784,
+          "global_rank": 415,
+          "confederation_rank": 49,
+          "league_id": "bemm6tvgg2i1ahekeensrjlnm"
+        },
+        {
+          "tier": 7,
+          "name": "Canadian Soccer League",
+          "cvs": 33.1015,
+          "opta_top10": 33.1015,
+          "opta_top5": 33.1015,
+          "global_rank": 420,
+          "confederation_rank": 50,
+          "league_id": "d819an550wm67gxeuw7acbqoq"
+        }
+      ],
+      "s_country": 62.1393,
+      "retention": 0.574279
+    },
+    {
+      "rank": 107,
+      "country": "Ethiopia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 61.9524,
+          "opta_top10": 63.4548,
+          "opta_top5": 64.2283,
+          "global_rank": 157,
+          "confederation_rank": 24,
+          "league_id": "6ybvtzejh91761lqe7y1csrqo"
+        },
+        {
+          "tier": 2,
+          "name": "Higher League",
+          "cvs": 52.1113,
+          "opta_top10": 53.9679,
+          "opta_top5": 55.5411,
+          "global_rank": 278,
+          "confederation_rank": 50,
+          "league_id": "d2xx0aq6s4jxls7nycyp32gb8"
+        }
+      ],
+      "s_country": 61.9524,
+      "retention": 0.573905
+    },
+    {
+      "rank": 108,
+      "country": "Faroe Islands",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Faroe Islands Premier League",
+          "cvs": 61.7591,
+          "opta_top10": 61.7591,
+          "opta_top5": 68.3681,
+          "global_rank": 159,
+          "confederation_rank": 81,
+          "league_id": "dr2xk7muj8aqcjdz2b3li1c0k"
+        },
+        {
+          "tier": 2,
+          "name": "1. Deild",
+          "cvs": 46.8875,
+          "opta_top10": 46.8875,
+          "opta_top5": 49.9894,
+          "global_rank": 336,
+          "confederation_rank": 150,
+          "league_id": "341lj4ffzct6jdi87spbg8wr4"
+        },
+        {
+          "tier": 3,
+          "name": "2. Deild",
+          "cvs": 32.1386,
+          "opta_top10": 33.3046,
+          "opta_top5": 38.3715,
+          "global_rank": 424,
+          "confederation_rank": 190,
+          "league_id": "41u3ad31n4wngqv20yumidgsf"
+        }
+      ],
+      "s_country": 8.4994,
+      "retention": 0.466999,
+      "iffhs_points": 200.5,
+      "iffhs_rank": 75
+    },
+    {
+      "rank": 109,
+      "country": "Gabon",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Championnat D1",
+          "cvs": 61.6157,
+          "opta_top10": 62.9241,
+          "opta_top5": 65.1755,
+          "global_rank": 160,
+          "confederation_rank": 26,
+          "league_id": "cv1kehfzw58bg2vlj3c3ch26x"
+        }
+      ],
+      "s_country": 61.6157,
+      "retention": 0.573231
+    },
+    {
+      "rank": 110,
+      "country": "Haiti",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue Haïtienne",
+          "cvs": 61.4988,
+          "opta_top10": 62.4455,
+          "opta_top5": 63.9122,
+          "global_rank": 161,
+          "confederation_rank": 15,
+          "league_id": "33k2hl0zpk6lkn9hgxrolp8ds"
+        }
+      ],
+      "s_country": 61.4988,
+      "retention": 0.572998
+    },
+    {
+      "rank": 111,
+      "country": "Dominican Republic",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Mayor",
+          "cvs": 61.4925,
+          "opta_top10": 61.4925,
+          "opta_top5": 65.1818,
+          "global_rank": 162,
+          "confederation_rank": 14,
+          "league_id": "2wfvjdhzl6v3s1pf2s96qvdjx"
+        }
+      ],
+      "s_country": 61.4925,
+      "retention": 0.572985
+    },
+    {
+      "rank": 112,
+      "country": "Benin",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Championnat National",
+          "cvs": 61.3541,
+          "opta_top10": 62.991,
+          "opta_top5": 64.0166,
+          "global_rank": 163,
+          "confederation_rank": 38,
+          "league_id": "ddbbqccied7l21mo4lr44sbcr"
+        }
+      ],
+      "s_country": 61.3541,
+      "retention": 0.572708
+    },
+    {
+      "rank": 113,
+      "country": "Congo DR",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 61.2908,
+          "opta_top10": 66.8049,
+          "opta_top5": 69.6562,
+          "global_rank": 165,
+          "confederation_rank": 27,
+          "league_id": "7pl8j3qzfufcquaf8kvduau2r"
+        }
+      ],
+      "s_country": 10.089,
+      "retention": 0.470178,
+      "iffhs_points": 238.0,
+      "iffhs_rank": 68
+    },
+    {
+      "rank": 114,
+      "country": "Kenya",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Kenya Premier League",
+          "cvs": 61.165,
+          "opta_top10": 63.0655,
+          "opta_top5": 64.693,
+          "global_rank": 166,
+          "confederation_rank": 28,
+          "league_id": "7wssxdqi4xihseeam8grqa2b8"
+        },
+        {
+          "tier": 2,
+          "name": "Super League",
+          "cvs": 48.6138,
+          "opta_top10": 50.7032,
+          "opta_top5": 51.3158,
+          "global_rank": 314,
+          "confederation_rank": 52,
+          "league_id": "cize73kxls2n25jjwb5csecfe"
+        }
+      ],
+      "s_country": 61.165,
+      "retention": 0.57233
+    },
+    {
+      "rank": 115,
+      "country": "Cameroon",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Elite One",
+          "cvs": 61.0647,
+          "opta_top10": 62.1491,
+          "opta_top5": 63.2648,
+          "global_rank": 168,
+          "confederation_rank": 30,
+          "league_id": "18izk5zx4t85y7sbpjk3rlr4n"
+        },
+        {
+          "tier": 2,
+          "name": "Elite Two",
+          "cvs": 55.2111,
+          "opta_top10": 55.8457,
+          "opta_top5": 56.3475,
+          "global_rank": 250,
+          "confederation_rank": 48,
+          "league_id": "c8ynqmmwxpo7jh568jxg3syui"
+        }
+      ],
+      "s_country": 61.0647,
+      "retention": 0.572129
+    },
+    {
+      "rank": 116,
+      "country": "Congo",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 60.9797,
+          "opta_top10": 63.0822,
+          "opta_top5": 65.6327,
+          "global_rank": 169,
+          "confederation_rank": 29,
+          "league_id": "5veigtl6wbuw0zod1a6rcgwl1"
+        }
+      ],
+      "s_country": 60.9797,
+      "retention": 0.571959
+    },
+    {
+      "rank": 117,
+      "country": "Grenada",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier Division",
+          "cvs": 60.7885,
+          "opta_top10": 60.7885,
+          "opta_top5": 65.0264,
+          "global_rank": 171,
+          "confederation_rank": 16,
+          "league_id": "9xyp02u8pj4bl962r9jspbedd"
+        }
+      ],
+      "s_country": 60.7885,
+      "retention": 0.571577
+    },
+    {
+      "rank": 118,
+      "country": "Malaysia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Malaysian Super League",
+          "cvs": 60.7185,
+          "opta_top10": 62.9623,
+          "opta_top5": 67.6302,
+          "global_rank": 172,
+          "confederation_rank": 24,
+          "league_id": "eg6s9f1jj7jr6stmbosn0g6c8"
+        },
+        {
+          "tier": 2,
+          "name": "Liga A1",
+          "cvs": 45.0726,
+          "opta_top10": 47.5813,
+          "opta_top5": 48.6209,
+          "global_rank": 352,
+          "confederation_rank": 57,
+          "league_id": "3hlqtarrurifmxcu3wqebw1tf"
+        }
+      ],
+      "s_country": 8.1284,
+      "retention": 0.466257,
+      "iffhs_points": 191.75,
+      "iffhs_rank": 82
+    },
+    {
+      "rank": 119,
+      "country": "Lebanon",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 60.66,
+          "opta_top10": 62.1183,
+          "opta_top5": 66.2454,
+          "global_rank": 173,
+          "confederation_rank": 26,
+          "league_id": "3e40pestup9xzagsu2o6c0i8u"
+        }
+      ],
+      "s_country": 60.66,
+      "retention": 0.57132
+    },
+    {
+      "rank": 120,
+      "country": "Estonia",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Estonian Premium liiga",
+          "cvs": 60.1117,
+          "opta_top10": 60.1117,
+          "opta_top5": 64.7514,
+          "global_rank": 177,
+          "confederation_rank": 84,
+          "league_id": "4d5d3sf6805n5u6jdoa0hdlog"
+        },
+        {
+          "tier": 2,
+          "name": "Esiliiga A",
+          "cvs": 42.7751,
+          "opta_top10": 42.7751,
+          "opta_top5": 45.4322,
+          "global_rank": 377,
+          "confederation_rank": 164,
+          "league_id": "1jsiuepngd3pdeepzob61b02n"
+        },
+        {
+          "tier": 3,
+          "name": "Esiliiga B",
+          "cvs": 29.2398,
+          "opta_top10": 29.2398,
+          "opta_top5": 31.6078,
+          "global_rank": 432,
+          "confederation_rank": 191,
+          "league_id": "dv7yrlxxgsfl7wl2sno3adndq"
+        },
+        {
+          "tier": 4,
+          "name": "II Liiga",
+          "cvs": 16.2097,
+          "opta_top10": 19.8489,
+          "opta_top5": 21.2424,
+          "global_rank": 444,
+          "confederation_rank": 195,
+          "league_id": "7aj9v3zko7lw5cq2cxzwngyyo"
+        }
+      ],
+      "s_country": 12.5901,
+      "retention": 0.47518,
+      "iffhs_points": 297.0,
+      "iffhs_rank": 58
+    },
+    {
+      "rank": 121,
+      "country": "Cabo Verde",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Campeonato Nacional",
+          "cvs": 60.1063,
+          "opta_top10": 60.1063,
+          "opta_top5": 62.4224,
+          "global_rank": 178,
+          "confederation_rank": 31,
+          "league_id": "aok0scytttwue9bybamyj4s51"
+        }
+      ],
+      "s_country": 60.1063,
+      "retention": 0.570213
+    },
+    {
+      "rank": 122,
+      "country": "Rwanda",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 60.0061,
+          "opta_top10": 62.4278,
+          "opta_top5": 64.6316,
+          "global_rank": 180,
+          "confederation_rank": 34.5,
+          "league_id": "ppzvnquzq1gmez5snxzfxkbt"
+        }
+      ],
+      "s_country": 60.0061,
+      "retention": 0.570012
+    },
+    {
+      "rank": 123,
+      "country": "Gambia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "GFA League",
+          "cvs": 59.8409,
+          "opta_top10": 60.9699,
+          "opta_top5": 62.0798,
+          "global_rank": 183,
+          "confederation_rank": 36,
+          "league_id": "alfi8igkewru9ot3mah71mjc1"
+        }
+      ],
+      "s_country": 59.8409,
+      "retention": 0.569682
+    },
+    {
+      "rank": 124,
+      "country": "Madagascar",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Pro League",
+          "cvs": 59.785,
+          "opta_top10": 61.5342,
+          "opta_top5": 64.0646,
+          "global_rank": 184,
+          "confederation_rank": 32,
+          "league_id": "5ec1w4iscr1r482ty8t3lhp9m"
+        }
+      ],
+      "s_country": 59.785,
+      "retention": 0.56957
+    },
+    {
+      "rank": 125,
+      "country": "Burundi",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue A",
+          "cvs": 59.5765,
+          "opta_top10": 62.3311,
+          "opta_top5": 64.9139,
+          "global_rank": 187,
+          "confederation_rank": 39,
+          "league_id": "9akr1h05hescbbtybhii9hgrl"
+        }
+      ],
+      "s_country": 59.5765,
+      "retention": 0.569153
+    },
+    {
+      "rank": 126,
+      "country": "Northern Ireland",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Northern Ireland Premiership",
+          "cvs": 59.4839,
+          "opta_top10": 60.4076,
+          "opta_top5": 64.1055,
+          "global_rank": 189,
+          "confederation_rank": 88,
+          "league_id": "75i269i1ak43magshljadydrh"
+        },
+        {
+          "tier": 2,
+          "name": "Northern Ireland Championship",
+          "cvs": 46.2419,
+          "opta_top10": 47.6306,
+          "opta_top5": 49.9529,
+          "global_rank": 340,
+          "confederation_rank": 152,
+          "league_id": "53tknno09wqihmwxrqcuwq9sa"
+        },
+        {
+          "tier": 3,
+          "name": "Northern Ireland Premier Intermediate League",
+          "cvs": 34.9373,
+          "opta_top10": 36.5925,
+          "opta_top5": 38.2677,
+          "global_rank": 413,
+          "confederation_rank": 185,
+          "league_id": "6yhkvr1api401m5pkazxv4v4o"
+        }
+      ],
+      "s_country": 12.0602,
+      "retention": 0.47412,
+      "iffhs_points": 284.5,
+      "iffhs_rank": 61
+    },
+    {
+      "rank": 127,
+      "country": "Antigua and Barbuda",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier Division",
+          "cvs": 59.3618,
+          "opta_top10": 60.9053,
+          "opta_top5": 64.9549,
+          "global_rank": 191,
+          "confederation_rank": 18,
+          "league_id": "4ldempy7w5mi1yhxxhexquzkl"
+        }
+      ],
+      "s_country": 59.3618,
+      "retention": 0.568724
+    },
+    {
+      "rank": 128,
+      "country": "Singapore",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Singapore Premier League",
+          "cvs": 59.2769,
+          "opta_top10": 59.2769,
+          "opta_top5": 63.8083,
+          "global_rank": 192,
+          "confederation_rank": 27,
+          "league_id": "1q4ab2bpg5e8jl1g2udnakrju"
+        }
+      ],
+      "s_country": 7.0263,
+      "retention": 0.464053,
+      "iffhs_points": 165.75,
+      "iffhs_rank": 97
+    },
+    {
+      "rank": 129,
+      "country": "Botswana",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 59.182,
+          "opta_top10": 61.951,
+          "opta_top5": 64.8177,
+          "global_rank": 194,
+          "confederation_rank": 40,
+          "league_id": "3faz4auaxirmsh26ztmidb001"
+        }
+      ],
+      "s_country": 7.2594,
+      "retention": 0.464519,
+      "iffhs_points": 171.25,
+      "iffhs_rank": 92
+    },
+    {
+      "rank": 130,
+      "country": "Andorra",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Andorran First Division",
+          "cvs": 59.1338,
+          "opta_top10": 59.1338,
+          "opta_top5": 65.1366,
+          "global_rank": 195,
+          "confederation_rank": 90,
+          "league_id": "ejunkmfhjz9weugd2bqrkgobb"
+        },
+        {
+          "tier": 2,
+          "name": "2a Divisió",
+          "cvs": 39.3454,
+          "opta_top10": 39.3454,
+          "opta_top5": 42.9306,
+          "global_rank": 401,
+          "confederation_rank": 179,
+          "league_id": "3srzp139thd2ppo8ediqcasuq"
+        }
+      ],
+      "s_country": 7.8953,
+      "retention": 0.465791,
+      "iffhs_points": 186.25,
+      "iffhs_rank": 85
+    },
+    {
+      "rank": 131,
+      "country": "India",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Indian Super League",
+          "cvs": 58.81,
+          "opta_top10": 60.3245,
+          "opta_top5": 62.0789,
+          "global_rank": 199,
+          "confederation_rank": 28,
+          "league_id": "3oa9e03e7w9nr8kqwqc3tlqz9"
+        },
+        {
+          "tier": 2,
+          "name": "Indian Football League",
+          "cvs": 46.1037,
+          "opta_top10": 46.1037,
+          "opta_top5": 47.4972,
+          "global_rank": 342,
+          "confederation_rank": 55,
+          "league_id": "4pohvulrkgzx38eoqse6b5cdg"
+        },
+        {
+          "tier": 3,
+          "name": "I-League 2",
+          "cvs": 33.502,
+          "opta_top10": 33.502,
+          "opta_top5": 40.1025,
+          "global_rank": 418,
+          "confederation_rank": 75,
+          "league_id": "9h59sfgq97e19r6ldve5xrrrg"
+        },
+        {
+          "tier": 4,
+          "name": "Calcutta Premier Division",
+          "cvs": 29.412,
+          "opta_top10": 33.7445,
+          "opta_top5": 36.6457,
+          "global_rank": 431,
+          "confederation_rank": 80,
+          "league_id": "9q1lv8j58bsnrnmj6wf2inf4w"
+        }
+      ],
+      "s_country": 58.81,
+      "retention": 0.56762
+    },
+    {
+      "rank": 132,
+      "country": "Malawi",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League",
+          "cvs": 58.757,
+          "opta_top10": 60.9261,
+          "opta_top5": 63.6096,
+          "global_rank": 200,
+          "confederation_rank": 37,
+          "league_id": "3gp6ls97f1m51ohtkua36lj81"
+        }
+      ],
+      "s_country": 58.757,
+      "retention": 0.567514
+    },
+    {
+      "rank": 133,
+      "country": "Lesotho",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 58.7242,
+          "opta_top10": 62.5076,
+          "opta_top5": 64.3624,
+          "global_rank": 202,
+          "confederation_rank": 43,
+          "league_id": "7mkusa7mxyp5i41d8ntmojwl0"
+        }
+      ],
+      "s_country": 58.7242,
+      "retention": 0.567448
+    },
+    {
+      "rank": 134,
+      "country": "Eswatini",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 58.5623,
+          "opta_top10": 60.9417,
+          "opta_top5": 63.2516,
+          "global_rank": 204,
+          "confederation_rank": 42,
+          "league_id": "2tknn83yj1ls73ykdxgcekpiz"
+        }
+      ],
+      "s_country": 58.5623,
+      "retention": 0.567125
+    },
+    {
+      "rank": 135,
+      "country": "Martinique",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Division d'Honneur",
+          "cvs": 58.5385,
+          "opta_top10": 60.7701,
+          "opta_top5": 65.0111,
+          "global_rank": 205,
+          "confederation_rank": 22,
+          "league_id": "dnpfi8c4hzwgtzwqvd9784x9n"
+        }
+      ],
+      "s_country": 58.5385,
+      "retention": 0.567077
+    },
+    {
+      "rank": 136,
+      "country": "Liberia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "LFA First Division",
+          "cvs": 58.3861,
+          "opta_top10": 60.2118,
+          "opta_top5": 62.0198,
+          "global_rank": 210,
+          "confederation_rank": 41,
+          "league_id": "9568nq9sgf16yx6phx48srr12"
+        }
+      ],
+      "s_country": 58.3861,
+      "retention": 0.566772
+    },
+    {
+      "rank": 137,
+      "country": "Nepal",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League",
+          "cvs": 58.3195,
+          "opta_top10": 58.3195,
+          "opta_top5": 59.1845,
+          "global_rank": 211,
+          "confederation_rank": 29,
+          "league_id": "8q0wg3st81crmg1qpi1aa95hw"
+        },
+        {
+          "tier": 2,
+          "name": "National League",
+          "cvs": 46.4834,
+          "opta_top10": 48.3255,
+          "opta_top5": 49.62,
+          "global_rank": 338,
+          "confederation_rank": 54,
+          "league_id": "17p94td96tdrcvpxoqfmcaz85"
+        }
+      ],
+      "s_country": 58.3195,
+      "retention": 0.566639
+    },
+    {
+      "rank": 138,
+      "country": "French Guiana",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Régional 1",
+          "cvs": 57.9916,
+          "opta_top10": 59.9356,
+          "opta_top5": 62.7643,
+          "global_rank": 215,
+          "confederation_rank": 23,
+          "league_id": "4bf3hqyk1elw3f32kvib7c3dp"
+        }
+      ],
+      "s_country": 57.9916,
+      "retention": 0.565983
+    },
+    {
+      "rank": 139,
+      "country": "Suriname",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Suriname Major League",
+          "cvs": 57.9231,
+          "opta_top10": 57.9231,
+          "opta_top5": 62.9425,
+          "global_rank": 216,
+          "confederation_rank": 17,
+          "league_id": "cbl4teapo1c4l1oy6gaqj4sv6"
+        }
+      ],
+      "s_country": 57.9231,
+      "retention": 0.565846
+    },
+    {
+      "rank": 140,
+      "country": "Aruba",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Division di Honor",
+          "cvs": 57.5968,
+          "opta_top10": 57.5968,
+          "opta_top5": 63.024,
+          "global_rank": 220,
+          "confederation_rank": 21,
+          "league_id": "ai1avxe03fp35cep030gkcwjs"
+        }
+      ],
+      "s_country": 57.5968,
+      "retention": 0.565194
+    },
+    {
+      "rank": 141,
+      "country": "Wales",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Welsh Premier League",
+          "cvs": 57.4071,
+          "opta_top10": 58.7046,
+          "opta_top5": 61.296,
+          "global_rank": 223,
+          "confederation_rank": 100,
+          "league_id": "c76z5d6j7dpi1e79tm8fpm39z"
+        },
+        {
+          "tier": 2,
+          "name": "FAW Championship",
+          "cvs": 44.0032,
+          "opta_top10": 48.8712,
+          "opta_top5": 52.0498,
+          "global_rank": 364,
+          "confederation_rank": 162,
+          "league_id": "5vq1bl8h8dxdr34w0jaanokto"
+        }
+      ],
+      "s_country": 6.6342,
+      "retention": 0.463268,
+      "iffhs_points": 156.5,
+      "iffhs_rank": 99
+    },
+    {
+      "rank": 142,
+      "country": "Puerto Rico",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Liga Puerto Rico",
+          "cvs": 57.1313,
+          "opta_top10": 58.3299,
+          "opta_top5": 64.8544,
+          "global_rank": 226,
+          "confederation_rank": 25,
+          "league_id": "8lm9iu12f854rhiovkfxkb5vm"
+        }
+      ],
+      "s_country": 57.1313,
+      "retention": 0.564263
+    },
+    {
+      "rank": 143,
+      "country": "Sudan",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Sudani Premier League",
+          "cvs": 56.9459,
+          "opta_top10": 62.0269,
+          "opta_top5": 63.7917,
+          "global_rank": 229,
+          "confederation_rank": 34.5,
+          "league_id": "2c01jrik7ggtta321pstz8tm4"
+        }
+      ],
+      "s_country": 56.9459,
+      "retention": 0.563892
+    },
+    {
+      "rank": 144,
+      "country": "Hong Kong, China",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 56.2613,
+          "opta_top10": 56.2613,
+          "opta_top5": 61.1293,
+          "global_rank": 234,
+          "confederation_rank": 30,
+          "league_id": "4rls982p5uzil6x30mhyhv9f3"
+        },
+        {
+          "tier": 2,
+          "name": "HKFA 1st Division",
+          "cvs": 43.6615,
+          "opta_top10": 45.9285,
+          "opta_top5": 47.979,
+          "global_rank": 368,
+          "confederation_rank": 62,
+          "league_id": "32vph7vcjqgo1ksj1548di90n"
+        }
+      ],
+      "s_country": 56.2613,
+      "retention": 0.562523
+    },
+    {
+      "rank": 145,
+      "country": "Turkmenistan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ýokary Liga",
+          "cvs": 55.739,
+          "opta_top10": 55.739,
+          "opta_top5": 60.0897,
+          "global_rank": 240,
+          "confederation_rank": 34,
+          "league_id": "85d7d2jwmo1xx2pen4hkoclyn"
+        }
+      ],
+      "s_country": 8.3722,
+      "retention": 0.466744,
+      "iffhs_points": 197.5,
+      "iffhs_rank": 77
+    },
+    {
+      "rank": 146,
+      "country": "Philippines",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "PFL",
+          "cvs": 55.6543,
+          "opta_top10": 56.8011,
+          "opta_top5": 61.8064,
+          "global_rank": 241,
+          "confederation_rank": 36,
+          "league_id": "8ifnkq96dckjtn9ab9wplpl9l"
+        }
+      ],
+      "s_country": 55.6543,
+      "retention": 0.561309
+    },
+    {
+      "rank": 147,
+      "country": "Mauritius",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Mauritian League",
+          "cvs": 55.6048,
+          "opta_top10": 55.6048,
+          "opta_top5": 58.9097,
+          "global_rank": 242,
+          "confederation_rank": 47,
+          "league_id": "4vvwpf5yr8d48w59mkgu7iudv"
+        }
+      ],
+      "s_country": 55.6048,
+      "retention": 0.56121
+    },
+    {
+      "rank": 148,
+      "country": "St. Kitts and Nevis",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 54.7084,
+          "opta_top10": 54.7084,
+          "opta_top5": 59.8434,
+          "global_rank": 253,
+          "confederation_rank": 29,
+          "league_id": "651b0xvst5pj9piqt9sj49ks7"
+        }
+      ],
+      "s_country": 54.7084,
+      "retention": 0.559417
+    },
+    {
+      "rank": 149,
+      "country": "British Virgin Islands",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "BVIFA National League",
+          "cvs": 54.1858,
+          "opta_top10": 55.3996,
+          "opta_top5": 60.3502,
+          "global_rank": 259,
+          "confederation_rank": 27,
+          "league_id": "7y5gvvqykm41h8t4traz87yxq"
+        }
+      ],
+      "s_country": 54.1858,
+      "retention": 0.558372
+    },
+    {
+      "rank": 150,
+      "country": "Sierra Leone",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 54.0723,
+          "opta_top10": 56.47,
+          "opta_top5": 57.962,
+          "global_rank": 261,
+          "confederation_rank": 49,
+          "league_id": "3umprqta6ipyann6qjjh07biz"
+        }
+      ],
+      "s_country": 54.0723,
+      "retention": 0.558145
+    },
+    {
+      "rank": 151,
+      "country": "Tajikistan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Vysshaya Liga",
+          "cvs": 53.9449,
+          "opta_top10": 54.9658,
+          "opta_top5": 57.6208,
+          "global_rank": 264,
+          "confederation_rank": 41,
+          "league_id": "4gv4fxg1q7qxdubycjhbiqsl7"
+        }
+      ],
+      "s_country": 53.9449,
+      "retention": 0.55789
+    },
+    {
+      "rank": 152,
+      "country": "Trinidad and Tobago",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "TT Premier League",
+          "cvs": 53.413,
+          "opta_top10": 55.2211,
+          "opta_top5": 60.2361,
+          "global_rank": 268,
+          "confederation_rank": 28,
+          "league_id": "b542gms4cavvp8zbkjs35ed76"
+        },
+        {
+          "tier": 2,
+          "name": "TT Premier League 2",
+          "cvs": 39.6094,
+          "opta_top10": 44.1004,
+          "opta_top5": 46.2963,
+          "global_rank": 400,
+          "confederation_rank": 47,
+          "league_id": "2ahvmrdzsmds84ppbtmegtdnu"
+        }
+      ],
+      "s_country": 53.413,
+      "retention": 0.556826
+    },
+    {
+      "rank": 153,
+      "country": "Guadeloupe",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Division d'Honneur",
+          "cvs": 52.8469,
+          "opta_top10": 55.1211,
+          "opta_top5": 57.3878,
+          "global_rank": 270,
+          "confederation_rank": 30,
+          "league_id": "3kkj5ejehz23411flej4ilvl9"
+        }
+      ],
+      "s_country": 52.8469,
+      "retention": 0.555694
+    },
+    {
+      "rank": 154,
+      "country": "Djibouti",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Division 1",
+          "cvs": 52.4554,
+          "opta_top10": 52.4554,
+          "opta_top5": 55.3527,
+          "global_rank": 271,
+          "confederation_rank": 51,
+          "league_id": "26gq2z96ehrmb82q3sq9cf0fp"
+        }
+      ],
+      "s_country": 52.4554,
+      "retention": 0.554911
+    },
+    {
+      "rank": 155,
+      "country": "Gibraltar",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Gibraltar Premier Division",
+          "cvs": 51.9371,
+          "opta_top10": 53.9364,
+          "opta_top5": 60.5159,
+          "global_rank": 281,
+          "confederation_rank": 121,
+          "league_id": "dzu6b07r25e3pk2uahxi5mzsz"
+        }
+      ],
+      "s_country": 51.9371,
+      "retention": 0.553874
+    },
+    {
+      "rank": 156,
+      "country": "Curaçao",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Curaçao Promé Divishon",
+          "cvs": 51.0461,
+          "opta_top10": 51.0461,
+          "opta_top5": 54.9668,
+          "global_rank": 289,
+          "confederation_rank": 32,
+          "league_id": "959v2qa82bknmcc6epvb6dgpu"
+        }
+      ],
+      "s_country": 51.0461,
+      "retention": 0.552092
+    },
+    {
+      "rank": 157,
+      "country": "Turks and Caicos Islands",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 50.2562,
+          "opta_top10": 50.2562,
+          "opta_top5": 53.6779,
+          "global_rank": 295,
+          "confederation_rank": 33,
+          "league_id": "65dvfflsc4olwbhg8is69zrxa"
+        }
+      ],
+      "s_country": 50.2562,
+      "retention": 0.550512
+    },
+    {
+      "rank": 158,
+      "country": "São Tomé e Príncipe",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Campeonato Nacional",
+          "cvs": 49.5877,
+          "opta_top10": 58.4677,
+          "opta_top5": 59.5442,
+          "global_rank": 301,
+          "confederation_rank": 46,
+          "league_id": "3vw4oev0x9kt3lxsq5ej068ey"
+        }
+      ],
+      "s_country": 49.5877,
+      "retention": 0.549175
+    },
+    {
+      "rank": 159,
+      "country": "Myanmar",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "National League",
+          "cvs": 49.0338,
+          "opta_top10": 50.4988,
+          "opta_top5": 54.1603,
+          "global_rank": 308,
+          "confederation_rank": 48,
+          "league_id": "t2th5fajt23vbdfzhnd6gbbe"
+        }
+      ],
+      "s_country": 49.0338,
+      "retention": 0.548068
+    },
+    {
+      "rank": 160,
+      "country": "New Zealand",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "National League",
+          "cvs": 49.0152,
+          "opta_top10": 55.418,
+          "opta_top5": 57.7185,
+          "global_rank": 309,
+          "confederation_rank": 1,
+          "league_id": "1vyghvhuy6abu4htoemdi79bd"
+        }
+      ],
+      "s_country": 49.0152,
+      "retention": 0.54803
+    },
+    {
+      "rank": 161,
+      "country": "Barbados",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 48.9859,
+          "opta_top10": 48.9859,
+          "opta_top5": 52.2324,
+          "global_rank": 310,
+          "confederation_rank": 35,
+          "league_id": "bjxqgib2ebgol60tlg5ob43tq"
+        }
+      ],
+      "s_country": 48.9859,
+      "retention": 0.547972
+    },
+    {
+      "rank": 162,
+      "country": "Kyrgyz Republic",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 48.6625,
+          "opta_top10": 51.3653,
+          "opta_top5": 55.3382,
+          "global_rank": 313,
+          "confederation_rank": 49,
+          "league_id": "eve4cbr6ybatmp2qdh0nu7lx9"
+        }
+      ],
+      "s_country": 48.6625,
+      "retention": 0.547325
+    },
+    {
+      "rank": 163,
+      "country": "Réunion",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Regionale 1",
+          "cvs": 48.3518,
+          "opta_top10": 50.1606,
+          "opta_top5": 53.9594,
+          "global_rank": 318,
+          "confederation_rank": 53,
+          "league_id": "ec21s5dmmw0zsmhmzn1wuso9x"
+        }
+      ],
+      "s_country": 48.3518,
+      "retention": 0.546704
+    },
+    {
+      "rank": 164,
+      "country": "Bermuda",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 48.2316,
+          "opta_top10": 48.2316,
+          "opta_top5": 52.0605,
+          "global_rank": 320,
+          "confederation_rank": 39,
+          "league_id": "cxjve7cb7vo52bn49j7l4vlil"
+        }
+      ],
+      "s_country": 48.2316,
+      "retention": 0.546463
+    },
+    {
+      "rank": 165,
+      "country": "Cambodia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 48.1882,
+          "opta_top10": 49.1807,
+          "opta_top5": 54.7199,
+          "global_rank": 322,
+          "confederation_rank": 53,
+          "league_id": "6s4p9pfxu7j31isquv8o9h4dd"
+        }
+      ],
+      "s_country": 48.1882,
+      "retention": 0.546376
+    },
+    {
+      "rank": 166,
+      "country": "Cayman Islands",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "CIFA Premier League",
+          "cvs": 48.1369,
+          "opta_top10": 49.9674,
+          "opta_top5": 54.7147,
+          "global_rank": 323,
+          "confederation_rank": 36,
+          "league_id": "7et0m0uh6m3q6taxgxqm88mpo"
+        }
+      ],
+      "s_country": 48.1369,
+      "retention": 0.546274
+    },
+    {
+      "rank": 167,
+      "country": "Belize",
+      "confederation": "N/C America",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 48.0096,
+          "opta_top10": 48.0096,
+          "opta_top5": 50.9476,
+          "global_rank": 326,
+          "confederation_rank": 34,
+          "league_id": "6gnffmfauvm3mohkusjt96fj4"
+        }
+      ],
+      "s_country": 48.0096,
+      "retention": 0.546019
+    },
+    {
+      "rank": 168,
+      "country": "Chinese Taipei",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Taiwan Football Premier League",
+          "cvs": 47.5202,
+          "opta_top10": 47.5202,
+          "opta_top5": 49.988,
+          "global_rank": 330,
+          "confederation_rank": 52,
+          "league_id": "bcpgmjs508joni6hpme87qz2b"
+        }
+      ],
+      "s_country": 47.5202,
+      "retention": 0.54504
+    },
+    {
+      "rank": 169,
+      "country": "Tahiti",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Ligue 1",
+          "cvs": 46.4837,
+          "opta_top10": 48.3648,
+          "opta_top5": 54.4282,
+          "global_rank": 337,
+          "confederation_rank": 2,
+          "league_id": "7k4t5z7iiueq1l5pu1bymud71"
+        }
+      ],
+      "s_country": 46.4837,
+      "retention": 0.542967
+    },
+    {
+      "rank": 170,
+      "country": "Bangladesh",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Bangladesh Premier League",
+          "cvs": 45.8822,
+          "opta_top10": 45.8822,
+          "opta_top5": 49.9971,
+          "global_rank": 344,
+          "confederation_rank": 59,
+          "league_id": "3c8633feplm71zs185iyado3t"
+        }
+      ],
+      "s_country": 45.8822,
+      "retention": 0.541764
+    },
+    {
+      "rank": 171,
+      "country": "New Caledonia",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super Ligue",
+          "cvs": 45.0426,
+          "opta_top10": 45.0426,
+          "opta_top5": 48.7749,
+          "global_rank": 353,
+          "confederation_rank": 3,
+          "league_id": "6aitj7wkkunkhpa8f1sf6klrh"
+        }
+      ],
+      "s_country": 45.0426,
+      "retention": 0.540085
+    },
+    {
+      "rank": 172,
+      "country": "Somalia",
+      "confederation": "Africa",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Somali Premier League",
+          "cvs": 44.311,
+          "opta_top10": 48.9659,
+          "opta_top5": 53.7688,
+          "global_rank": 360,
+          "confederation_rank": 54,
+          "league_id": "6ngm2hkpw6o9fuf9vgipde3dn"
+        }
+      ],
+      "s_country": 44.311,
+      "retention": 0.538622
+    },
+    {
+      "rank": 173,
+      "country": "Maldives",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Dhivehi Premier League",
+          "cvs": 44.1479,
+          "opta_top10": 44.1479,
+          "opta_top5": 47.916,
+          "global_rank": 362,
+          "confederation_rank": 60,
+          "league_id": "9bbedsqm0xttwhpayj85otgen"
+        }
+      ],
+      "s_country": 44.1479,
+      "retention": 0.538296
+    },
+    {
+      "rank": 174,
+      "country": "Mongolia",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 43.4682,
+          "opta_top10": 43.4682,
+          "opta_top5": 48.8742,
+          "global_rank": 371,
+          "confederation_rank": 61,
+          "league_id": "8s9m5mnys5sljfcss6seb6dca"
+        }
+      ],
+      "s_country": 43.4682,
+      "retention": 0.536936
+    },
+    {
+      "rank": 175,
+      "country": "Macao",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Primeira Divisão",
+          "cvs": 42.158,
+          "opta_top10": 42.158,
+          "opta_top5": 46.9203,
+          "global_rank": 382,
+          "confederation_rank": 65,
+          "league_id": "8dpljd2ae9a8739ledhj91fl8"
+        }
+      ],
+      "s_country": 42.158,
+      "retention": 0.534316
+    },
+    {
+      "rank": 176,
+      "country": "Fiji",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "National Football League",
+          "cvs": 41.6634,
+          "opta_top10": 41.6634,
+          "opta_top5": 45.4067,
+          "global_rank": 387,
+          "confederation_rank": 4,
+          "league_id": "eho9l3wi70zmnymt4twce7ehz"
+        }
+      ],
+      "s_country": 41.6634,
+      "retention": 0.533327
+    },
+    {
+      "rank": 177,
+      "country": "San Marino",
+      "confederation": "Europe",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "San Marino Campionato",
+          "cvs": 41.1127,
+          "opta_top10": 45.6797,
+          "opta_top5": 49.9734,
+          "global_rank": 392,
+          "confederation_rank": 173,
+          "league_id": "2c63lkabcjzoiqavj24madt2d"
+        }
+      ],
+      "s_country": 8.3616,
+      "retention": 0.466723,
+      "iffhs_points": 197.25,
+      "iffhs_rank": 78
+    },
+    {
+      "rank": 178,
+      "country": "Brunei Darussalam",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Super League",
+          "cvs": 37.594,
+          "opta_top10": 39.8706,
+          "opta_top5": 47.0071,
+          "global_rank": 406,
+          "confederation_rank": 69,
+          "league_id": "b3uaeojrwdz549l6u6x1epwvy"
+        }
+      ],
+      "s_country": 37.594,
+      "retention": 0.525188
+    },
+    {
+      "rank": 179,
+      "country": "Papua New Guinea",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "National Soccer League",
+          "cvs": 33.6003,
+          "opta_top10": 34.3134,
+          "opta_top5": 38.8297,
+          "global_rank": 417,
+          "confederation_rank": 5,
+          "league_id": "1kmct9gg4dtk0lc59honmosu7"
+        }
+      ],
+      "s_country": 33.6003,
+      "retention": 0.517201
+    },
+    {
+      "rank": 180,
+      "country": "Solomon Islands",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "S-League",
+          "cvs": 33.1157,
+          "opta_top10": 34.6524,
+          "opta_top5": 38.067,
+          "global_rank": 419,
+          "confederation_rank": 6,
+          "league_id": "ebt3vhoz98paeu1k4cjqi1ul5"
+        }
+      ],
+      "s_country": 33.1157,
+      "retention": 0.516231
+    },
+    {
+      "rank": 181,
+      "country": "Guam",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "G League",
+          "cvs": 32.8679,
+          "opta_top10": 40.4665,
+          "opta_top5": 45.2196,
+          "global_rank": 421,
+          "confederation_rank": 71,
+          "league_id": "5ejd6eyz6h60nznehnlu5qedi"
+        }
+      ],
+      "s_country": 32.8679,
+      "retention": 0.515736
+    },
+    {
+      "rank": 182,
+      "country": "Bhutan",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Premier League",
+          "cvs": 27.7632,
+          "opta_top10": 27.7632,
+          "opta_top5": 34.1058,
+          "global_rank": 435,
+          "confederation_rank": 81,
+          "league_id": "3tvqr9pmxgq7ftlg34m85icmh"
+        }
+      ],
+      "s_country": 27.7632,
+      "retention": 0.505526
+    },
+    {
+      "rank": 183,
+      "country": "Laos",
+      "confederation": "Asia",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Lao League",
+          "cvs": 23.122,
+          "opta_top10": 23.122,
+          "opta_top5": 27.2084,
+          "global_rank": 438,
+          "confederation_rank": 83,
+          "league_id": "cup8yhuyraqjany9hynm06cvl"
+        }
+      ],
+      "s_country": 23.122,
+      "retention": 0.496244
+    },
+    {
+      "rank": 184,
+      "country": "Cook Islands",
+      "confederation": "Oceania",
+      "divisions": [
+        {
+          "tier": 1,
+          "name": "Round Cup",
+          "cvs": 6.4103,
+          "opta_top10": 6.4103,
+          "opta_top5": 7.6924,
+          "global_rank": 446,
+          "confederation_rank": 7,
+          "league_id": "bzlcw1r7cdm47j42dc28qf9wl"
+        }
+      ],
+      "s_country": 6.4103,
+      "retention": 0.462821
+    }
+  ],
+  "iffhs_source": "IFFHS_League_CVS_Scored_2025.json",
+  "iffhs_matched_countries": 100,
+  "parameters": {
+    "delta_base": 0.55,
+    "alpha": 0.2,
+    "retention_formula": "1 - (delta_base - alpha * s_country / 100)"
+  }
+}

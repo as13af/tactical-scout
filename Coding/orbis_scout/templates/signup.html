@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — Scout{% endblock %}
+{% block body_class %}ui2{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <img src="{{ url_for('static', filename='img/dashboard_logo.png') }}" alt="Scout" class="auth-logo">
+  <h1>Create your account</h1>
+  <p class="auth-sub">Join Scout to save and compare players.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="auth-flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('signup') }}" data-no-loading>
+    <div class="auth-field">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" value="{{ username or '' }}"
+             autocomplete="username" required autofocus>
+      <div class="auth-hint">3–32 characters: letters, numbers, and . _ -</div>
+    </div>
+    <div class="auth-field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ email or '' }}"
+             autocomplete="email" required>
+    </div>
+    <div class="auth-field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password"
+             autocomplete="new-password" required data-pw-toggle>
+      <div class="auth-hint">At least 8 characters.</div>
+    </div>
+    <div class="auth-field">
+      <label for="confirm_password">Confirm password</label>
+      <input type="password" id="confirm_password" name="confirm_password"
+             autocomplete="new-password" required data-pw-toggle>
+    </div>
+    <button type="submit" class="auth-btn">Sign up</button>
+  </form>
+
+  <div class="auth-foot">
+    Already have an account? <a href="{{ url_for('signin') }}">Sign in</a>
+  </div>
+</div>
+{% endblock %}

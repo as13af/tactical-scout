@@ -1,0 +1,124 @@
+{
+  "provider": "Sofascore",
+  "position": "Advanced Forward",
+  "core_10_model": {
+    "weight_distribution": {
+      "penetration_runs": 0.25,
+      "finishing_quality": 0.30,
+      "link_support": 0.15,
+      "chance_creation": 0.15,
+      "pressing_output": 0.15
+    },
+    "metrics": [
+      {
+        "name": "Successful dribbles per 90",
+        "sofascore_key": "successfulDribbles",
+        "computation": "successfulDribbles / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Successful dribbles per 90 minutes (proxy for progressive penetration runs)",
+        "category": "penetration_runs"
+      },
+      {
+        "name": "Shots on target per 90",
+        "sofascore_key": "shotsOnTarget",
+        "computation": "shotsOnTarget / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Shots on target per 90 minutes (proxy for dangerous box touches)",
+        "category": "penetration_runs"
+      },
+      {
+        "name": "Was fouled per 90",
+        "sofascore_key": "wasFouled",
+        "computation": "wasFouled / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Times fouled per 90 minutes (reflects penetrative threat and movement in depth)",
+        "category": "penetration_runs"
+      },
+      {
+        "name": "Shots per 90",
+        "sofascore_key": "totalShots",
+        "computation": "totalShots / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total shots attempted per 90 minutes",
+        "category": "finishing_quality"
+      },
+      {
+        "name": "Shots on target, %",
+        "sofascore_key": ["shotsOnTarget", "totalShots"],
+        "computation": "shotsOnTarget / totalShots * 100",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots on target",
+        "category": "finishing_quality"
+      },
+      {
+        "name": "Goals per 90",
+        "sofascore_key": "goals",
+        "computation": "goals / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Goals scored per 90 minutes",
+        "category": "finishing_quality"
+      },
+      {
+        "name": "Goal conversion, %",
+        "sofascore_key": "goalConversionPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of shots converted into goals (proxy for expected goals quality)",
+        "category": "finishing_quality"
+      },
+      {
+        "name": "Passes per 90",
+        "sofascore_key": "totalPasses",
+        "computation": "totalPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Total passes per 90 minutes",
+        "category": "link_support"
+      },
+      {
+        "name": "Accurate passes, %",
+        "sofascore_key": "accuratePassesPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Pass completion percentage",
+        "category": "link_support"
+      },
+      {
+        "name": "Key passes per 90",
+        "sofascore_key": "keyPasses",
+        "computation": "keyPasses / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Passes leading directly to a shot per 90 minutes",
+        "category": "chance_creation"
+      },
+      {
+        "name": "Pass to assist per 90",
+        "sofascore_key": "passToAssist",
+        "computation": "passToAssist / (minutesPlayed / 90)",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Passes directly leading to a goal assist per 90 minutes",
+        "category": "chance_creation"
+      },
+      {
+        "name": "Total duels won, %",
+        "sofascore_key": "totalDuelsWonPercentage",
+        "computation": "direct",
+        "higher_is_better": true,
+        "value": null,
+        "description": "Percentage of all duels won (proxy for pressing duel success rate)",
+        "category": "pressing_output"
+      }
+    ],
+    "scoring_method": "Each metric is computed from Sofascore raw stats per the computation formula, then converted to percentile (0-100). For inverse metrics (higher_is_better: false), the inverted percentile is used. Category score = average percentile of metrics in that category. Final score = sum(category_score * category_weight)."
+  }
+}

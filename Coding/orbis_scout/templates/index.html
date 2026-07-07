@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Competitions — Scout{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Competitions</h1>
+    <div class="sub">{{ competitions|length }} competition(s) in database</div>
+  </div>
+</div>
+
+{% if not competitions %}
+  <div class="card">
+    <div style="text-align:center; padding:48px; color:var(--text3);">
+      No competitions available yet.
+    </div>
+  </div>
+{% else %}
+  {% set countries = competitions | map(attribute='country') | unique | list %}
+  {% for country in countries | sort %}
+    <div class="mb16">
+      <div style="font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">
+        {{ country.replace('_',' ') }}
+      </div>
+      <div class="grid-auto">
+        {% for c in competitions if c.country == country %}
+          <a href="/competition/{{ c.country }}/{{ c.competition }}" class="competition-card">
+            <div class="country">{{ c.country.replace('_',' ') }}</div>
+            <div class="name">{{ c.competition.replace('_',' ') }}</div>
+            <div class="meta">{{ c.club_count }} clubs</div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}
