@@ -1,0 +1,99 @@
+/* ============================================================================
+   mobile.css — smartphone usability layer
+   ----------------------------------------------------------------------------
+   Loaded LAST in base.html so it overrides desktop rules on small screens only.
+   Scope: "make it usable" — no horizontal overflow, scrollable tables, tappable
+   controls, images that scale, a wrappable nav. Desktop (>820px) is untouched.
+   Applies to both webapp and orbis_scout (kept in sync).
+   ========================================================================== */
+
+/* ── Global guards (all viewports) ─────────────────────────────────────────── */
+/* Media never forces the page wider than the screen. */
+img, svg, canvas, video { max-width: 100%; height: auto; }
+/* Any table lives inside a scrollable box instead of stretching the layout. */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Tablet / large phone ──────────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  html, body { overflow-x: hidden; max-width: 100%; }
+
+  /* Roomier desktop padding is too much on a phone. */
+  body.ui2 .container,
+  .container { padding: 16px 14px !important; }
+
+  /* ── Navigation: let a fixed 3-col bar collapse into a wrapping row ──────── */
+  nav {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    height: auto !important;
+    padding: 8px 12px !important;
+    gap: 8px;
+    row-gap: 6px;
+  }
+  .nav-left {
+    flex: 1 1 100%;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-search-container { flex: 1 1 auto; min-width: 0; }
+  .nav-search-wrapper, .nav-search-input { width: 100%; }
+  /* Links + account scroll horizontally rather than overflow the screen. */
+  .nav-links {
+    flex: 1 1 100%;
+    justify-self: stretch !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  .nav-links > a,
+  .nav-links .nav-trigger {
+    white-space: nowrap;
+    padding: 10px 10px;         /* taller = easier to tap */
+    font-size: 13px;
+  }
+  /* Tap opens dropdowns (mobile fires :hover on first tap). Keep them on-screen. */
+  .nav-dropdown { right: auto; left: 0; }
+  .nav-account .nav-dropdown { right: 0; left: auto; }
+
+  /* ── Player header stacks ───────────────────────────────────────────────── */
+  body.ui2 .player-header { flex-direction: column; align-items: flex-start; }
+  body.ui2 .player-header img { align-self: center; }
+
+  /* ── Stat tiles: at most 2 across ───────────────────────────────────────── */
+  body.ui2 .stat-grid,
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* ── Carousel never pushes the page sideways ────────────────────────────── */
+  body.ui2 .stat-carousel,
+  .stat-carousel { max-width: 100%; overflow: hidden; }
+  .carousel-viewport { overflow-x: hidden; }
+  .carousel-slide { min-width: 0; }
+
+  /* ── Team Contribution rows fit narrow screens ──────────────────────────── */
+  .contrib-label { min-width: 82px !important; font-size: 10px !important; }
+  .contrib-pct   { min-width: 36px !important; }
+  .contrib-raw   { min-width: 52px !important; }
+
+  /* ── Tap targets: switches / buttons comfortable for a thumb ─────────────── */
+  .p90-switch { transform: scale(1.15); transform-origin: left center; }
+  button, .btn, .club-action-btn, input[type="submit"] { min-height: 40px; }
+  .p90-toggle-wrap, #pos-avg-toggle-wrap { padding: 6px 0; }
+}
+
+/* ── Small phone ───────────────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  body.ui2 .stat-grid,
+  .stat-grid { grid-template-columns: 1fr !important; }
+
+  body.ui2 .container,
+  .container { padding: 12px 10px !important; }
+
+  .breadcrumb { font-size: 10px; }
+  /* Contribution: let the raw pair drop below its bar if space is tight. */
+  .contrib-row { flex-wrap: wrap; }
+  .contrib-track { flex: 1 1 60%; }
+}

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ data.get('player_name','Player') }} — Scout{% endblock %}
+{% block body_class %}ui2{% endblock %}
 
 {% block content %}
 {% set profile = data.get('profile', {}).get('player', {}) %}
@@ -17,7 +18,10 @@
 </div>
 
 <!-- Player header -->
-<div class="player-header">
+<div class="player-header"
+     id="player-page-header"
+     data-tc-primary="{{ team_colors.primary if team_colors else '#6E6E6E' }}"
+     data-tc-secondary="{{ team_colors.secondary if team_colors else '#D9D9D9' }}">
   <div class="player-meta" style="flex:1;">
     <h1>{{ data.get('player_name','') }}</h1>
     <div class="team-line">
@@ -44,8 +48,8 @@
       {% if profile.get('nationality') %}
         <div class="bio-item"><span class="bio-label">Nationality</span><span class="bio-val">{{ profile.nationality }}</span></div>
       {% endif %}
-      {% if profile.get('contract', {}).get('contractUntil') %}
-        <div class="bio-item"><span class="bio-label">Contract</span><span class="bio-val">Until {{ profile.contract.contractUntil }}</span></div>
+      {% if contract_display %}
+        <div class="bio-item"><span class="bio-label">Contract</span><span class="bio-val">Until {{ contract_display }}</span></div>
       {% endif %}
       {% if cvs_score is defined and cvs_score %}
         <div class="bio-item">
@@ -66,12 +70,24 @@
          class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
         🏟️ Club Fit Analysis
       </a>
+      {% if data.get('player_id') %}
+      <a href="https://www.sofascore.com/player/{{ data.get('player_name','') | lower | replace(' ', '-') }}/{{ data.get('player_id') }}"
+         target="_blank" rel="noopener"
+         class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
+        ↗ SofaScore
+      </a>
+      {% endif %}
     </div>
     {% endif %}
   </div>
 
   {% if stats.get('rating') %}
-    {% set rc = 'rc-good' if stats.rating|float >= 7.0 else ('rc-mid' if stats.rating|float >= 6.0 else 'rc-low') %}
+    {%- set _r = stats.rating|float -%}
+    {%- set rc = 'rc-excellent' if _r >= 9.0 else
+                ('rc-vgood'    if _r >= 8.0 else
+                ('rc-good'     if _r >= 7.0 else
+                ('rc-avg'      if _r >= 6.5 else
+                ('rc-below'    if _r >= 6.0 else 'rc-poor')))) -%}
     <div style="text-align:center; padding:20px 32px; background:var(--bg3); border-radius:var(--radius); border:1px solid var(--border);">
       <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Avg Rating</div>
       <div class="rating-val {{ rc }}" style="font-family:'BasementGrotesque', sans-serif; font-size:48px; font-weight:800;">
@@ -80,6 +96,89 @@
     </div>
   {% endif %}
 </div>
+
+<!-- ── Player Role Profile card ───────────────────────────────────────────── -->
+{% if player_path is defined %}
+<div class="card" id="role-card" style="margin-bottom:20px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+    <div class="card-title" style="margin:0;">Player Role Profile</div>
+    <div id="role-sample-warning" style="display:none; font-size:10px; font-weight:700; letter-spacing:.06em;
+         background:#3a2800; color:#f5a623; border:1px solid #6b4400; border-radius:4px; padding:3px 8px;
+         text-transform:uppercase;">Low sample — &lt; 270 min</div>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div id="role-loading" style="color:var(--text3); font-size:12px;">Loading role profile…</div>
+  <!-- Error state -->
+  <div id="role-error" style="display:none; color:var(--text3); font-size:12px;"></div>
+
+  <!-- FM24 badge row -->
+  <div id="role-badges-wrap" style="display:none; margin-bottom:18px;">
+    <div style="font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">FM24 Role Archetype</div>
+    <div id="role-badges" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+  </div>
+
+  <!-- Fitness score + category breakdown (hidden for GK) -->
+  <div id="role-fitness-wrap" style="display:none;">
+    <div style="display:flex; align-items:flex-start; gap:24px; flex-wrap:wrap;">
+      <!-- Score ring -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;">
+        <div class="score-ring" id="role-score-ring" style="--pct:0; width:88px; height:88px;">
+          <span id="role-score-val" style="font-size:22px;">--</span>
+        </div>
+        <div id="role-name-label" style="font-size:10px; color:var(--text3); text-transform:uppercase;
+             letter-spacing:.07em; text-align:center; max-width:90px; line-height:1.3;"></div>
+      </div>
+      <!-- Category bars -->
+      <div style="flex:1; min-width:180px;">
+        <div id="role-cat-bars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Spatial Zone Profile card ──────────────────────────────────────────── -->
+{% if player_path is defined %}
+<div class="card" id="spatial-card" style="display:none; margin-bottom:20px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+    <div class="card-title" style="margin:0;">Spatial Zone Profile</div>
+    <span id="spatial-zone-badge" style="display:none; font-size:10px; font-weight:700; letter-spacing:.07em;
+         text-transform:uppercase; border-radius:4px; padding:3px 10px; border:1px solid var(--border2);
+         color:var(--text2);"></span>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+    <!-- Mini pitch SVG -->
+    <div id="spatial-pitch-wrap" style="flex-shrink:0;"></div>
+
+    <!-- Right panel: depth bars + summary + toggle -->
+    <div style="flex:1; min-width:180px;">
+      <!-- Depth bars -->
+      <div id="spatial-depth-bars" style="margin-bottom:14px;"></div>
+
+      <!-- Summary -->
+      <div id="spatial-summary" style="font-size:12px; color:var(--text1); line-height:1.6; margin-bottom:10px;"></div>
+
+      <!-- Expandable narrative -->
+      <div id="spatial-narrative-wrap" style="display:none;">
+        <div id="spatial-narrative" style="font-size:11px; color:var(--text2); line-height:1.7;
+             border-top:1px solid var(--border); padding-top:10px; margin-top:4px;"></div>
+      </div>
+      <button id="spatial-toggle-btn"
+              onclick="(function(){var w=document.getElementById('spatial-narrative-wrap'),
+                b=document.getElementById('spatial-toggle-btn');
+                var open=w.style.display!=='none';
+                w.style.display=open?'none':'block';
+                b.textContent=open?'Read more ↓':'Read less ↑';})()"
+              style="background:none;border:none;color:var(--text3);font-size:11px;
+                     cursor:pointer;padding:4px 0;letter-spacing:.03em;margin-top:2px;">
+        Read more ↓
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <!-- Stats + Heatmap grid -->
 <div class="grid-2" style="gap:20px; align-items:start;">
@@ -95,27 +194,79 @@
     </div>
     {% endif %}
 
+    <!-- Team Contribution -->
+    {% if contribution %}
+    <div class="card mb16" id="contribution-card">
+      <div class="card-title" style="margin-bottom:2px;">Team Contribution</div>
+      <div style="font-size:11px; color:var(--text3); margin-bottom:12px;">
+        Player's share of {{ data.get('team','the team') }}'s season totals
+        {% if contribution.minutes_share is not none %}
+          · Played {{ contribution.minutes_played }} min ·
+          {{ contribution.minutes_share }}% of available minutes
+        {% endif %}
+      </div>
+      {% for cat in contribution.categories %}
+      <div class="contrib-cat">
+        <div class="contrib-cat-head">
+          <span class="contrib-cat-name">{{ cat.label }}</span>
+          {% if cat.aggregate is not none %}
+            <span class="contrib-cat-agg">{{ cat.aggregate }}% of team</span>
+          {% endif %}
+        </div>
+        {% for row in cat.rows %}
+        <div class="contrib-row">
+          <span class="contrib-label">{{ row.label }}</span>
+          <div class="contrib-track">
+            <div class="contrib-fill contrib-{{ row.tier }}" style="width:{{ row.pct }}%;"></div>
+          </div>
+          <span class="contrib-pct contrib-{{ row.tier }}-text">{{ row.pct }}%</span>
+          <span class="contrib-raw"
+                data-raw="{{ row.player }}/{{ row.team }}"
+                {% if row.p90_player is not none and row.p90_team is not none %}data-p90="{{ row.p90_player }}/{{ row.p90_team }}"{% endif %}>{{ row.player }}/{{ row.team }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div class="contrib-legend">
+        <span><i class="contrib-dot contrib-low"></i>&lt;10%</span>
+        <span><i class="contrib-dot contrib-mid"></i>10–25%</span>
+        <span><i class="contrib-dot contrib-high"></i>&gt;25%</span>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Core stats -->
     <div class="card mb16">
       <div class="card-title">Core Statistics</div>
       <div class="stat-grid">
         {% set core = [
-          ('Appearances',  stats.get('appearances','')),
-          ('Goals',        stats.get('goals','')),
-          ('Assists',      stats.get('assists','')),
-          ('Minutes',      stats.get('minutesPlayed','')),
-          ('Yellow Cards', stats.get('yellowCards','')),
-          ('Red Cards',    stats.get('redCards','')),
+          ('Appearances',  stats.get('appearances',''),   'appearances'),
+          ('Goals',        stats.get('goals',''),         'goals'),
+          ('Assists',      stats.get('assists',''),       'assists'),
+          ('Minutes',      stats.get('minutesPlayed',''), 'minutesPlayed'),
+          ('Yellow Cards', stats.get('yellowCards',''),   'yellowCards'),
+          ('Red Cards',    stats.get('redCards',''),      'redCards'),
         ] %}
-        {% for label, val in core %}
+        {% for label, val, key in core %}
           {% if val != '' and val is not none %}
-            <div class="stat-block">
+            <div class="stat-block" data-statkey="{{ key }}">
               <div class="label">{{ label }}</div>
-              <div class="value">{{ val }}</div>
+              <div class="value" data-raw="{{ val }}">{{ val }}</div>
+              <div class="stat-avg-sub"></div>
             </div>
           {% endif %}
         {% endfor %}
       </div>
+    </div>
+
+    <!-- Position Avg toggle (shown by JS after fetch) -->
+    <div id="pos-avg-toggle-wrap" style="display:none; align-items:center; gap:10px; justify-content:flex-end; margin-bottom:12px;">
+      <span style="font-size:12px; color:var(--text2);">vs Position Avg</span>
+      <label class="p90-switch">
+        <input type="checkbox" id="posAvgToggle" onchange="setPosAvgMode(this.checked)">
+        <span class="p90-slider"></span>
+      </label>
+      <span id="pos-avg-chip" style="font-size:10px; color:var(--text3);"></span>
     </div>
 
     <!-- Per-90 toggle -->
@@ -131,24 +282,37 @@
     </div>
     {% endif %}
 
+    <!-- Stat categories (Attacking / Passing / Defensive) — carousel for density -->
+    <div class="card stat-carousel" id="stat-categories" data-carousel>
+
     <!-- Attacking -->
     {% set atk = [
-      ('Shots', stats.get('shots','')),
-      ('Shots on Target', stats.get('shotsOnTarget','')),
-      ('Big Chances', stats.get('bigChances','')),
-      ('Big Chances Missed', stats.get('bigChancesMissed','')),
-      ('Successful Dribbles', stats.get('successfulDribbles','')),
-      ('Dribble Attempts', stats.get('totalDribbleAttempts','')),
-      ('Key Passes', stats.get('keyPasses','')),
+      ('Shots',                  stats.get('totalShots',''),                 'totalShots'),
+      ('Shots on Target',        stats.get('shotsOnTarget',''),              'shotsOnTarget'),
+      ('Shots Inside Box',       stats.get('shotsFromInsideTheBox',''),      'shotsFromInsideTheBox'),
+      ('Shots Outside Box',      stats.get('shotsFromOutsideTheBox',''),     'shotsFromOutsideTheBox'),
+      ('Big Chances Created',    stats.get('bigChancesCreated',''),          'bigChancesCreated'),
+      ('Big Chances Missed',     stats.get('bigChancesMissed',''),           'bigChancesMissed'),
+      ('Successful Dribbles',    stats.get('successfulDribbles',''),         'successfulDribbles'),
+      ('Dribble Success %',      "%.1f"|format(stats.successfulDribblesPercentage|float) if stats.get('successfulDribblesPercentage') else '', 'successfulDribblesPercentage'),
+      ('Key Passes',             stats.get('keyPasses',''),                  'keyPasses'),
+      ('Fouls Won',              stats.get('wasFouled',''),                  'wasFouled'),
+      ('Blocked Shots',          stats.get('blockedShots',''),               'blockedShots'),
+      ('Hit Woodwork',           stats.get('hitWoodwork',''),                'hitWoodwork'),
+      ('Offsides',               stats.get('offsides',''),                   'offsides'),
+      ('Goal Conversion %',      "%.1f"|format(stats.goalConversionPercentage|float) if stats.get('goalConversionPercentage') else '', 'goalConversionPercentage'),
     ] %}
     {% if atk | selectattr(1, 'ne', '') | list %}
-      <div class="card mb16">
+      <div class="card mb16 stat-pane" data-label="Attacking">
         <div class="card-title">Attacking</div>
         <div class="table-wrap">
           <table>
+            <thead id="atk-thead" style="display:none;">
+              <tr><th></th><th class="td-num">Val</th><th class="td-num" style="color:var(--text3);font-size:10px;">vs Avg</th></tr>
+            </thead>
             <tbody>
-              {% for label, val in atk %}{% if val != '' and val is not none %}
-                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num p90-cell" data-raw="{{ val }}">{{ val }}</td></tr>
+              {% for label, val, key in atk %}{% if val != '' and val is not none %}
+                <tr data-statkey="{{ key }}"><td style="color:var(--text2);">{{ label }}</td><td class="td-num{% if '%' not in label %} p90-cell{% endif %}"{% if '%' not in label %} data-raw="{{ val }}"{% endif %}>{{ val }}</td><td class="td-num td-pos-avg" data-statkey="{{ key }}"></td></tr>
               {% endif %}{% endfor %}
             </tbody>
           </table>
@@ -158,21 +322,30 @@
 
     <!-- Passing -->
     {% set pass_stats = [
-      ('Total Passes', stats.get('totalPasses','')),
-      ('Accurate Passes', stats.get('accuratePasses','')),
-      ('Pass Accuracy %', "%.1f"|format(stats.accuratePassesPercentage|float) if stats.get('accuratePassesPercentage') else ''),
-      ('Long Balls', stats.get('totalLongBalls','')),
-      ('Accurate Long Balls', stats.get('accurateLongBalls','')),
-      ('Crosses', stats.get('totalCross','')),
+      ('Total Passes',          stats.get('totalPasses',''),                  'totalPasses'),
+      ('Accurate Passes',       stats.get('accuratePasses',''),               'accuratePasses'),
+      ('Pass Accuracy %',       "%.1f"|format(stats.accuratePassesPercentage|float) if stats.get('accuratePassesPercentage') else '', 'accuratePassesPercentage'),
+      ('Own Half Passes',       stats.get('totalOwnHalfPasses',''),           'totalOwnHalfPasses'),
+      ('Opp Half Passes',       stats.get('totalOppositionHalfPasses',''),    'totalOppositionHalfPasses'),
+      ('Long Balls',            stats.get('totalLongBalls',''),               'totalLongBalls'),
+      ('Accurate Long Balls',   stats.get('accurateLongBalls',''),            'accurateLongBalls'),
+      ('Long Ball Acc. %',      "%.1f"|format(stats.accurateLongBallsPercentage|float) if stats.get('accurateLongBallsPercentage') else '', 'accurateLongBallsPercentage'),
+      ('Crosses',               stats.get('totalCross',''),                   'totalCross'),
+      ('Accurate Crosses',      stats.get('accurateCrosses',''),              'accurateCrosses'),
+      ('Cross Acc. %',          "%.1f"|format(stats.accurateCrossesPercentage|float) if stats.get('accurateCrossesPercentage') else '', 'accurateCrossesPercentage'),
+      ('Through Balls',         stats.get('passToAssist',''),                 'passToAssist'),
     ] %}
     {% if pass_stats | selectattr(1, 'ne', '') | list %}
-      <div class="card mb16">
+      <div class="card mb16 stat-pane" data-label="Passing">
         <div class="card-title">Passing</div>
         <div class="table-wrap">
           <table>
+            <thead id="pass-thead" style="display:none;">
+              <tr><th></th><th class="td-num">Val</th><th class="td-num" style="color:var(--text3);font-size:10px;">vs Avg</th></tr>
+            </thead>
             <tbody>
-              {% for label, val in pass_stats %}{% if val != '' and val is not none %}
-                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num{% if '%' not in label %} p90-cell{% endif %}"{% if '%' not in label %} data-raw="{{ val }}"{% endif %}>{{ val }}</td></tr>
+              {% for label, val, key in pass_stats %}{% if val != '' and val is not none %}
+                <tr data-statkey="{{ key }}"><td style="color:var(--text2);">{{ label }}</td><td class="td-num{% if '%' not in label %} p90-cell{% endif %}"{% if '%' not in label %} data-raw="{{ val }}"{% endif %}>{{ val }}</td><td class="td-num td-pos-avg" data-statkey="{{ key }}"></td></tr>
               {% endif %}{% endfor %}
             </tbody>
           </table>
@@ -182,36 +355,66 @@
 
     <!-- Defensive -->
     {% set def_stats = [
-      ('Tackles', stats.get('tackles','')),
-      ('Interceptions', stats.get('interceptions','')),
-      ('Clearances', stats.get('clearances','')),
-      ('Aerial Duels Won', stats.get('aerialDuelsWon','')),
-      ('Aerial Duels', stats.get('totalAerialDuels','')),
-      ('Total Duels Won', stats.get('totalDuelsWon','')),
-      ('Total Duels', stats.get('totalDuels','')),
+      ('Tackles',            stats.get('tackles',''),            'tackles'),
+      ('Tackles Won',        stats.get('tacklesWon',''),         'tacklesWon'),
+      ('Tackle Success %',   "%.1f"|format(stats.tacklesWonPercentage|float) if stats.get('tacklesWonPercentage') else '', 'tacklesWonPercentage'),
+      ('Interceptions',      stats.get('interceptions',''),      'interceptions'),
+      ('Clearances',         stats.get('clearances',''),         'clearances'),
+      ('Blocks',             stats.get('outfielderBlocks',''),   'outfielderBlocks'),
+      ('Aerial Duels Won',   stats.get('aerialDuelsWon',''),     'aerialDuelsWon'),
+      ('Aerial Win %',       "%.1f"|format(stats.aerialDuelsWonPercentage|float) if stats.get('aerialDuelsWonPercentage') else '', 'aerialDuelsWonPercentage'),
+      ('Total Duels Won',    stats.get('totalDuelsWon',''),      'totalDuelsWon'),
+      ('Duel Win %',         "%.1f"|format(stats.totalDuelsWonPercentage|float) if stats.get('totalDuelsWonPercentage') else '', 'totalDuelsWonPercentage'),
+      ('Ball Recoveries',    stats.get('ballRecovery',''),       'ballRecovery'),
+      ('Fouls Committed',    stats.get('fouls',''),              'fouls'),
+      ('Dispossessed',       stats.get('dispossessed',''),       'dispossessed'),
+      ('Possession Lost',    stats.get('possessionLost',''),     'possessionLost'),
+      ('Dribbled Past',      stats.get('dribbledPast',''),       'dribbledPast'),
+      ('Error → Goal',       stats.get('errorLeadToGoal',''),    'errorLeadToGoal'),
+      ('Error → Shot',       stats.get('errorLeadToShot',''),    'errorLeadToShot'),
     ] %}
     {% if def_stats | selectattr(1, 'ne', '') | list %}
-      <div class="card">
+      <div class="card stat-pane" data-label="Defensive">
         <div class="card-title">Defensive</div>
         <div class="table-wrap">
           <table>
+            <thead id="def-thead" style="display:none;">
+              <tr><th></th><th class="td-num">Val</th><th class="td-num" style="color:var(--text3);font-size:10px;">vs Avg</th></tr>
+            </thead>
             <tbody>
-              {% for label, val in def_stats %}{% if val != '' and val is not none %}
-                <tr><td style="color:var(--text2);">{{ label }}</td><td class="td-num p90-cell" data-raw="{{ val }}">{{ val }}</td></tr>
+              {% for label, val, key in def_stats %}{% if val != '' and val is not none %}
+                <tr data-statkey="{{ key }}"><td style="color:var(--text2);">{{ label }}</td><td class="td-num{% if '%' not in label %} p90-cell{% endif %}"{% if '%' not in label %} data-raw="{{ val }}"{% endif %}>{{ val }}</td><td class="td-num td-pos-avg" data-statkey="{{ key }}"></td></tr>
               {% endif %}{% endfor %}
             </tbody>
           </table>
         </div>
       </div>
     {% endif %}
+
+    </div><!-- /.stat-carousel -->
   </div>
 
   <!-- Heatmap + Career -->
   <div>
+    <!-- Position Z-Score Radar -->
+    {% if player_path is defined %}
+    <div class="card mb16" id="radar-card" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:2px;">
+        <div class="card-title" style="margin:0;">Position Z-Score Radar</div>
+        <span id="radar-sample-warning"
+              style="display:none; font-size:9px; font-weight:700; letter-spacing:.06em;
+                     text-transform:uppercase; color:var(--amber); border:1px solid var(--amber);
+                     border-radius:4px; padding:1px 6px;"></span>
+      </div>
+      <div id="radar-sub" style="font-size:11px; color:var(--text3); margin-bottom:8px;">Loading…</div>
+      <div id="radar-mount" style="display:flex; justify-content:center;"></div>
+      <div id="radar-legend" style="font-size:10px; color:var(--text3); margin-top:8px; text-align:center;"></div>
+    </div>
+    {% endif %}
     {% if heatmap %}
       <div class="heatmap-wrap mb16">
         <div class="card-title" style="margin-bottom:12px;">Position Heatmap</div>
-        <img src="/heatmap/{{ heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
+        <img src="{{ heatmap if heatmap.startswith('/') else '/heatmap/' + heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
       </div>
     {% endif %}
 
@@ -258,11 +461,11 @@
 
 <!-- ── Match Data Insights ─────────────────────────────── -->
 {% if match_per90 and match_count > 0 %}
-<div class="card" style="margin-top:20px; border-color:#1a2744;">
+<div class="card" style="margin-top:20px; border-color:#1A1A1A;">
   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
     <div style="display:flex; align-items:center; gap:10px;">
       <div class="card-title" style="margin:0;">Per-90 from Match Data</div>
-      <span style="display:inline-block; font-size:9px; font-weight:700; letter-spacing:.06em; background:#1a2744; color:#80DEEA; border-radius:4px; padding:2px 6px; text-transform:uppercase;">{{ match_count }} match{% if match_count > 1 %}es{% endif %}</span>
+      <span style="display:inline-block; font-size:9px; font-weight:700; letter-spacing:.06em; background:#0F0F0F; color:#FFFFFF; border-radius:4px; padding:2px 6px; text-transform:uppercase;">{{ match_count }} match{% if match_count > 1 %}es{% endif %}</span>
     </div>
     {% if data.get('player_id') %}
     <a href="/player_matches/{{ data.player_id }}" class="btn btn-ghost" style="font-size:12px; padding:5px 12px;">
@@ -273,7 +476,7 @@
   <div class="grid-2" style="gap:16px;">
     <!-- Match-Only Stats -->
     <div>
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#80DEEA; margin-bottom:10px;">Match-Only Insights</div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#FFFFFF; margin-bottom:10px;">Match-Only Insights</div>
       <table style="width:100%;border-collapse:collapse;font-size:12px;">
         <tbody>
           {% set ns2 = namespace(shown=0) %}
@@ -292,7 +495,7 @@
           {% set ns2.shown = ns2.shown + 1 %}
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:5px 6px; color:var(--text2);">{{ label }}</td>
-            <td style="padding:5px 6px; text-align:right; font-weight:700; color:#80DEEA;">{{ p90v }}<small style="color:var(--text3); font-weight:400; margin-left:3px;">/90</small></td>
+            <td style="padding:5px 6px; text-align:right; font-weight:700; color:#FFFFFF;">{{ p90v }}<small style="color:var(--text3); font-weight:400; margin-left:3px;">/90</small></td>
             <td style="padding:5px 6px; text-align:right; color:var(--text3); font-size:11px;">{{ match_per90.totals.get(key, '') }}</td>
           </tr>
           {% endif %}
@@ -338,10 +541,19 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+/* ── Player team color accent ── */
+(function () {
+  const h = document.getElementById('player-page-header');
+  if (!h || !window.readableAccent) return;
+  const accent = readableAccent(h.dataset.tcPrimary, h.dataset.tcSecondary);
+  const h1 = h.querySelector('h1');
+  if (h1) { h1.style.borderLeft = `4px solid ${accent}`; h1.style.paddingLeft = '12px'; }
+  h.style.borderTop = `2px solid ${window.hexToRgba ? hexToRgba(accent, 0.35) : accent}`;
+})();
+</script>
 <style>
-.rc-good { color: var(--green); }
-.rc-mid  { color: var(--amber); }
-.rc-low  { color: var(--red); }
+/* rc-* rating tier classes now defined globally in style.css */
 .p90-toggle-wrap {
   display: flex;
   align-items: center;
@@ -386,6 +598,53 @@
   transform: translateX(18px);
   background: #fff;
 }
+.stat-avg-sub { font-size:10px; color:var(--text3); font-family:'CoFoSans',monospace; margin-top:4px; min-height:14px; }
+.td-pos-avg { font-size:11px; color:var(--text3); font-variant-numeric:tabular-nums; }
+
+/* ── Team Contribution card ── */
+.contrib-cat { margin-bottom:14px; }
+.contrib-cat:last-of-type { margin-bottom:6px; }
+.contrib-cat-head {
+  display:flex; align-items:baseline; justify-content:space-between;
+  margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border);
+}
+.contrib-cat-name {
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--text2);
+}
+.contrib-cat-agg {
+  font-size:10px; color:var(--text3); font-variant-numeric:tabular-nums;
+}
+.contrib-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.contrib-label {
+  min-width:120px; font-size:11px; color:var(--text2);
+  font-family:'CoFoSans',monospace;
+}
+.contrib-track {
+  flex:1; height:4px; background:var(--bg); border:1px solid var(--border);
+  border-radius:2px; overflow:hidden;
+}
+.contrib-fill { height:100%; transition:width .6s; }
+.contrib-pct {
+  min-width:42px; text-align:right; font-size:11px;
+  font-family:'BasementGrotesque',sans-serif; font-weight:900;
+}
+.contrib-raw {
+  min-width:64px; text-align:right; font-size:10px; color:var(--text3);
+  font-variant-numeric:tabular-nums;
+}
+.contrib-low  { background:#EF4444; }
+.contrib-mid  { background:#22C55E; }
+.contrib-high { background:#3B82F6; }
+.contrib-low-text  { color:#EF4444; }
+.contrib-mid-text  { color:#22C55E; }
+.contrib-high-text { color:#3B82F6; }
+.contrib-legend {
+  display:flex; gap:14px; margin-top:10px; padding-top:8px;
+  border-top:1px solid var(--border); font-size:10px; color:var(--text3);
+}
+.contrib-legend span { display:flex; align-items:center; gap:5px; }
+.contrib-dot { display:inline-block; width:8px; height:8px; border-radius:2px; }
 </style>
 <script>
 function toggleP90(on) {
@@ -399,7 +658,124 @@ function toggleP90(on) {
       td.textContent = td.dataset.raw;
     }
   });
+  // Team Contribution card: swap the player/team pair to per-90 rates.
+  // The % share bar is left unchanged (it is a season-total share).
+  document.querySelectorAll('.contrib-raw').forEach(function(el) {
+    var p90 = el.dataset.p90;
+    el.textContent = (on && p90) ? p90 : el.dataset.raw;
+  });
 }
+
+// ── Position Average panel ───────────────────────────────────────────────────
+var setPosAvgMode = function() {};
+(function () {
+  const PLAYER_PATH = "{{ player_path | default('') }}";
+  if (!PLAYER_PATH) return;
+
+  const LOWER_IS_BETTER = new Set([
+    'yellowCards','redCards','yellowRedCards','bigChancesMissed',
+    'possessionLost','errorLeadToGoal','errorLeadToShot',
+    'fouls','dribbledPast','goalsConceded','dispossessed',
+    'blockedShots','offsides','foulsCommitted'
+  ]);
+
+  const BROAD_LABEL = {'GK':'GK','DEF':'Defenders','MID':'Midfielders','FWD':'Forwards'};
+
+  let posAvgData = null;
+  let posAvgOn = false;
+
+  fetch('/api/league_position_avg?player=' + encodeURIComponent(PLAYER_PATH) + '&pos_mode=grouped')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || data.error) return;
+      posAvgData = data;
+
+      // Show the toggle row
+      var wrap = document.getElementById('pos-avg-toggle-wrap');
+      if (wrap) wrap.style.display = 'flex';
+
+      // Set chip text
+      var chip = document.getElementById('pos-avg-chip');
+      if (chip) {
+        var positions = (data.positions_used || []);
+        var broadSet = new Set();
+        var broadMap = {
+          'GK':'GK','DC':'DEF','DL':'DEF','DR':'DEF','WBL':'DEF','WBR':'DEF',
+          'DM':'MID','MC':'MID','AM':'MID','ML':'MID','MR':'MID','CM':'MID',
+          'LW':'FWD','RW':'FWD','ST':'FWD','SS':'FWD','CF':'FWD'
+        };
+        positions.forEach(function(p){ var b = broadMap[p]; if (b) broadSet.add(b); });
+        var groupLabel = broadSet.size === 1 ? (BROAD_LABEL[Array.from(broadSet)[0]] || Array.from(broadSet)[0]) : 'Players';
+        chip.textContent = 'vs ' + data.pool_size + ' ' + groupLabel + ' · ' + data.competition;
+      }
+    })
+    .catch(function() {});
+
+  function renderPosAvg(on) {
+    posAvgOn = on;
+    var p90On = document.getElementById('p90Toggle') ? document.getElementById('p90Toggle').checked : false;
+    var avgs  = !posAvgData ? null : (p90On ? posAvgData.p90_averages : posAvgData.averages);
+
+    // Show/hide thead rows
+    ['atk-thead','pass-thead','def-thead'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = on ? '' : 'none';
+    });
+
+    // Helper: get the player's effective value for comparison (p90-adjusted if p90 is on)
+    var _minsWrap = document.querySelector('.p90-toggle-wrap');
+    var _totalMins = _minsWrap ? parseInt(_minsWrap.dataset.mins, 10) : 0;
+    function _effectiveVal(rawData, textContent, isPercentStat) {
+      if (isPercentStat) return parseFloat(textContent);
+      var raw = parseFloat(rawData);
+      if (isNaN(raw)) return parseFloat(textContent);
+      if (p90On && _totalMins > 0) return raw / _totalMins * 90;
+      return raw;
+    }
+
+    // Populate td-pos-avg cells in tables
+    document.querySelectorAll('.td-pos-avg').forEach(function(td) {
+      if (!on || !avgs) { td.textContent = ''; return; }
+      var key = td.dataset.statkey;
+      var avg = avgs[key];
+      var tr  = td.closest('tr');
+      var valTd = tr ? tr.querySelector('.td-num:not(.td-pos-avg)') : null;
+      var isPercent = valTd ? !valTd.classList.contains('p90-cell') : false;
+      var playerVal = valTd ? _effectiveVal(valTd.dataset.raw, valTd.textContent, isPercent) : NaN;
+      if (avg == null || isNaN(playerVal) || avg === 0) { td.textContent = '—'; td.style.color = 'var(--text3)'; return; }
+      var delta = (playerVal - avg) / Math.abs(avg) * 100;
+      var positive = LOWER_IS_BETTER.has(key) ? delta < 0 : delta > 0;
+      var avgFmt = avg >= 10 ? avg.toFixed(1) : avg.toFixed(2);
+      td.innerHTML = '<span style="color:var(--text3);font-size:10px;">avg ' + avgFmt + '</span><br>' +
+        '<span style="font-weight:700;">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span>';
+      td.style.color = positive ? '#22C55E' : (delta === 0 ? 'var(--text3)' : '#EF4444');
+    });
+
+    // Populate stat-avg-sub divs in core stats
+    document.querySelectorAll('.stat-block[data-statkey]').forEach(function(block) {
+      var sub = block.querySelector('.stat-avg-sub');
+      if (!sub) return;
+      if (!on || !avgs) { sub.textContent = ''; return; }
+      var key = block.dataset.statkey;
+      var avg = avgs[key];
+      var valDiv = block.querySelector('.value');
+      var rawVal = valDiv ? _effectiveVal(valDiv.dataset.raw, valDiv.textContent, false) : NaN;
+      if (avg == null || isNaN(rawVal) || avg === 0) { sub.textContent = ''; return; }
+      var delta = (rawVal - avg) / Math.abs(avg) * 100;
+      var positive = LOWER_IS_BETTER.has(key) ? delta < 0 : delta > 0;
+      var sign = delta >= 0 ? '+' : '';
+      var avgFmt = avg >= 10 ? avg.toFixed(1) : avg.toFixed(2);
+      sub.textContent = 'avg ' + avgFmt + ' · ' + sign + delta.toFixed(1) + '%';
+      sub.style.color = positive ? '#22C55E' : (delta === 0 ? 'var(--text3)' : '#EF4444');
+    });
+  }
+
+  setPosAvgMode = function(on) { renderPosAvg(on); };
+
+  // Re-render when p90 toggle changes so deltas stay consistent
+  var origToggleP90 = window.toggleP90 || function(){};
+  window.toggleP90 = function(on) { origToggleP90(on); if (posAvgOn) renderPosAvg(true); };
+})();
 
 // ── Percentile panel ──────────────────────────────────────────────────────────
 (function () {
@@ -462,6 +838,597 @@ function toggleP90(on) {
       });
 
       card.style.display = 'block';
+    })
+    .catch(() => {});
+})();
+
+// ── Player Role Profile card ──────────────────────────────────────────────────
+(function () {
+  const PLAYER_PATH = "{{ player_path | default('') }}";
+  if (!PLAYER_PATH) return;
+  const roleCard = document.getElementById('role-card');
+  if (!roleCard) return;
+
+  // Cluster → accent colour (monochrome palette friendy)
+  const CLUSTER_COLOUR = {
+    'Goalscorer':     '#FFFFFF',
+    'Creative':       '#D9D9D9',
+    'Wide':           '#A8A8A8',
+    'Ball-winner':    '#D9D9D9',
+    'Deep Creator':   '#A8A8A8',
+    'Box-to-box':     '#D9D9D9',
+    'Defender':       '#A8A8A8',
+    'Target Striker': '#D9D9D9',
+    'Goalkeeper':     '#6E6E6E',
+  };
+
+  function animateRoleRing(target) {
+    const ring  = document.getElementById('role-score-ring');
+    const label = document.getElementById('role-score-val');
+    if (!ring || !label) return;
+    const colour = target >= 70 ? 'var(--green)' : target >= 45 ? 'var(--amber)' : 'var(--red)';
+    ring.style.setProperty('--ring-colour', colour);
+    ring.style.setProperty('--pct', '0');
+    const start = performance.now();
+    requestAnimationFrame(function frame(now) {
+      const t     = Math.min((now - start) / 800, 1);
+      const eased = t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+      const cur   = target * eased;
+      ring.style.setProperty('--pct', cur.toFixed(2));
+      label.textContent = Math.round(cur).toString();
+      if (t < 1) requestAnimationFrame(frame);
+      else label.textContent = Math.round(target).toString();
+    });
+  }
+
+  // Fallback generic label when player stats don't satisfy any role
+  const FALLBACK_LABEL = {
+    'GK':  { group: 'G', label: 'Goalkeeper'        },
+    'CB':  { group: 'D', label: 'Centre Back'        },
+    'DC':  { group: 'D', label: 'Centre Back'        },
+    'LB':  { group: 'D', label: 'Full Back'          },
+    'RB':  { group: 'D', label: 'Full Back'          },
+    'DL':  { group: 'D', label: 'Full Back'          },
+    'DR':  { group: 'D', label: 'Full Back'          },
+    'LWB': { group: 'D', label: 'Wing Back'          },
+    'RWB': { group: 'D', label: 'Wing Back'          },
+    'DM':  { group: 'M', label: 'Defensive Mid'      },
+    'CM':  { group: 'M', label: 'Central Midfielder' },
+    'AM':  { group: 'M', label: 'Attacking Mid'      },
+    'ML':  { group: 'M', label: 'Wide Midfielder'    },
+    'MR':  { group: 'M', label: 'Wide Midfielder'    },
+    'ST':  { group: 'F', label: 'Poacher'            },
+    'LW':  { group: 'F', label: 'Winger'             },
+    'RW':  { group: 'F', label: 'Winger'             },
+  };
+
+  function _makeBadge(groupLabel, roleLabel, isStrict, metaText, col) {
+    const badge = document.createElement('div');
+    badge.style.cssText = [
+      'display:inline-flex; flex-direction:column; align-items:center; gap:2px;',
+      'border:1px solid ' + (isStrict ? col : 'var(--border2)') + ';',
+      'border-radius:4px; padding:5px 12px; min-width:90px;',
+      'background:' + (isStrict ? 'rgba(255,255,255,0.04)' : 'transparent') + ';',
+    ].join('');
+
+    const lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:11px; font-weight:700; letter-spacing:.04em; color:' + col + '; white-space:nowrap;';
+    lbl.textContent = groupLabel + ' · ' + roleLabel;
+
+    const meta = document.createElement('span');
+    meta.style.cssText = 'font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em;';
+    meta.textContent = metaText;
+
+    badge.appendChild(lbl);
+    badge.appendChild(meta);
+    return badge;
+  }
+
+  function renderBadges(fm24, playerPos, playerMinutes) {
+    const wrap      = document.getElementById('role-badges-wrap');
+    const container = document.getElementById('role-badges');
+    if (!wrap || !container) return;
+
+    container.innerHTML = '';
+
+    // ── Tier 1: strict match ──────────────────────────────────────────────────
+    if (fm24.strict.length > 0) {
+      fm24.strict.slice(0, 2).forEach(function (role) {
+        const col  = CLUSTER_COLOUR[role.cluster] || 'var(--text2)';
+        const meta = role.cluster + (role.confidence_tier === 'low' ? ' · low conf.' : '');
+        container.appendChild(_makeBadge(role.position_group, role.label, true, meta, col));
+      });
+      wrap.style.display = 'block';
+      return;
+    }
+
+    // ── Tier 2 / 3 decision: near matches ────────────────────────────────────
+    const bestNear     = fm24.near.length > 0 ? fm24.near[0] : null;
+    const bestCoverage = bestNear ? (bestNear.conditions_met / bestNear.conditions_total) : 0;
+    const isFallback   = bestCoverage < 0.333 && playerMinutes < 500;
+
+    // ── Tier 3: generic fallback ──────────────────────────────────────────────
+    if (isFallback || !bestNear) {
+      const fb = FALLBACK_LABEL[playerPos] || { group: '?', label: playerPos || 'Unknown' };
+      container.appendChild(_makeBadge(fb.group, fb.label, false, 'General position', 'var(--text2)'));
+      wrap.style.display = 'block';
+      return;
+    }
+
+    // ── Tier 2: near match ────────────────────────────────────────────────────
+    fm24.near.slice(0, 2).forEach(function (role) {
+      const col  = CLUSTER_COLOUR[role.cluster] || 'var(--text2)';
+      const meta = role.conditions_met + '/' + role.conditions_total + ' criteria · ' + role.cluster;
+      container.appendChild(_makeBadge(role.position_group, '~ ' + role.label, false, meta, col));
+    });
+    wrap.style.display = 'block';
+  }
+
+  function renderFitness(profile) {
+    const fitWrap = document.getElementById('role-fitness-wrap');
+    if (!fitWrap || !profile) return;
+
+    // Score ring
+    animateRoleRing(profile.overall_score);
+    const nameLabel = document.getElementById('role-name-label');
+    if (nameLabel) nameLabel.textContent = profile.role_name;
+
+    // Category bars
+    const catWrap = document.getElementById('role-cat-bars');
+    if (!catWrap) return;
+    catWrap.innerHTML = '';
+
+    const weights = profile.weights;
+    const cats    = Object.keys(weights).sort(function (a, b) { return weights[b] - weights[a]; });
+    cats.forEach(function (cat) {
+      const sc     = profile.category_scores[cat] || 0;
+      const wPct   = (weights[cat] * 100).toFixed(0);
+      const fill   = sc >= 70
+        ? 'linear-gradient(90deg,#3a3a3a 0%,#6e6e6e 100%)'
+        : sc >= 45
+        ? 'linear-gradient(90deg,#2a2a2a 0%,#4a4a4a 100%)'
+        : 'linear-gradient(90deg,#1a1a1a 0%,#3a3a3a 100%)';
+      const row = document.createElement('div');
+      row.className = 'cat-bar-row';
+      row.innerHTML = '<div class="cat-bar-header">'
+        + '<span class="cat-bar-name">' + cat.replace(/_/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}) + '</span>'
+        + '<span class="cat-bar-meta">wt ' + wPct + '% &nbsp;·&nbsp; <strong>' + sc.toFixed(1) + '</strong>/100</span>'
+        + '</div>'
+        + '<div class="cat-bar-track">'
+        + '<div class="cat-bar-fill" style="width:' + sc + '%; background:' + fill + ';"></div>'
+        + '</div>';
+      catWrap.appendChild(row);
+    });
+
+    fitWrap.style.display = 'block';
+  }
+
+  fetch('/api/player_role?player=' + encodeURIComponent(PLAYER_PATH))
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      const loading = document.getElementById('role-loading');
+      if (loading) loading.style.display = 'none';
+
+      if (data.error) {
+        const errEl = document.getElementById('role-error');
+        if (errEl) { errEl.textContent = data.error; errEl.style.display = 'block'; }
+        return;
+      }
+
+      // Sample size warning
+      if (data.fm24_roles && data.fm24_roles.sample_size === 'low') {
+        const warn = document.getElementById('role-sample-warning');
+        if (warn) warn.style.display = 'inline-block';
+      }
+
+      // FM24 badges
+      if (data.fm24_roles) renderBadges(data.fm24_roles, data.player_position, data.player_minutes || 0);
+
+      // Position Line fitness
+      if (data.role_profile) renderFitness(data.role_profile);
+
+      // Spatial zone profile
+      if (data.spatial_analysis) renderSpatialCard(data.spatial_analysis);
+    })
+    .catch(function () {
+      const loading = document.getElementById('role-loading');
+      if (loading) loading.style.display = 'none';
+      const errEl = document.getElementById('role-error');
+      if (errEl) { errEl.textContent = 'Could not load role profile.'; errEl.style.display = 'block'; }
+    });
+
+  // ── Spatial Zone Profile card renderer ─────────────────────────────────────
+  function renderSpatialCard(spatial) {
+    const card = document.getElementById('spatial-card');
+    if (!card || !spatial) return;
+
+    const zone   = spatial.zone   || {};
+    const feat   = spatial.features || {};
+    const expl   = spatial.explanation || {};
+
+    // ── Zone badge ──────────────────────────────────────────────────────────
+    const badge = document.getElementById('spatial-zone-badge');
+    if (badge) {
+      badge.textContent = zone.qualified_label || zone.zone_label || '';
+      badge.style.display = 'inline-block';
+    }
+
+    // ── Mini pitch SVG ──────────────────────────────────────────────────────
+    const pitchWrap = document.getElementById('spatial-pitch-wrap');
+    if (pitchWrap) pitchWrap.innerHTML = _buildPitchSVG(feat, zone);
+
+    // ── Depth bars ──────────────────────────────────────────────────────────
+    const barsWrap = document.getElementById('spatial-depth-bars');
+    if (barsWrap) {
+      const bars = [
+        { label: 'Def. Third', pct: Math.round((feat.def_third_pct || 0) * 100) },
+        { label: 'Midfield',   pct: Math.round((feat.mid_third_pct || 0) * 100) },
+        { label: 'Att. Third', pct: Math.round((feat.att_third_pct || 0) * 100) },
+      ];
+      const maxPct  = Math.max(...bars.map(b => b.pct));
+      barsWrap.innerHTML = bars.map(function(b) {
+        const isDom = b.pct === maxPct;
+        const fill  = isDom ? '#D9D9D9' : '#3a3a3a';
+        const col   = isDom ? '#FFFFFF' : 'var(--text3)';
+        return (
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+            '<span style="min-width:72px;font-size:10px;color:var(--text3);' +
+              'text-transform:uppercase;letter-spacing:.06em;">' + b.label + '</span>' +
+            '<div style="flex:1;height:4px;background:var(--bg);border:1px solid var(--border);' +
+              'border-radius:2px;overflow:hidden;">' +
+              '<div style="width:' + b.pct + '%;height:100%;background:' + fill + ';' +
+                'transition:width .5s;"></div>' +
+            '</div>' +
+            '<span style="min-width:30px;text-align:right;font-size:11px;font-weight:700;' +
+              'color:' + col + ';">' + b.pct + '%</span>' +
+          '</div>'
+        );
+      }).join('') +
+      // Lateral bias indicator
+      (zone.lateral_bias && zone.lateral_bias !== 'central'
+        ? '<div style="margin-top:8px;font-size:10px;color:var(--text3);letter-spacing:.05em;">' +
+            'Lateral bias: <strong style="color:var(--text2);">' +
+            (zone.lateral_bias === 'left' ? '← Left channel' : 'Right channel →') +
+            '</strong>' +
+          '</div>'
+        : '<div style="margin-top:8px;font-size:10px;color:var(--text3);">Lateral: central corridor</div>');
+    }
+
+    // ── Summary & narrative ──────────────────────────────────────────────────
+    const summaryEl = document.getElementById('spatial-summary');
+    if (summaryEl) summaryEl.textContent = expl.summary || '';
+
+    const narrativeEl = document.getElementById('spatial-narrative');
+    if (narrativeEl) narrativeEl.textContent = expl.narrative || '';
+
+    // Show the toggle button only if there is narrative content
+    const toggleBtn = document.getElementById('spatial-toggle-btn');
+    if (toggleBtn && !expl.narrative) toggleBtn.style.display = 'none';
+
+    card.style.display = 'block';
+  }
+
+  function _buildPitchSVG(feat, zone) {
+    // SVG viewport 260×160; pitch occupies (15,15)→(245,145): 230×130 internal
+    var PX = 15, PY = 15, PW = 230, PH = 130;
+    var xS = PW / 100, yS = PH / 100;
+
+    // Map heatmap coords → SVG coords
+    // x: left=defensive(0) → right=attacking(100)
+    // y: flip because heatmap origin="lower" (y=0 at bottom) vs SVG y=0 at top
+    function sx(x) { return PX + x * xS; }
+    function sy(y) { return PY + (100 - y) * yS; }
+
+    // ── Zone shading (dominant operational third) ───────────────────────────
+    var zoneKey = zone.zone_key || 'central_defender';
+    var defEnd = sx(33), midEnd = sx(67);
+    var shadeRects = '';
+
+    // Depth zone fill
+    var depthX1, depthX2;
+    if (['central_defender','fullback_wingback','defensive_mid'].indexOf(zoneKey) >= 0) {
+      depthX1 = PX; depthX2 = defEnd;
+    } else if (['attacking_mid','wide_forward','centre_forward'].indexOf(zoneKey) >= 0) {
+      depthX1 = midEnd; depthX2 = PX + PW;
+    } else {
+      depthX1 = defEnd; depthX2 = midEnd;
+    }
+    shadeRects += '<rect x="' + depthX1 + '" y="' + PY + '" width="' + (depthX2 - depthX1) +
+      '" height="' + PH + '" fill="#FFFFFF" fill-opacity="0.06" rx="1"/>';
+
+    // Lateral zone refinement
+    // SofaScore: y=100 (top of image) = LEFT touchline → after SVG y-flip → top of SVG
+    //            y=0   (bottom of image) = RIGHT touchline → after flip → bottom of SVG
+    var lat = zone.lateral_bias;
+    if (lat === 'left') {
+      // left = high heatmap y → low SVG y → upper half of SVG
+      shadeRects += '<rect x="' + depthX1 + '" y="' + PY + '" width="' +
+        (depthX2 - depthX1) + '" height="' + (PH * 0.45) + '" fill="#FFFFFF" fill-opacity="0.07" rx="1"/>';
+    } else if (lat === 'right') {
+      // right = low heatmap y → high SVG y → lower half of SVG
+      shadeRects += '<rect x="' + depthX1 + '" y="' + (PY + PH * 0.55) + '" width="' +
+        (depthX2 - depthX1) + '" height="' + (PH * 0.45) + '" fill="#FFFFFF" fill-opacity="0.07" rx="1"/>';
+    }
+
+    // ── Pitch outline & markings ────────────────────────────────────────────
+    var lc = '#3a3a3a', lw = '1';
+    var lines = '';
+    // Outer boundary
+    lines += '<rect x="' + PX + '" y="' + PY + '" width="' + PW + '" height="' + PH +
+      '" fill="none" stroke="' + lc + '" stroke-width="' + lw + '"/>';
+    // Halfway line
+    lines += '<line x1="' + sx(50) + '" y1="' + PY + '" x2="' + sx(50) + '" y2="' + (PY + PH) +
+      '" stroke="' + lc + '" stroke-width="' + lw + '" stroke-dasharray="3 3"/>';
+    // Third lines (faint)
+    lines += '<line x1="' + defEnd + '" y1="' + PY + '" x2="' + defEnd + '" y2="' + (PY + PH) +
+      '" stroke="#2a2a2a" stroke-width="1"/>';
+    lines += '<line x1="' + midEnd + '" y1="' + PY + '" x2="' + midEnd + '" y2="' + (PY + PH) +
+      '" stroke="#2a2a2a" stroke-width="1"/>';
+    // Center circle (simplified)
+    lines += '<circle cx="' + sx(50) + '" cy="' + sy(50) + '" r="14" fill="none" stroke="' + lc +
+      '" stroke-width="' + lw + '"/>';
+    lines += '<circle cx="' + sx(50) + '" cy="' + sy(50) + '" r="2" fill="' + lc + '"/>';
+    // Left penalty box
+    lines += '<rect x="' + PX + '" y="' + sy(78.9) + '" width="' + (sx(16.5) - PX) +
+      '" height="' + (sy(21.1) - sy(78.9)) + '" fill="none" stroke="' + lc + '" stroke-width="' + lw + '"/>';
+    // Right penalty box
+    lines += '<rect x="' + sx(83.5) + '" y="' + sy(78.9) + '" width="' + (PX + PW - sx(83.5)) +
+      '" height="' + (sy(21.1) - sy(78.9)) + '" fill="none" stroke="' + lc + '" stroke-width="' + lw + '"/>';
+    // Penalty spots
+    lines += '<circle cx="' + sx(11) + '" cy="' + sy(50) + '" r="2" fill="' + lc + '"/>';
+    lines += '<circle cx="' + sx(89) + '" cy="' + sy(50) + '" r="2" fill="' + lc + '"/>';
+    // Goals
+    lines += '<rect x="' + (PX - 5) + '" y="' + sy(61.1) + '" width="5" height="' + (sy(38.9) - sy(61.1)) +
+      '" fill="none" stroke="' + lc + '" stroke-width="' + lw + '"/>';
+    lines += '<rect x="' + (PX + PW) + '" y="' + sy(61.1) + '" width="5" height="' + (sy(38.9) - sy(61.1)) +
+      '" fill="none" stroke="' + lc + '" stroke-width="' + lw + '"/>';
+
+    // ── Activity centroid marker ─────────────────────────────────────────────
+    var cx_val = typeof feat.x_centroid === 'number' ? feat.x_centroid : 50;
+    var cy_val = typeof feat.y_centroid === 'number' ? feat.y_centroid : 50;
+    var dotX   = sx(cx_val);
+    var dotY   = sy(cy_val);
+    var marker = '<circle cx="' + dotX + '" cy="' + dotY +
+      '" r="5" fill="#FFFFFF" fill-opacity="0.9"/>' +
+      '<circle cx="' + dotX + '" cy="' + dotY +
+      '" r="9" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.5"/>';
+
+    // ── Depth-zone labels ────────────────────────────────────────────────────
+    var labelY = PY + PH + 10;
+    var defPct = Math.round((feat.def_third_pct || 0) * 100);
+    var midPct = Math.round((feat.mid_third_pct || 0) * 100);
+    var attPct = Math.round((feat.att_third_pct || 0) * 100);
+    var maxPct = Math.max(defPct, midPct, attPct);
+    function labelCol(p) { return p === maxPct ? '#D9D9D9' : '#4a4a4a'; }
+    var labels =
+      '<text x="' + (PX + (defEnd - PX) / 2) + '" y="' + labelY +
+        '" text-anchor="middle" font-size="8" fill="' + labelCol(defPct) + '">' + defPct + '%</text>' +
+      '<text x="' + ((defEnd + midEnd) / 2) + '" y="' + labelY +
+        '" text-anchor="middle" font-size="8" fill="' + labelCol(midPct) + '">' + midPct + '%</text>' +
+      '<text x="' + ((midEnd + PX + PW) / 2) + '" y="' + labelY +
+        '" text-anchor="middle" font-size="8" fill="' + labelCol(attPct) + '">' + attPct + '%</text>';
+
+    return (
+      '<svg viewBox="0 0 260 175" style="width:100%;max-width:240px;height:auto;' +
+        'font-family:\'CoFoSans\',monospace;">' +
+        '<rect width="260" height="175" fill="#0a0a0a" rx="4"/>' +
+        shadeRects + lines + marker + labels +
+      '</svg>'
+    );
+  }
+})();
+</script>
+
+<script>
+// ── Position Z-Score Radar — interactive ─────────────────────────────────────
+(function () {
+  const PLAYER_PATH = "{{ player_path | default('') }}";
+  if (!PLAYER_PATH) return;
+  const card = document.getElementById('radar-card');
+  if (!card) return;
+
+  // ── Tooltip styles (injected once) ────────────────────────────────────────
+  const _sty = document.createElement('style');
+  _sty.textContent =
+    '#radar-tip{position:fixed;z-index:9999;pointer-events:none;background:#111;' +
+      'border:1px solid #3A3A3A;border-radius:8px;padding:12px 14px;' +
+      'min-width:195px;max-width:min(248px,82vw);' +
+      'font-family:"CoFoSans",monospace;opacity:0;transition:opacity .12s;' +
+      'box-shadow:0 6px 28px rgba(0,0,0,.75);}' +
+    '#radar-tip.vis{opacity:1;}' +
+    '#radar-tip .rt-hd{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;' +
+      'padding-bottom:6px;border-bottom:1px solid #2a2a2a;}' +
+    '#radar-tip .rt-row{display:flex;justify-content:space-between;align-items:center;' +
+      'gap:10px;font-size:11px;color:#A8A8A8;margin-bottom:4px;}' +
+    '#radar-tip .rt-row b{color:#fff;font-variant-numeric:tabular-nums;}' +
+    '#radar-tip .rt-bg{height:3px;background:#2a2a2a;border-radius:2px;margin:9px 0 3px;}' +
+    '#radar-tip .rt-fg{height:100%;border-radius:2px;}' +
+    '#radar-tip .rt-pl{font-size:9px;color:#6E6E6E;text-align:right;margin-bottom:6px;}' +
+    '#radar-tip .rt-z{font-size:14px;font-weight:900;margin-top:4px;}' +
+    '#radar-tip .rt-z em{font-size:10px;font-weight:400;font-style:normal;' +
+      'color:#6E6E6E;margin-left:5px;}' +
+    '#radar-tip .rt-ft{font-size:9px;color:#6E6E6E;margin-top:8px;' +
+      'border-top:1px solid #2a2a2a;padding-top:6px;}';
+  document.head.appendChild(_sty);
+
+  // ── Tooltip element ───────────────────────────────────────────────────────
+  const tip = document.createElement('div');
+  tip.id = 'radar-tip';
+  document.body.appendChild(tip);
+
+  // ── SVG helpers ───────────────────────────────────────────────────────────
+  const Z_MAX = 3;
+  const CX = 180, CY = 180, MAXR = 110, LBLR = MAXR + 22;
+  const zToR = z => Math.max(0, Math.min(1, (z + Z_MAX) / (2 * Z_MAX)));
+  const pt   = (deg, r) => { const a = deg * Math.PI / 180; return [CX + r*Math.cos(a), CY + r*Math.sin(a)]; };
+  // Monochrome tiers: bright = strong, mid = average, dim = weak
+  const tCol  = z => z >= 1 ? '#D9D9D9' : (z <= -1 ? '#6E6E6E' : '#A8A8A8');
+  const tTier = z => z >= 1 ? 'Above average' : (z <= -1 ? 'Below average' : 'Around average');
+
+  const RATE_KEYS = new Set([
+    'accuratePassesPercentage','accurateLongBallsPercentage','accurateCrossesPercentage',
+    'successfulDribblesPercentage','totalDuelsWonPercentage','aerialDuelsWonPercentage',
+    'goalConversionPercentage','penaltyConversion','rating',
+    'tacklesWonPercentage','groundDuelsWonPercentage',
+  ]);
+
+  // ── Fetch & render ────────────────────────────────────────────────────────
+  fetch('/api/player_radar?player=' + encodeURIComponent(PLAYER_PATH))
+    .then(r => r.json())
+    .then(data => {
+      if (data.error || !data.metrics || !data.metrics.length) return;
+
+      document.getElementById('radar-sub').textContent =
+        data.group + ' · ' + data.competition + ' · ' + data.peer_count +
+        ' peers · min ' + Math.round(data.minutes_threshold) + "'";
+      if (data.small_sample) {
+        const w = document.getElementById('radar-sample-warning');
+        w.textContent = 'small sample (n=' + data.peer_count + ')';
+        w.style.display = 'inline-block';
+      }
+
+      const M = data.metrics, n = M.length;
+      const ang = i => -90 + i * (360 / n);
+      const svg = [];
+
+      svg.push('<svg viewBox="0 0 360 360" style="width:100%;max-width:340px;' +
+        'height:auto;font-family:\'CoFoSans\',monospace;overflow:visible;">');
+
+      // Grid rings
+      [0.25, 0.5, 0.75, 1.0].forEach(lv => {
+        const pts = M.map((_, i) => pt(ang(i), lv*MAXR).map(v => v.toFixed(1)).join(',')).join(' ');
+        const mid = lv === 0.5;
+        svg.push('<polygon points="' + pts + '" fill="none" stroke="var(--border)" stroke-width="1"' +
+          (mid ? ' stroke-dasharray="3 3" stroke-opacity="0.85"' : ' stroke-opacity="0.4"') + '/>');
+      });
+
+      // Axis lines (id so we can brighten on hover)
+      M.forEach((_, i) => {
+        const [x, y] = pt(ang(i), MAXR);
+        svg.push('<line id="rax-' + i + '" x1="' + CX + '" y1="' + CY +
+          '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) +
+          '" stroke="var(--border)" stroke-width="1" stroke-opacity="0.4" ' +
+          'style="transition:stroke .12s,stroke-opacity .12s;"/>');
+      });
+
+      // Player shape
+      const verts = M.map((mm, i) => pt(ang(i), zToR(mm.z) * MAXR));
+      svg.push('<polygon points="' + verts.map(v => v.map(c => c.toFixed(1)).join(',')).join(' ') +
+        '" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2"/>');
+
+      // Vertex dots (id so we can scale on hover)
+      M.forEach((mm, i) => {
+        const [x, y] = verts[i];
+        svg.push('<circle id="rdot-' + i + '" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
+          '" r="3.5" fill="' + tCol(mm.z) + '"/>');
+      });
+
+      // Axis labels + z text
+      M.forEach((mm, i) => {
+        const [lx, ly] = pt(ang(i), LBLR);
+        const anc  = Math.abs(lx - CX) < 6 ? 'middle' : (lx < CX ? 'end' : 'start');
+        const zTxt = (mm.z >= 0 ? '+' : '') + mm.z + 'σ';
+        svg.push('<text x="' + lx.toFixed(1) + '" y="' + (ly - 1).toFixed(1) +
+          '" text-anchor="' + anc + '" font-size="9" fill="var(--text2)">' + mm.label + '</text>');
+        svg.push('<text x="' + lx.toFixed(1) + '" y="' + (ly + 9).toFixed(1) +
+          '" text-anchor="' + anc + '" font-size="9" font-weight="700" fill="' + tCol(mm.z) + '">' + zTxt + '</text>');
+      });
+
+      // ── Hit zones — wide transparent lines, one per spoke ─────────────────
+      // Extending to LBLR+16 covers both the chart area AND the label text,
+      // so hovering the label name itself also triggers the tooltip.
+      M.forEach((_, i) => {
+        const [ex, ey] = pt(ang(i), LBLR + 16);
+        svg.push('<line class="radar-hit" data-idx="' + i +
+          '" x1="' + CX + '" y1="' + CY +
+          '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) +
+          '" stroke="transparent" stroke-width="40" stroke-linecap="round" ' +
+          'style="cursor:pointer;"/>');
+      });
+
+      svg.push('</svg>');
+
+      const mount = document.getElementById('radar-mount');
+      mount.innerHTML = svg.join('');
+      document.getElementById('radar-legend').innerHTML =
+        'Dashed ring = league average (0σ) · outer edge = +3σ · hover any spoke for detail';
+      card.style.display = 'block';
+
+      // ── Interactivity ────────────────────────────────────────────────────
+      let activeIdx = -1;
+
+      function setActive(idx) {
+        if (activeIdx === idx) return;
+        // Reset previous axis
+        if (activeIdx >= 0) {
+          const d = document.getElementById('rdot-' + activeIdx);
+          const a = document.getElementById('rax-' + activeIdx);
+          if (d) { d.setAttribute('r', '3.5'); d.style.filter = ''; }
+          if (a) { a.setAttribute('stroke', 'var(--border)'); a.setAttribute('stroke-opacity', '0.4'); }
+        }
+        activeIdx = idx;
+        if (idx >= 0) {
+          const d = document.getElementById('rdot-' + idx);
+          const a = document.getElementById('rax-' + idx);
+          if (d) { d.setAttribute('r', '6'); d.style.filter = 'drop-shadow(0 0 5px rgba(255,255,255,.5))'; }
+          if (a) { a.setAttribute('stroke', '#D9D9D9'); a.setAttribute('stroke-opacity', '1'); }
+        }
+      }
+
+      function buildTip(mm) {
+        const isRate = RATE_KEYS.has(mm.key);
+        const valUnit = isRate ? '' : ' p90';
+        const val  = mm.value != null ? mm.value : '—';
+        const avg  = mm.mean  != null ? mm.mean  : '—';
+        const pct  = mm.percentile;
+        const col  = tCol(mm.z);
+        const zSign = mm.z >= 0 ? '+' : '';
+        return (
+          '<div class="rt-hd">' + mm.label + '</div>' +
+          '<div class="rt-row"><span>Player' + valUnit + '</span><b>' + val + '</b></div>' +
+          '<div class="rt-row"><span>League avg' + valUnit + '</span><span>' + avg + '</span></div>' +
+          (pct != null
+            ? '<div class="rt-bg"><div class="rt-fg" style="width:' + pct + '%;background:' + col + ';"></div></div>' +
+              '<div class="rt-pl">' + pct + 'th percentile</div>'
+            : '') +
+          '<div class="rt-z" style="color:' + col + ';">' + zSign + mm.z + 'σ' +
+            '<em>' + tTier(mm.z) + '</em></div>' +
+          '<div class="rt-ft">' + data.peer_count + ' qualifying ' + data.group +
+            ' players · ' + Math.round(data.minutes_threshold) + "' min threshold</div>"
+        );
+      }
+
+      function moveTip(cx, cy) {
+        const W = window.innerWidth, H = window.innerHeight;
+        const tw = tip.offsetWidth || 220, th = tip.offsetHeight || 170;
+        let left = cx + 18, top = cy - 12;
+        if (left + tw > W - 10) left = cx - tw - 18;
+        if (top + th > H - 10) top  = H - th - 10;
+        if (top < 8) top = 8;
+        tip.style.left = left + 'px';
+        tip.style.top  = top  + 'px';
+      }
+
+      mount.querySelectorAll('.radar-hit').forEach(el => {
+        el.addEventListener('mouseenter', function(e) {
+          const i = +this.dataset.idx;
+          setActive(i);
+          tip.innerHTML = buildTip(M[i]);
+          moveTip(e.clientX, e.clientY);
+          tip.classList.add('vis');
+        });
+        el.addEventListener('mousemove',  function(e) { moveTip(e.clientX, e.clientY); });
+        el.addEventListener('mouseleave', function()  { tip.classList.remove('vis'); setActive(-1); });
+        el.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          const t = e.touches[0], i = +this.dataset.idx;
+          setActive(i);
+          tip.innerHTML = buildTip(M[i]);
+          moveTip(t.clientX, t.clientY);
+          tip.classList.add('vis');
+        }, { passive: false });
+        el.addEventListener('touchend', function() { tip.classList.remove('vis'); setActive(-1); });
+      });
     })
     .catch(() => {});
 })();
