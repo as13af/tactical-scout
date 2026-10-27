@@ -28,6 +28,7 @@ from __future__ import annotations
 import glob
 import json
 import os
+import re
 import statistics
 from pathlib import Path
 
@@ -257,5 +258,156 @@ def build_radar(player_path: str, output_dir: str) -> dict | None:
         'peer_count':        len(qualified),
         'minutes_threshold': round(minutes_threshold, 1),
         'small_sample':      len(qualified) < _SMALL_SAMPLE,
+        'metrics':           metrics,
+    }
+
+
+# ── Compare radar: two players + league average, as percentiles ──────────────
+
+
+def _same_season_glob(target_file: str) -> str:
+    """Glob for files of the same season as *target_file* (``*_Season_<id>.json``).
+
+    Files without a season suffix keep matching everything."""
+    m = re.search(r'_Season_(\d+)\.json$', target_file)
+    return f'*_Season_{m.group(1)}.json' if m else '*.json'
+
+
+def _load_player(output_dir: str, player_path: str):
+    """Load a player file from a 'Country/Competition/Club/file' path.
+
+    Returns (parts, target_file, raw) or None if the path is bad / missing."""
+    parts = player_path.split('/')
+    if len(parts) != 4:
+        return None
+    country, competition, club_slug, filename = parts
+    target_file = filename if filename.endswith('.json') else filename + '.json'
+    full_path = os.path.join(output_dir, country, competition, club_slug, 'Players', target_file)
+    if not os.path.exists(full_path):
+        return None
+    with open(full_path, encoding='utf-8') as f:
+        return parts, target_file, json.load(f)
+
+
+def _pos_codes(raw: dict) -> list[str]:
+    """Upper-cased position codes, same source order as get_league_position_avg."""
+    profile = raw.get('profile', {}).get('player', {})
+    return [str(p).upper()
+            for p in (profile.get('positionsDetailed') or
+                      raw.get('positions', [profile.get('position', '')]))
+            if p]
+
+
+def _pos_match(target_pos: list[str], other_pos: list[str], pos_mode: str) -> bool:
+    """Exact = share a position code; grouped = share a GK/DEF/MID/FWD bucket."""
+    if pos_mode == 'grouped':
+        from data_loader import _BROAD_GROUP
+        t = {_BROAD_GROUP.get(p) for p in target_pos} - {None}
+        o = {_BROAD_GROUP.get(p) for p in other_pos} - {None}
+        return bool(t & o)
+    return any(p in target_pos for p in other_pos)
+
+
+def build_compare_radar(path_a: str, path_b: str, output_dir: str,
+                        pos_mode: str = 'exact') -> dict | None:
+    """Percentile radar for two players plus the league average.
+
+    The peer pool is Player A's league season, filtered to A's position
+    (``pos_mode`` exact / grouped, mirroring /api/league_position_avg) and
+    gated at the 33rd percentile of minutes. Both players are ranked against
+    that one pool so the three shapes share a scale; when B comes from a
+    different league or position, ``same_pool`` is False and the UI says so.
+    Axes come from A's position-group template (POSITION_TEMPLATES).
+    Countable stats are per-90; rate stats are used as-is.
+    """
+    loaded_a = _load_player(output_dir, path_a)
+    loaded_b = _load_player(output_dir, path_b)
+    if loaded_a is None or loaded_b is None:
+        return None
+    (country, competition, _, _), file_a, raw_a = loaded_a
+    (country_b, competition_b, _, _), file_b, raw_b = loaded_b
+
+    stats_a = raw_a.get('statistics', {}).get('statistics', {}) or {}
+    stats_b = raw_b.get('statistics', {}).get('statistics', {}) or {}
+    mins_a  = stats_a.get('minutesPlayed') or 0
+    mins_b  = stats_b.get('minutesPlayed') or 0
+    if not mins_a or not mins_b:
+        return {'error': 'Both players need recorded minutes for a radar.'}
+
+    pos_a = _pos_codes(raw_a)
+    if not pos_a:
+        return {'error': "Could not determine Player A's position."}
+
+    # ── Pool: same league season + position as A, minutes-gated ──────────────
+    comp_dir = os.path.join(output_dir, country, competition)
+    peers = []   # list of (minutes, stats-dict)
+    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', _same_season_glob(file_a))):
+        try:
+            with open(fpath, encoding='utf-8') as f:
+                pd = json.load(f)
+            if not _pos_match(pos_a, _pos_codes(pd), pos_mode):
+                continue
+            ps = pd.get('statistics', {}).get('statistics', {})
+            mins = ps.get('minutesPlayed')
+            if not isinstance(mins, (int, float)) or mins <= 0:
+                continue
+            peers.append((float(mins), ps))
+        except Exception:
+            continue
+
+    minutes_threshold = _percentile(sorted(m for m, _ in peers), 0.33)
+    qualified = [ps for m, ps in peers if m >= minutes_threshold]
+
+    same_pool = (country_b == country and competition_b == competition
+                 and _same_season_glob(file_b) == _same_season_glob(file_a)
+                 and _pos_match(pos_a, _pos_codes(raw_b), pos_mode))
+
+    group    = _group_for(raw_a)
+    template = POSITION_TEMPLATES.get(group, POSITION_TEMPLATES['MID'])
+
+    # Keep an axis only when both players have the stat and the pool has data.
+    metrics = []
+    for key, label in template:
+        if len(metrics) >= _MAX_AXES:
+            break
+        val_a = _stat_value(stats_a, key, mins_a)
+        val_b = _stat_value(stats_b, key, mins_b)
+        if val_a is None or val_b is None:
+            continue
+        pool = []
+        for ps in qualified:
+            val = _stat_value(ps, key, ps.get('minutesPlayed') or 0)
+            if val is not None:
+                pool.append(val)
+        if len(pool) < 2:
+            continue
+        mean = statistics.fmean(pool)
+        metrics.append({
+            'key':     key,
+            'label':   label,
+            'is_rate': key in _RATE_STATS,
+            'a':   {'value': round(val_a, 2), 'pct': _pct_rank(val_a, pool)},
+            'b':   {'value': round(val_b, 2), 'pct': _pct_rank(val_b, pool)},
+            'avg': {'value': round(mean, 2),  'pct': _pct_rank(mean, pool)},
+        })
+
+    if len(metrics) < _MIN_AXES:
+        return {'error': 'Not enough comparable data for a radar '
+                         f'(only {len(metrics)} metric(s) shared by both players).'}
+
+    def _name(raw):
+        return raw.get('player_name', raw.get('profile', {}).get('player', {}).get('name', ''))
+
+    return {
+        'player_a':          _name(raw_a),
+        'player_b':          _name(raw_b),
+        'group':             group,
+        'positions_used':    pos_a,
+        'pos_mode':          pos_mode,
+        'competition':       competition.replace('_', ' '),
+        'peer_count':        len(qualified),
+        'minutes_threshold': round(minutes_threshold, 1),
+        'small_sample':      len(qualified) < _SMALL_SAMPLE,
+        'same_pool':         same_pool,
         'metrics':           metrics,
     }

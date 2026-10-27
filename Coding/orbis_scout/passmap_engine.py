@@ -29,6 +29,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.patheffects as pe
+from mplsoccer import Pitch
 
 # ── Colour palette (consistent with zone_heatmap.py) ─────────────────────────
 _BG    = "#0d0221"
@@ -64,22 +65,19 @@ _DRAW_ORDER = ("backline_passes", "mid_passes", "forward_passes")
 # ── Internal helpers ──────────────────────────────────────────────────────────
 
 def _draw_pitch(ax: plt.Axes, lc: str = "white", lw: float = 1.4) -> None:
-    """Draw standard pitch markings on ax (0-100 coordinate space)."""
-    ax.set_facecolor(_PITCH)
-    kw = dict(fill=False, edgecolor=lc, linewidth=lw, zorder=4)
-    ax.add_patch(patches.Rectangle((0, 0), 100, 100, **kw))
-    ax.axvline(50, color=lc, linewidth=lw, zorder=4)
-    ax.add_patch(plt.Circle((50, 50), 9.15, color=lc, fill=False, linewidth=lw, zorder=4))
-    ax.plot(50, 50, "o", color=lc, markersize=3, zorder=4)
-    ax.add_patch(patches.Rectangle((0,    21.1), 16.5, 57.8, **kw))
-    ax.add_patch(patches.Rectangle((83.5, 21.1), 16.5, 57.8, **kw))
-    ax.add_patch(patches.Rectangle((0,    36.8),  5.5, 26.4, **kw))
-    ax.add_patch(patches.Rectangle((94.5, 36.8),  5.5, 26.4, **kw))
-    ax.plot(11, 50, "o", color=lc, markersize=3, zorder=4)
-    ax.plot(89, 50, "o", color=lc, markersize=3, zorder=4)
-    ax.set_xlim(-2, 102)
-    ax.set_ylim(-2, 102)
-    ax.axis("off")
+    """Draw standard pitch markings on ax (0-100 coordinate space).
+
+    mplsoccer's 'opta' pitch is the same 100×100 normalisation SofaScore uses,
+    and locks the Axes aspect to 68/105 so the centre circle renders round.
+    line_zorder=4 preserves the original per-patch stacking.
+    """
+    Pitch(
+        pitch_type="opta",
+        pitch_color=_PITCH,
+        line_color=lc,
+        linewidth=lw,
+        line_zorder=4,
+    ).draw(ax=ax)
 
 
 def _text_outline(

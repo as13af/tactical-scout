@@ -531,6 +531,182 @@ def search_players(output_dir, filters):
         "total_pages": (total + per_page - 1) // per_page,
     }
 
+# ── Free agents ───────────────────────────────────────────────────────────────
+
+# SofaScore models "no club" as a real team rather than a null destination:
+#   {"id": 241802, "name": "No team", "slug": "no-team", "disabled": true}
+# A departure whose transferTo is that team is a free agent.  Retirements arrive
+# as {"toTeamName": "Retired"} with NO transferTo object at all, so keying on
+# transferTo.id drops them without needing a special case.
+_NO_TEAM_ID = 241802
+
+
+def _fa_fmt_date(ts) -> str:
+    """Epoch seconds → 'YYYY-MM-DD', matching scraper_cli._fmt_epoch_date()."""
+    if not ts:
+        return ""
+    try:
+        return datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+
+def _fa_sort_paginate(rows, filters):
+    """Filter / sort / paginate free-agent rows. Kept identical to data_loader."""
+    def _f(val, key, cast=str):
+        v = filters.get(key, "")
+        if not v: return True
+        try: return cast(val or 0) >= cast(v)
+        except Exception: return True
+
+    q_nrm = _nrm(filters.get("q", "")) if filters.get("q") else ""
+
+    filtered = []
+    for p in rows:
+        s = p.get("stats", {}) or {}
+        if q_nrm and q_nrm not in _nrm(p.get("name", "")):
+            continue
+        if filters.get("country") and filters["country"].lower() != str(p.get("country", "")).lower():
+            continue
+        if filters.get("competition") and _nrm(filters["competition"]) not in _nrm(p.get("competition", "")):
+            continue
+        if filters.get("club") and _nrm(filters["club"]) not in _nrm(p.get("team", "")):
+            continue
+        if filters.get("nationality") and _nrm(filters["nationality"]) not in _nrm(p.get("nationality", "")):
+            continue
+        # Broad position category (G/D/M/F)
+        cat_filter = filters.get("position", "").upper()
+        if cat_filter:
+            broad = profile_category(p.get("positions", []), p.get("position", ""))
+            if not broad.upper().startswith(cat_filter):
+                continue
+        # Specific position codes (e.g. "DC,AM")
+        sp_list = [x.strip() for x in filters.get("specific_pos", "").upper().split(",") if x.strip()]
+        if sp_list:
+            player_pos = [str(x).upper() for x in p.get("positions", [])]
+            if not any(sp in player_pos for sp in sp_list):
+                continue
+        if not _f(p.get("age", ""),         "age_min",       int):   continue
+        if not _f(s.get("appearances", 0),  "apps_min",      int):   continue
+        if not _f(s.get("rating", 0),       "rating_min",    float): continue
+        if not _f(s.get("goals", 0),        "goals_min",     int):   continue
+        if not _f(s.get("assists", 0),      "assists_min",   int):   continue
+        age_max = filters.get("age_max", "")
+        if age_max:
+            try:
+                if int(p.get("age") or 999) > int(age_max): continue
+            except Exception:
+                pass
+        filtered.append(p)
+
+    sort_by  = filters.get("sort_by", "departure_date")
+    sort_dir = filters.get("sort_dir", "desc")
+    sort_map = {
+        "departure_date": lambda p: int(p.get("departure_ts") or 0),
+        "rating":         lambda p: float((p.get("stats") or {}).get("rating", 0) or 0),
+        "goals":          lambda p: int((p.get("stats") or {}).get("goals", 0) or 0),
+        "assists":        lambda p: int((p.get("stats") or {}).get("assists", 0) or 0),
+        "appearances":    lambda p: int((p.get("stats") or {}).get("appearances", 0) or 0),
+        "age":            lambda p: int(p.get("age") or 0),
+        "name":           lambda p: p.get("name", "").lower(),
+    }
+    key_fn = sort_map.get(sort_by, sort_map["departure_date"])
+    filtered.sort(key=key_fn, reverse=(sort_dir == "desc"))
+
+    page     = int(filters.get("page", 1))
+    per_page = int(filters.get("per_page", 50))
+    total    = len(filtered)
+    start    = (page - 1) * per_page
+    return {
+        "players":     filtered[start : start + per_page],
+        "total":       total,
+        "page":        page,
+        "per_page":    per_page,
+        "total_pages": (total + per_page - 1) // per_page,
+    }
+
+
+def search_free_agents(output_dir, filters):
+    """Players who left a club and have no new club ("No team" on SofaScore).
+
+    Two sources, unioned and deduped by player_id:
+      * players.transfer_out.team_id == 241802  → fully enriched rows
+      * clubs.transfers.transfersOut[].transferTo.id == 241802 → bare rows for
+        players we hold no player document for.
+
+    A player can show up under several club/season documents; the record with
+    the newest departure timestamp wins — the same rule scraper_cli.py's
+    _index_transfers() uses.
+    """
+    db = _db()
+    by_id: dict = {}
+
+    # ── Enriched: player documents carry the flattened transfer_out summary ────
+    for doc in db.players.find({"transfer_out.team_id": _NO_TEAM_ID}):
+        t   = doc.get("transfer_out") or {}
+        row = _parse_player_doc(doc)
+        row["departure_ts"]   = int(t.get("timestamp") or 0)
+        row["departure_date"] = t.get("date") or ""
+        row["from_club"]      = row.get("team", "")
+        row["fee"]            = t.get("fee") or ""
+        row["enriched"]       = True
+        prev = by_id.get(row["player_id"])
+        if prev is None or row["departure_ts"] > prev["departure_ts"]:
+            by_id[row["player_id"]] = row
+
+    # ── Bare: raw club transfer records for players with no player document ───
+    for club in db.clubs.find(
+        {"transfers.transfersOut.transferTo.id": _NO_TEAM_ID},
+        {"transfers.transfersOut": 1, "_country": 1, "_competition": 1,
+         "_club": 1, "team_name": 1, "team_id": 1},
+    ):
+        for t in (club.get("transfers") or {}).get("transfersOut") or []:
+            if (t.get("transferTo") or {}).get("id") != _NO_TEAM_ID:
+                continue
+            player = t.get("player") or {}
+            pid    = player.get("id")
+            if pid is None:
+                continue
+            pid = str(pid)
+            existing = by_id.get(pid)
+            if existing is not None and existing.get("enriched"):
+                continue          # the player document is strictly better
+            ts = int(t.get("transferDateTimestamp") or 0)
+            if existing is not None and ts <= existing["departure_ts"]:
+                continue
+            club_name = club.get("_club") or club.get("team_name", "")
+            by_id[pid] = {
+                "name":              player.get("name", ""),
+                "player_id":         pid,
+                "team":              club.get("team_name") or club_name,
+                "team_id":           club.get("team_id", ""),
+                "competition":       club.get("_competition", ""),
+                "country":           club.get("_country", ""),
+                "club_slug":         club_name,
+                "position":          player.get("position", ""),
+                "positions":         [],
+                "nationality":       "",
+                "country_alpha2":    "",
+                "age":               "",
+                "height":            "",
+                "preferred_foot":    "",
+                "shirt_number":      "",
+                "stats":             {},
+                "file":              "",
+                "path":              "",
+                "contract_until_ts": 0,
+                "contract_until":    "",
+                "contract_badge":    "",
+                "departure_ts":      ts,
+                "departure_date":    _fa_fmt_date(ts),
+                "from_club":         club.get("team_name") or club_name,
+                "fee":               t.get("transferFeeDescription", "") or "",
+                "enriched":          False,
+            }
+
+    return _fa_sort_paginate(list(by_id.values()), filters)
+
+
 # ── All-players flat (compare autocomplete) ───────────────────────────────────
 
 _PLAYER_CACHE = None

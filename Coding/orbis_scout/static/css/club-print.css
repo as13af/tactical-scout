@@ -1,0 +1,146 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Club page print layout — pairs with static/js/club-print.js.
+
+   Keeps the on-screen theme (backgrounds included), unrolls the overview
+   carousel so Season Stats, Form and Heatmap all print, drops every control,
+   and gives the full squad table its own landscape pages. Rules that depend
+   on the extras club-print.js adds are scoped to html.club-printing, so a
+   plain Ctrl+P still prints the page as it stands.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media screen {
+  .print-only { display: none !important; }
+}
+
+@media print {
+  /* Zero page margin lets the theme background reach the paper edge and drops
+     the browser's URL / date headers; the container padding is repeated on
+     every page fragment instead. */
+  @page { size: A4; margin: 0; }
+  @page squad { size: A4 landscape; margin: 0; }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html, body { background: var(--bg) !important; }
+  body { margin: 0; }
+
+  .container {
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 12mm !important;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* ── Chrome & controls ──────────────────────────────────────────────────── */
+  nav, #route-progress, #route-overlay, #intro-curtain,
+  .breadcrumb,
+  .club-action-btn,
+  #heatmap-toggles, #heatmap-download, #passmap-download,
+  #stat-settings-modal,
+  #transfers-card,
+  .db-badge,
+  .expand-toggle,
+  .squad-detail-row {
+    display: none !important;
+  }
+  /* Squad card header controls (basis toggle, P90, ⚙ Stats, contract, search) */
+  #squad-count-label + div { display: none !important; }
+
+  .site-footer { margin-top: 8mm !important; padding: 4mm 12mm !important; }
+
+  a { color: inherit !important; text-decoration: none !important; }
+
+  /* ── Carousel unrolled: every slide stacked as its own card ────────────────
+     The carousel frame itself goes transparent; otherwise its background
+     stretches down the page whenever a slide is pushed to the next one. */
+  .cards-carousel .carousel-head,
+  .cards-carousel .carousel-dots { display: none !important; }
+  .cards-carousel {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    break-inside: auto !important;
+  }
+  .cards-carousel,
+  .cards-carousel .carousel-viewport { height: auto !important; overflow: visible !important; }
+  .cards-carousel .carousel-track {
+    display: block !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .cards-carousel .carousel-slide {
+    display: block !important;
+    width: auto !important;
+    margin: 0 0 16px !important;
+    padding: 22px 24px !important;
+    background: var(--bg2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    break-inside: avoid;
+  }
+
+  /* ── Pagination ─────────────────────────────────────────────────────────── */
+  .card { break-inside: avoid; box-shadow: none !important; }
+  .page-header { break-after: avoid; }
+  img { max-width: 100% !important; break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  .table-wrap { overflow: visible !important; }
+
+  /* ── Extras added by club-print.js ──────────────────────────────────────── */
+  html.club-printing #heatmap-wrap { display: none !important; }
+  html.club-printing #squad-card { display: none !important; }
+  /* The squad sits on its own landscape page, so a footer after it would get a
+     page of its own; club-print.js repeats the notice inside the section. */
+  html.club-printing .site-footer { display: none !important; }
+
+  .print-meta { margin-top: 4px; color: var(--text3) !important; font-size: 11px; }
+
+  .print-heatmaps { display: grid; gap: 6mm; margin-bottom: 4mm; }
+  .print-heatmaps figure { margin: 0; break-inside: avoid; text-align: center; }
+  .print-heatmaps figcaption {
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: .05em;
+    text-align: left; margin-bottom: 6px;
+  }
+  .print-heatmaps img {
+    max-width: 100%; max-height: 120mm;
+    border-radius: 6px; border: 1px solid var(--border);
+  }
+
+  .print-squad-section {
+    page: squad;
+    break-before: page;
+    break-inside: auto !important;
+  }
+  .print-squad-section .card-title { margin-bottom: 4mm; }
+  /* !important throughout: the app's `body.ui2 tbody td` / `thead th` rules
+     outrank a single class and would widen the table past the page. */
+  .print-squad { width: 100% !important; border-collapse: collapse; font-size: 9px !important; }
+  .print-squad th, .print-squad td {
+    padding: 3px 4px !important;
+    border-bottom: 1px solid var(--border) !important;
+    position: static !important;
+  }
+  .print-squad td { white-space: nowrap !important; }
+  .print-squad th {
+    color: var(--text3) !important; text-align: left; font-weight: 600;
+    font-size: 8px !important; letter-spacing: .03em !important;
+    white-space: normal !important; vertical-align: bottom;
+  }
+  .print-squad .td-num { text-align: right !important; }
+  .print-squad .rating-badge, .print-squad .contract-badge { padding: 0 4px !important; }
+  .print-copyright {
+    margin-top: 6mm; text-align: center; font-size: 9px; color: var(--text3);
+  }
+  .print-squad tr.departed td { color: var(--text3); }
+  .print-squad .departed-tag {
+    font-size: 8px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--amber, #f0a500); border: 1px solid var(--amber, #f0a500);
+    border-radius: 3px; padding: 0 3px; margin-left: 4px;
+  }
+}

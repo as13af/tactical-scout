@@ -1,0 +1,72 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Player page print layout — loaded after club-print.css, whose base print
+   rules (A4 page, theme backgrounds, hidden nav/breadcrumb, .print-only) it
+   builds on. Everything here is scoped to html.player-printing, which the
+   player page's export hook sets while ⬇ Export PDF runs, so a plain Ctrl+P
+   is unaffected.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Controls, and the on-screen views the export replaces with full versions
+     (core grid + stat carousel → Detailed Statistics; legend → explanation). */
+  html.player-printing #player-actions,
+  html.player-printing #competition-switcher,
+  html.player-printing #pos-avg-toggle-wrap,
+  html.player-printing .p90-toggle-wrap,
+  html.player-printing #spatial-toggle-btn,
+  html.player-printing #radar-tip,
+  html.player-printing #radar-legend,
+  html.player-printing #core-stats-card,
+  html.player-printing #stat-categories,
+  html.player-printing #match-data-card .btn { display: none !important; }
+
+  html.player-printing #spatial-narrative-wrap { display: block !important; }
+
+  /* One column: half an A4 page is too narrow for the stat tables. */
+  html.player-printing #player-main-grid { display: block !important; }
+
+  /* club-print.css hides the footer because the club's squad table ends on its
+     own landscape page; the player PDF has no such page, so keep the notice. */
+  html.club-printing.player-printing .site-footer { display: block !important; }
+
+  /* ── Extras added by the player page's export hooks ───────────────────── */
+  .print-note {
+    font-size: 10px; line-height: 1.5; color: var(--text3);
+    margin: 0 0 10px;
+  }
+  .print-subtitle {
+    font-size: 10px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin: 0 0 6px;
+  }
+
+  .print-stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; align-items: start;
+  }
+  .print-stat-group { break-inside: avoid; }
+
+  /* !important throughout: the app's `body.ui2 tbody td` / `thead th` rules
+     outrank a single class (same as .print-squad in club-print.css). */
+  .print-table { width: 100% !important; border-collapse: collapse; font-size: 9px !important; }
+  .print-table th, .print-table td {
+    padding: 3px 4px !important;
+    border-bottom: 1px solid var(--border) !important;
+    position: static !important;
+  }
+  .print-table th {
+    color: var(--text3) !important; text-align: left; font-weight: 600;
+    font-size: 8px !important; letter-spacing: .03em !important;
+    vertical-align: bottom;
+  }
+  .print-table .td-num { text-align: right !important; white-space: nowrap; }
+  .print-table .u { color: var(--text3); font-size: 8px; margin-left: 1px; }
+  .print-good { color: var(--green) !important; font-weight: 700; }
+  .print-bad  { color: var(--red) !important; font-weight: 700; }
+
+  .print-radar-explain {
+    margin-top: 10px; font-size: 10px; line-height: 1.55; color: var(--text2);
+  }
+  .print-radar-explain p { margin: 0 0 6px; }
+  .print-radar-explain .print-warn { color: var(--amber) !important; }
+  .print-radar-explain .print-table { margin-top: 8px; }
+}

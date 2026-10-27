@@ -25,6 +25,7 @@ from services.positions import (
 from services.scatter import (
     CLUB_STAT_FIELDS, _CLUB_P90_EXCLUDE, PLAYER_STAT_FIELDS,
     _P90_EXCLUDE, _CAT_TO_GROUP, _percentile,
+    player_axis_label, club_axis_label, scatter_export_filename,
     compute_player_composites,
 )
 from composite_club_stats import compute_club_composites, CLUB_COMPOSITE_KEYS
@@ -203,8 +204,14 @@ def api_scatter_export_xlsx():
 
     # ── Rank by combined normalised x+y score ─────────────────────────────────
     def _sv(c, key):
-        src = c['stats_p90'] if stat_mode == 'p90' else c['stats']
-        return src.get(key)
+        # Mirror the frontend's getStatVal(): in p90 mode fall back to the season
+        # value for keys with no p90 variant (percentages, possession, …), else a
+        # p90-mode export of such an axis would find no values and come out empty.
+        if stat_mode == 'p90':
+            v = c['stats_p90'].get(key)
+            if v is not None:
+                return v
+        return c['stats'].get(key)
 
     valid = [c for c in clubs if _sv(c, x_key) is not None and _sv(c, y_key) is not None]
     if valid:
@@ -362,9 +369,12 @@ def api_scatter_export_xlsx():
 
     S1_ID = ['Club', 'Matches']
     S1_AXIS = []
+    def axl(key):
+        """Axis header — only p90-eligible keys actually carry a p90 value."""
+        return pl(key) if (stat_mode == 'p90' and key not in _CLUB_P90_EXCLUDE) else rl(key)
     for ax in (x_key, y_key):
-        S1_AXIS += [rl(ax), f'Rank ({rl(ax)})', f'Pct ({rl(ax)})',
-                    f'Tier ({rl(ax)})', f'Avg ({rl(ax)})', f'Median ({rl(ax)})']
+        S1_AXIS += [axl(ax), f'Rank ({axl(ax)})', f'Pct ({axl(ax)})',
+                    f'Tier ({axl(ax)})', f'Avg ({axl(ax)})', f'Median ({axl(ax)})']
 
     S1_HEADERS = S1_ID + S1_AXIS
     S1_N = len(S1_HEADERS)
@@ -494,12 +504,17 @@ def api_scatter_export_xlsx():
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    safe_comp = competition.replace(' ', '_')
+    _is_p90 = stat_mode == 'p90'
+    fname = scatter_export_filename(
+        'ClubScatter', competition,
+        club_axis_label(x_key, _is_p90),
+        club_axis_label(y_key, _is_p90),
+    )
     return send_file(
         buf,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         as_attachment=True,
-        download_name=f'ClubScatter_{safe_comp}.xlsx',
+        download_name=fname,
     )
 
 
@@ -776,6 +791,7 @@ def api_player_scatter_export_xlsx():
                     'stats_p90':         stats_p90,
                     'nationality':       (profile.get('country') or {}).get('name', '') or profile.get('nationality', ''),
                     'age':               age,
+                    'preferred_foot':    profile.get('preferredFoot') or '',
                     'height':            profile.get('height', ''),
                     'market_value':      profile.get('proposedMarketValue') or (profile.get('proposedMarketValueRaw') or {}).get('value') or profile.get('marketValue') or 0,
                     'sofascore_slug':    sofascore_slug,
@@ -808,8 +824,15 @@ def api_player_scatter_export_xlsx():
 
     # ── Rank by combined x+y normalised score ────────────────────────────────
     def get_stat_val(player, key):
-        src = player['stats_p90'] if stat_mode == 'p90' else player['stats']
-        return src.get(key)
+        # Mirror the frontend's getStatVal(): in p90 mode fall back to the season
+        # value for keys that have no p90 variant (percentages, rating, …).
+        # Without the fallback a p90-mode export of e.g. Dribble Success % scores
+        # every player as None and the sheet comes out empty.
+        if stat_mode == 'p90':
+            v = player['stats_p90'].get(key)
+            if v is not None:
+                return v
+        return player['stats'].get(key)
 
     valid = [p for p in filtered if (
         get_stat_val(p, x_key) is not None and
@@ -1025,18 +1048,22 @@ def api_player_scatter_export_xlsx():
     # Identity + x/y stat value + per-axis analytics (rank, pct, tier, avg, median)
     S1_IDENTITY = [
         'Player', 'Club', 'Position', 'Positions', 'Nationality', 'Age',
+        'Preferred Foot',
         'Contract Until', 'Market Value', 'Height (cm)', 'Minutes', 'Profile Link',
     ]
     # Per axis: value, rank, percentile, tier, avg, median — 6 cols × 2 axes = 12
     S1_AXIS_COLS = []
+    def axl(key):
+        """Axis header — only p90-eligible keys actually carry a p90 value."""
+        return f'{key} p90' if (stat_mode == 'p90' and key not in _P90_EXCLUDE) else key
     for ax in (x_key, y_key):
         S1_AXIS_COLS += [
-            ax,
-            f'Rank ({ax})',
-            f'Percentile ({ax})',
-            f'Tier ({ax})',
-            f'Avg ({ax})',
-            f'Median ({ax})',
+            axl(ax),
+            f'Rank ({axl(ax)})',
+            f'Percentile ({axl(ax)})',
+            f'Tier ({axl(ax)})',
+            f'Avg ({axl(ax)})',
+            f'Median ({axl(ax)})',
         ]
 
     S1_HEADERS  = S1_IDENTITY + S1_AXIS_COLS
@@ -1064,6 +1091,7 @@ def api_player_scatter_export_xlsx():
             ' / '.join(p.get('positionsDetailed') or []) or p['position'],
             p['nationality'] or '—',
             p['age'] if p['age'] is not None else '—',
+            p.get('preferred_foot') or '—',
             p['contract_until'] or '—',
             mv_str(p.get('market_value')),
             p['height'] or '—',
@@ -1083,13 +1111,20 @@ def api_player_scatter_export_xlsx():
             ya.get('median', '—'),
         ]
 
-        TIER_COLS = {15, 21}   # 1-indexed positions of the two Tier columns
+        # Derived from the header list rather than hard-coded, so inserting an
+        # identity column (as 'Preferred Foot' was) can't silently misalign the
+        # tier / rank / hyperlink styling. Each axis block is 6 wide:
+        # value, rank, percentile, tier, avg, median.
+        _n_id     = len(S1_IDENTITY)
+        LINK_COL  = S1_IDENTITY.index('Profile Link') + 1
+        TIER_COLS = {_n_id + 4, _n_id + 10}
+        RANK_COLS = {_n_id + 2, _n_id + 3, _n_id + 8, _n_id + 9}
         for ci, val in enumerate(row_vals, 1):
             if ci in TIER_COLS:
                 tier_cell(ws1, r, ci, val, row_num=r)
-            elif ci in (13, 14, 19, 20):   # rank + percentile cols
+            elif ci in RANK_COLS:           # rank + percentile cols
                 data_cell(ws1, r, ci, val, color=C_ACCENT, bold=True, row_num=r)
-            elif ci == 11:                  # profile link — clickable hyperlink
+            elif ci == LINK_COL:            # profile link — clickable hyperlink
                 has_link = val and val != '—'
                 c = ws1.cell(row=r, column=ci, value='Visit Profile' if has_link else '—')
                 c.font      = Font(size=9, color='60A5FA', name='Consolas',
@@ -1104,7 +1139,7 @@ def api_player_scatter_export_xlsx():
 
         ws1.row_dimensions[r].height = 15
 
-    s1_widths = [22, 18, 8, 14, 14, 6, 12, 13, 10, 9, 16,
+    s1_widths = [22, 18, 8, 14, 14, 6, 14, 12, 13, 10, 9, 16,
                  12, 10, 14, 14, 12, 12,
                  12, 10, 14, 14, 12, 12]
     for i, w in enumerate(s1_widths[:S1_COLS_N], 1):
@@ -1119,6 +1154,7 @@ def api_player_scatter_export_xlsx():
 
     S2_IDENTITY = [
         'Player', 'Club', 'Position', 'Positions', 'Nationality', 'Age',
+        'Preferred Foot',
         'Contract Until', 'Market Value', 'Height (cm)', 'Minutes', 'Profile Link',
     ]
     # Raw stat display labels — try to map keys to friendly names, fall back to key
@@ -1217,6 +1253,7 @@ def api_player_scatter_export_xlsx():
             ' / '.join(p.get('positionsDetailed') or []) or p['position'],
             p['nationality'] or '—',
             p['age'] if p['age'] is not None else '—',
+            p.get('preferred_foot') or '—',
             p['contract_until'] or '—', mv_str(p.get('market_value')),
             p['height'] or '—', p['minutesPlayed'], p['profile_link'] or '—',
         ]
@@ -1232,8 +1269,9 @@ def api_player_scatter_export_xlsx():
         ]
 
         all_vals = id_vals + raw_vals + p90_vals
+        S2_LINK_COL = S2_IDENTITY.index('Profile Link') + 1
         for ci, val in enumerate(all_vals, 1):
-            if ci == 11:   # profile link — clickable hyperlink
+            if ci == S2_LINK_COL:   # profile link — clickable hyperlink
                 has_link = val and val != '—'
                 c = ws2.cell(row=r, column=ci, value='Visit Profile' if has_link else '—')
                 c.font      = Font(size=9, color='60A5FA', name='Consolas',
@@ -1252,7 +1290,7 @@ def api_player_scatter_export_xlsx():
 
         ws2.row_dimensions[r].height = 14
 
-    id_widths = [22, 18, 8, 14, 14, 6, 12, 13, 10, 9, 16]
+    id_widths = [22, 18, 8, 14, 14, 6, 14, 12, 13, 10, 9, 16]
     for i, w in enumerate(id_widths, 1):
         ws2.column_dimensions[get_column_letter(i)].width = w
     for i in range(n_id + 1, S2_COLS_N + 1):
@@ -1312,10 +1350,37 @@ def api_player_scatter_export_xlsx():
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    safe_comp = competition.replace(' ', '_')
+    _is_p90 = stat_mode == 'p90'
+    # Position is always present so every player export has the same shape;
+    # 'ALL' stands in when no position filter is active.
+    pos_token = position if position and position != 'All' else 'ALL'
+
+    # NOTE: this page has no nationality / detailed-position filters (its
+    # template predates them), so those tokens can't appear here. If
+    # templates/player_scatter.html is ever synced with webapp's, add them —
+    # the builder already accepts any number of extras.
+    extras = []
+    if club and club != 'All':
+        extras.append(club)
+    if age_min is not None and age_max is not None:
+        extras.append(f'Age-{age_min}-{age_max}')
+    elif age_min is not None:
+        extras.append(f'Age-{age_min}plus')
+    elif age_max is not None:
+        extras.append(f'Age-upto-{age_max}')
+    if contract_year is not None:
+        extras.append(f'Contract-{contract_year}')
+
+    fname = scatter_export_filename(
+        'PlayerScatter', competition,
+        player_axis_label(x_key, _is_p90),
+        player_axis_label(y_key, _is_p90),
+        position=pos_token,
+        extras=extras,
+    )
     return send_file(
         buf,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         as_attachment=True,
-        download_name=f'PlayerScatter_{safe_comp}.xlsx',
+        download_name=fname,
     )

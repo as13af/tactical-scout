@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% set copyright_notice = '© 2026 Ali Shidqie Al Faruqi · Orbis Scout. All rights reserved.' %}
+  <meta name="copyright" content="{{ copyright_notice }}">
   <title>{% block title %}SofaScore Analytics{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style-v2.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}?v=2">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}?v=2" media="screen">
   <script defer src="{{ url_for('static', filename='js/ui-v2.js') }}"></script>
   <style>
     :root {
@@ -79,7 +81,7 @@
     <a href="/" {% if endpoint == 'home' %}class="active"{% endif %}>Home</a>
 
     {% set browse_eps   = ['index','competition','club','player','players','matches','match_detail','player_matches'] %}
-    {% set scouting_eps = ['compatibility','club_compatibility','batch_compare'] %}
+    {% set scouting_eps = ['compatibility','club_compatibility','batch_compare','free_agents'] %}
     {% set charts_eps   = ['compare','scatter','player_scatter','playing_styles'] %}
     {% set more_eps     = ['league_rankings','export_page'] %}
 
@@ -98,6 +100,7 @@
         <a href="/compatibility"      {% if endpoint == 'compatibility' %}class="active"{% endif %}>Compatibility</a>
         <a href="/club_compatibility" {% if endpoint == 'club_compatibility' %}class="active"{% endif %}>Club Fit</a>
         <a href="/batch_compare"      {% if endpoint == 'batch_compare' %}class="active"{% endif %}>Shortlist</a>
+        <a href="/free_agents"        {% if endpoint == 'free_agents' %}class="active"{% endif %}>Free Agents</a>
       </div>
     </div>
 
@@ -142,6 +145,10 @@
 <div class="container">
   {% block content %}{% endblock %}
 </div>
+
+<footer class="site-footer" style="margin-top:40px; padding:18px 16px 28px; border-top:1px solid var(--border); color:var(--text3); font-size:11px; text-align:center; letter-spacing:.02em;">
+  {{ copyright_notice }}
+</footer>
 
 <script>
   /* ── Team / competition color utilities — available on all pages ────────── */

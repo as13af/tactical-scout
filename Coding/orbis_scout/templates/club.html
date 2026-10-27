@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ data.get('team_name', club) }} — Scout{% endblock %}
 {% block body_class %}ui2{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/club-print.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="breadcrumb">
@@ -28,6 +31,12 @@
       🗑 Reset Match History
     </button>
     {% endif %}
+    <button type="button" class="btn-update club-action-btn" data-club-print
+            data-club="{{ data.get('team_name', club) }}"
+            data-competition="{{ competition }}"
+            data-season="{{ season_name or '' }}">
+      ⬇ Export PDF
+    </button>
     <a href="/competition/{{ country }}/{{ competition }}/{{ club }}/evolution"
        class="btn-update club-action-btn">
       📈 Tactical Evolution
@@ -44,18 +53,24 @@
   <div class="card mb16" data-carousel-slide data-label="Season Stats">
     <div class="card-title">Season Statistics</div>
     <div class="stat-grid">
+      {# Keys follow SofaScore's team season-statistics payload (goalsScored,
+         avgRating, averageBallPossession, cleanSheets…), not the player one. #}
       {% set club_stats = [
-        ('Goals',      cs.get('goals','')),
-        ('Conceded',   cs.get('goalsConceded','')),
-        ('Avg Rating', "%.2f"|format(cs.get('rating')|float) if cs.get('rating') else ''),
-        ('Shots',      cs.get('shots','')),
-        ('Pass Acc %', "%.1f"|format(cs.get('accuratePassesPercentage')|float) if cs.get('accuratePassesPercentage') else ''),
-        ('Possession', cs.get('possession','')),
-        ('Tackles',    cs.get('tackles','')),
-        ('Clean Sheets', cs.get('cleanSheet','')),
+        ('Matches',      cs.get('matches')),
+        ('Goals',        cs.get('goalsScored')),
+        ('Conceded',     cs.get('goalsConceded')),
+        ('Assists',      cs.get('assists')),
+        ('Clean Sheets', cs.get('cleanSheets')),
+        ('Avg Rating',   "%.2f"|format(cs.get('avgRating')|float) if cs.get('avgRating') is not none else none),
+        ('Shots',        cs.get('shots')),
+        ('Possession %', "%.1f"|format(cs.get('averageBallPossession')|float) if cs.get('averageBallPossession') is not none else none),
+        ('Pass Acc %',   "%.1f"|format(cs.get('accuratePassesPercentage')|float) if cs.get('accuratePassesPercentage') is not none else none),
+        ('Tackles',      cs.get('tackles')),
+        ('Yellow Cards', cs.get('yellowCards')),
+        ('Red Cards',    cs.get('redCards')),
       ] %}
       {% for label, val in club_stats %}
-        {% if val != '' and val is not none %}
+        {% if val is not none and val != '' %}
           <div class="stat-block">
             <div class="label">{{ label }}</div>
             <div class="value">{{ val }}</div>
@@ -63,6 +78,13 @@
         {% endif %}
       {% endfor %}
     </div>
+    {# Low-coverage competitions (e.g. National League South) only get basic
+       season totals from SofaScore — no rating, shots or possession. #}
+    {% if cs.get('avgRating') is none and cs.get('shots') is none and cs.get('averageBallPossession') is none %}
+      <div style="margin-top:10px;font-size:11px;color:var(--text3);">
+        Limited SofaScore coverage for this competition — only basic season totals are available.
+      </div>
+    {% endif %}
   </div>
 {% endif %}
 
@@ -193,7 +215,7 @@
 </div><!-- /.cards-carousel -->
 
 <!-- Players table -->
-<div class="card">
+<div class="card" id="squad-card">
   <div class="card-title flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
     <span>Squad — {{ players|length }} players</span>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -204,6 +226,22 @@
       </label>
       <!-- Stats Settings button -->
       <button id="squad-settings-btn" style="padding:4px 8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);border-radius:4px;cursor:pointer;font-size:12px;">⚙ Stats</button>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="display:flex;gap:4px;align-items:center;">
+        <span style="font-size:11px;color:var(--text3);">Sort:</span>
+        <select id="squad-sort"
+                style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+                       color:var(--text);padding:4px 8px;font-size:11px;font-family:'CoFoSans',sans-serif;">
+          <option value="">Default order</option>
+          <option value="shirt">#</option>
+          <option value="name">Name</option>
+          <option value="position">Position</option>
+          <!-- Stat options are appended by the squad table script -->
+        </select>
+        <button type="button" id="squad-sort-dir" title="Flip sort direction"
+                style="display:none;padding:3px 7px;border:1px solid var(--border);background:var(--bg3);
+                       color:var(--text);border-radius:4px;cursor:pointer;font-size:11px;">↓</button>
+      </div>
       <div style="width:1px;height:20px;background:var(--border);"></div>
       <div style="display:flex;gap:4px;align-items:center;">
         <span style="font-size:11px;color:var(--text3);">Contract:</span>
@@ -226,9 +264,9 @@
     <table id="squad-table" data-keynav>
       <thead id="squad-table-head">
         <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Pos</th>
+          <th data-sort="shirt">#</th>
+          <th data-sort="name">Name</th>
+          <th data-sort="position">Pos</th>
           <!-- Dynamic columns will be inserted here by JS -->
         </tr>
       </thead>
@@ -238,9 +276,67 @@
     </table>
   </div>
 </div>
+
+<!-- ── Stat Settings Modal — lives here, not after the scripts, so its
+     listeners find it when they attach ── -->
+<div id="stat-settings-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;">
+  <div class="stat-settings-modal-inner" style="padding:24px;max-width:400px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="color:var(--text);font-size:16px;font-weight:700;">Select Main Row Stats</h3>
+      <button id="stat-settings-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    
+    <p style="color:var(--text2);font-size:12px;margin-bottom:16px;">Select which stats appear in the main squad table row. Default: Goals, Assists, Matches Played, Minutes Played, Rating.</p>
+    
+    <div id="stat-options" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="goals" checked> <span style="color:var(--text);">Goals</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="assists" checked> <span style="color:var(--text);">Assists</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="appearances" checked> <span style="color:var(--text);">Matches Played</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="rating" checked> <span style="color:var(--text);">Rating</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="totalShots"> <span style="color:var(--text);">Shots</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="keyPasses"> <span style="color:var(--text);">Key Passes</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="totalCross"> <span style="color:var(--text);">Crosses</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="tackles"> <span style="color:var(--text);">Tackles</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="interceptions"> <span style="color:var(--text);">Interceptions</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="aerialDuelsWon"> <span style="color:var(--text);">Aerials Won</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="minutesPlayed" checked> <span style="color:var(--text);">Minutes Played</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" value="contract"> <span style="color:var(--text);">Contract</span>
+      </label>
+    </div>
+    
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button id="stat-settings-close-btn" onclick="document.getElementById('stat-settings-modal').style.display='none'" style="padding:8px 16px;border:1px solid var(--border);background:var(--bg3);color:var(--text);border-radius:4px;cursor:pointer;">Cancel</button>
+      <button id="stat-settings-save" style="padding:8px 16px;border:1px solid var(--green);background:var(--green-bg);color:var(--green);border-radius:4px;cursor:pointer;font-weight:600;">Save</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/club-print.js') }}"></script>
 <script>
 /* ── Club team color accent ── */
 (function () {
@@ -376,24 +472,28 @@ document.getElementById('squad-search').addEventListener('input', applySquadFilt
     dlBtn.style.display   = 'none';
 
     const probe = new Image();
-    probe.onload = () => {
-      spinner.style.display = 'none';
-      img.src               = src;
-      img.style.display     = '';
-      dlBtn.href            = src;
-      dlBtn.download        = `passmap_${CLUB_SLUG}.png`;
-      dlBtn.style.display   = '';
-    };
-    probe.onerror = () => {
-      spinner.style.display = 'none';
-      errDiv.style.display  = '';
-    };
+    PrintReady.track(new Promise(resolve => {
+      probe.onload = () => {
+        spinner.style.display = 'none';
+        img.src               = src;
+        img.style.display     = '';
+        dlBtn.href            = src;
+        dlBtn.download        = `passmap_${CLUB_SLUG}.png`;
+        dlBtn.style.display   = '';
+        resolve();
+      };
+      probe.onerror = () => {
+        spinner.style.display = 'none';
+        errDiv.style.display  = '';
+        resolve();
+      };
+    }));
     probe.src = src;
   }
 
   function loadFormData() {
     const apiUrl = `/api/playing_style_data?country=${COUNTRY}&competition=${COMPETITION}`;
-    fetch(apiUrl)
+    PrintReady.track(fetch(apiUrl)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(data => {
         const team = (data.teams || []).find(t => t.slug === CLUB_SLUG);
@@ -418,7 +518,7 @@ document.getElementById('squad-search').addEventListener('input', applySquadFilt
       .catch(() => {
         document.getElementById('form-loading').style.display = 'none';
         document.getElementById('form-no-data').style.display = '';
-      });
+      }));
   }
 
   // Load on DOMContentLoaded (no tab interaction needed — always visible)
@@ -602,11 +702,27 @@ function populateStatTabs(row, detailRow) {
     contract: { label: 'Contract', key: 'contract' },
   };
 
-  const DEFAULT_STATS = ['goals', 'assists', 'appearances', 'rating'];
+  const DEFAULT_STATS = ['goals', 'assists', 'appearances', 'minutesPlayed', 'rating'];
 
   function getSelectedStats() {
     const saved = localStorage.getItem('selectedStats');
-    return saved ? JSON.parse(saved) : DEFAULT_STATS;
+    // Minutes became a default column after selections were already being
+    // saved — add it once, so turning it off afterwards still sticks. New
+    // visitors already get it from DEFAULT_STATS, so just mark them done.
+    if (!saved) {
+      localStorage.setItem('squadMinsAdded', '1');
+      return DEFAULT_STATS;
+    }
+    const stats = JSON.parse(saved);
+    if (!localStorage.getItem('squadMinsAdded')) {
+      if (!stats.includes('minutesPlayed')) {
+        const i = stats.indexOf('appearances');
+        stats.splice(i >= 0 ? i + 1 : stats.length, 0, 'minutesPlayed');
+        localStorage.setItem('selectedStats', JSON.stringify(stats));
+      }
+      localStorage.setItem('squadMinsAdded', '1');
+    }
+    return stats;
   }
 
   function formatStatValue(player, statKey, p90Enabled = false) {
@@ -614,11 +730,16 @@ function populateStatTabs(row, detailRow) {
     const colInfo = STAT_COLUMNS[statKey];
     if (!colInfo) return '—';
     
-    let value = stats[colInfo.key] || '—';
+    // ?? not ||, so a real 0 shows as 0 rather than '—'
+    let value = stats[colInfo.key] ?? '—';
 
     if (p90Enabled && typeof value === 'number' && value > 0 && statKey !== 'rating' && statKey !== 'appearances' && statKey !== 'minutesPlayed') {
       const mins = stats.minutesPlayed || (stats.appearances || 1) * 90;
       value = (value / (mins / 90)).toFixed(2);
+    }
+
+    if (statKey === 'minutesPlayed' && typeof value === 'number') {
+      return value.toLocaleString('en-US');
     }
 
     // Format rating badge
@@ -638,6 +759,66 @@ function populateStatTabs(row, detailRow) {
     return value === null ? '—' : value;
   }
 
+  // ── Sorting — in memory only, so every page load starts in loader order ──
+  const POS_RANK  = { G: 0, D: 1, M: 2, F: 3 };
+  const ASC_FIRST = new Set(['shirt', 'name', 'position', 'contract']);
+  const nrmName   = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  let sortKey = null, sortDir = null;
+
+  // Raw season totals even with P90 on, so the order doesn't jump when it's
+  // toggled. Missing values count as 0.
+  function sortValue(p, key) {
+    if (key === 'shirt')    return parseInt(p.shirt_number) || 0;
+    if (key === 'name')     return nrmName(p.name);
+    if (key === 'position') return POS_RANK[String(p.position || '').charAt(0).toUpperCase()] ?? 4;
+    if (key === 'contract') return parseInt(p.contract_until_ts) || 0;
+    return Number((p.stats || {})[key]) || 0;
+  }
+
+  function sortedPlayers() {
+    if (!sortKey) return PLAYERS_DATA;
+    const sign = sortDir === 'asc' ? 1 : -1;
+    const mins = p => Number((p.stats || {}).minutesPlayed) || 0;
+    return [...PLAYERS_DATA].sort((a, b) => {
+      const va = sortValue(a, sortKey), vb = sortValue(b, sortKey);
+      const c  = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
+      // Ties: regulars first, then alphabetical.
+      return sign * c || mins(b) - mins(a) || nrmName(a.name).localeCompare(nrmName(b.name));
+    });
+  }
+
+  function updateSortUI() {
+    document.querySelectorAll('#squad-table-head th[data-sort]').forEach(th => {
+      const on = th.dataset.sort === sortKey;
+      th.classList.toggle('sorted', on);
+      th.classList.toggle('asc', on && sortDir === 'asc');
+    });
+    document.getElementById('squad-sort').value = sortKey || '';
+    const dirBtn = document.getElementById('squad-sort-dir');
+    dirBtn.style.display = sortKey ? '' : 'none';
+    dirBtn.textContent   = sortDir === 'asc' ? '↑' : '↓';
+  }
+
+  // Reorder the existing row pairs rather than rebuilding, so open detail
+  // panels stay open and travel with their player.
+  function applySort() {
+    const tbody = document.getElementById('squad-table-body');
+    const pairs = new Map();
+    tbody.querySelectorAll('tr.squad-row').forEach(row => {
+      const detail = row.nextElementSibling;
+      pairs.set(row._player, detail && detail.classList.contains('squad-detail-row') ? [row, detail] : [row]);
+    });
+    sortedPlayers().forEach(p => (pairs.get(p) || []).forEach(r => tbody.appendChild(r)));
+    updateSortUI();
+  }
+
+  // No dir = the column's natural first direction (numbers high→low, text A→Z).
+  function setSort(key, dir) {
+    sortKey = key || null;
+    sortDir = sortKey ? (dir || (ASC_FIRST.has(sortKey) ? 'asc' : 'desc')) : null;
+    applySort();
+  }
+
   function buildTableHeaders() {
     const selectedStats = getSelectedStats();
     const headRow = document.querySelector('#squad-table-head tr');
@@ -652,6 +833,7 @@ function populateStatTabs(row, detailRow) {
       if (col) {
         const th = document.createElement('th');
         th.className = 'td-num';
+        th.dataset.sort = statKey;
         th.textContent = col.label;
         headRow.appendChild(th);
       }
@@ -664,10 +846,11 @@ function populateStatTabs(row, detailRow) {
     const tbody = document.getElementById('squad-table-body');
     tbody.innerHTML = '';
 
-    PLAYERS_DATA.forEach((player) => {
+    sortedPlayers().forEach((player) => {
       // Main row
       const mainRow = document.createElement('tr');
       mainRow.className = 'squad-row';
+      mainRow._player = player;  // lets applySort() move rows without a rebuild
       mainRow.dataset.contractBadge = player.contract_badge || '';
       mainRow.dataset.contractTs = player.contract_until_ts || '0';
       mainRow.dataset.playerFile = player.file;
@@ -733,10 +916,59 @@ function populateStatTabs(row, detailRow) {
   function rebuildTable() {
     buildTableHeaders();
     buildTableRows();
+    updateSortUI();
   }
 
   // Export for global use
   window.rebuildSquadTable = rebuildTable;
+
+  // PDF export: the full season roster with every stat column and raw totals,
+  // independent of the on-screen basis, filters, column choice and P90. Rows
+  // follow the on-screen sort.
+  window.buildSquadPrintTable = function () {
+    const keys = Object.keys(STAT_COLUMNS);
+    const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const departedN = PLAYERS_DATA.filter(p => p.in_current_squad === false || p.departed).length;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="card-title">Squad — ${PLAYERS_DATA.length} players (season roster${departedN ? `, ${departedN} departed` : ''})</div>
+      <table class="print-squad">
+        <thead><tr><th>#</th><th>Name</th><th>Pos</th>
+          ${keys.map(k => `<th class="td-num">${STAT_COLUMNS[k].label}</th>`).join('')}</tr></thead>
+        <tbody>${sortedPlayers().map(p => {
+          const departed = p.in_current_squad === false || p.departed;
+          const flag = p.is_foreign ? ` ${(typeof flagEmoji === 'function' && flagEmoji(p.country_alpha2)) || '🌍'}` : '';
+          const tag = departed ? ' <span class="departed-tag">departed</span>' : '';
+          return `<tr class="${departed ? 'departed' : ''}">
+            <td>${esc(p.shirt_number || '—')}</td>
+            <td>${esc(p.name)}${flag}${tag}</td>
+            <td>${esc(p.position || '?')}</td>
+            ${keys.map(k => `<td class="td-num">${formatStatValue(p, k, false)}</td>`).join('')}
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+    return wrap;
+  };
+
+  // Header clicks: the active column flips, any other starts in its natural direction.
+  document.getElementById('squad-table-head').addEventListener('click', e => {
+    const th = e.target.closest('th[data-sort]');
+    if (!th) return;
+    const key = th.dataset.sort;
+    setSort(key, key === sortKey ? (sortDir === 'asc' ? 'desc' : 'asc') : null);
+  });
+
+  // Sort-by dropdown lists every stat, including ones not shown as columns.
+  const sortSel = document.getElementById('squad-sort');
+  Object.entries(STAT_COLUMNS).forEach(([key, col]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = key === 'minutesPlayed' ? 'Minutes Played' : col.label;
+    sortSel.appendChild(opt);
+  });
+  sortSel.addEventListener('change', () => setSort(sortSel.value));
+  document.getElementById('squad-sort-dir').addEventListener('click', () =>
+    setSort(sortKey, sortDir === 'asc' ? 'desc' : 'asc'));
 
   // Initial build
   if (document.readyState === 'loading') {
@@ -771,7 +1003,7 @@ function populateStatTabs(row, detailRow) {
     const pngUrl = `/api/club_avg_heatmap_png/${COUNTRY}/${COMPETITION}/${CLUB_SLUG}/${seasonId}`;
     const zonesUrl = `/api/club_avg_heatmap_zones_png/${COUNTRY}/${COMPETITION}/${CLUB_SLUG}/${seasonId}`;
     
-    fetch(metaUrl)
+    PrintReady.track(fetch(metaUrl)
       .then(r => {
         if (r.status === 204 || r.status === 404) return Promise.reject('not_available');
         return r.ok ? r.json() : Promise.reject(r.status);
@@ -786,6 +1018,8 @@ function populateStatTabs(row, detailRow) {
         dlBtn.href = pngUrl;
         dlBtn.style.display = '';
         contentDiv.style.display = '';
+        // Both versions go into the PDF, whichever the toggle shows now.
+        window.__clubHeatmapUrls = { standard: pngUrl, zones: data.has_png ? zonesUrl : null };
         
         if (data.has_png) {
           toggles.style.display = 'flex';
@@ -812,7 +1046,7 @@ function populateStatTabs(row, detailRow) {
       .catch(err => {
         loadingDiv.style.display = 'none';
         errorDiv.style.display = '';
-      });
+      }));
   }
   
   if (document.readyState === 'loading') {
@@ -841,7 +1075,7 @@ document.getElementById('squad-settings-btn').addEventListener('click', (e) => {
   e.stopPropagation();
   
   // Load current selections before opening
-  const currentStats = JSON.parse(localStorage.getItem('selectedStats') || JSON.stringify(['goals', 'assists', 'appearances', 'rating']));
+  const currentStats = JSON.parse(localStorage.getItem('selectedStats') || JSON.stringify(['goals', 'assists', 'appearances', 'minutesPlayed', 'rating']));
   document.querySelectorAll('#stat-options input[type="checkbox"]').forEach(cb => {
     cb.checked = currentStats.includes(cb.value);
   });
@@ -881,60 +1115,13 @@ document.getElementById('stat-settings-save').addEventListener('click', () => {
 });
 </script>
 
-<!-- ── Stat Settings Modal ── -->
-<div id="stat-settings-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;">
-  <div class="stat-settings-modal-inner" style="padding:24px;max-width:400px;max-height:80vh;overflow-y:auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="color:var(--text);font-size:16px;font-weight:700;">Select Main Row Stats</h3>
-      <button id="stat-settings-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;">✕</button>
-    </div>
-    
-    <p style="color:var(--text2);font-size:12px;margin-bottom:16px;">Select which stats appear in the main squad table row. Default: Goals, Assists, Matches.</p>
-    
-    <div id="stat-options" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="goals" checked> <span style="color:var(--text);">Goals</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="assists" checked> <span style="color:var(--text);">Assists</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="appearances" checked> <span style="color:var(--text);">Matches Played</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="rating" checked> <span style="color:var(--text);">Rating</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="totalShots"> <span style="color:var(--text);">Shots</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="keyPasses"> <span style="color:var(--text);">Key Passes</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="totalCross"> <span style="color:var(--text);">Crosses</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="tackles"> <span style="color:var(--text);">Tackles</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="interceptions"> <span style="color:var(--text);">Interceptions</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="aerialDuelsWon"> <span style="color:var(--text);">Aerials Won</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="minutesPlayed"> <span style="color:var(--text);">Minutes Played</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-        <input type="checkbox" value="contract"> <span style="color:var(--text);">Contract</span>
-      </label>
-    </div>
-    
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button id="stat-settings-close-btn" onclick="document.getElementById('stat-settings-modal').style.display='none'" style="padding:8px 16px;border:1px solid var(--border);background:var(--bg3);color:var(--text);border-radius:4px;cursor:pointer;">Cancel</button>
-      <button id="stat-settings-save" style="padding:8px 16px;border:1px solid var(--green);background:var(--green-bg);color:var(--green);border-radius:4px;cursor:pointer;font-weight:600;">Save</button>
-    </div>
-  </div>
-</div>
+<style>
+/* Sortable squad headers — scoped here so the arrows don't depend on style.css */
+#squad-table th[data-sort] { cursor: pointer; user-select: none; white-space: nowrap; }
+#squad-table th[data-sort]:hover { color: var(--text); }
+#squad-table th.sorted { color: var(--accent); }
+#squad-table th.sorted::after { content: ' ↓'; }
+#squad-table th.sorted.asc::after { content: ' ↑'; }
+</style>
 
 {% endblock %}

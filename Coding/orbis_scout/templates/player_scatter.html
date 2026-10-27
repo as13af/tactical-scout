@@ -45,7 +45,7 @@
   }
   .sc-axis-row {
     display: grid;
-    grid-template-columns: 1fr 1fr auto auto auto auto;
+    grid-template-columns: 1fr 1fr auto auto auto auto auto;
     gap: 12px;
     align-items: end;
     margin-bottom: 16px;
@@ -504,6 +504,15 @@
         </button>
       </div>
       <div class="sc-axis-field">
+        <label>Download</label>
+        <div style="display:flex; gap:4px;">
+          <button class="btn-ghost" id="sc-img-png" onclick="downloadScatter('png')"
+                  style="height:38px; padding:0 12px;" disabled>&#8595; PNG</button>
+          <button class="btn-ghost" id="sc-img-pdf" onclick="downloadScatter('pdf')"
+                  style="height:38px; padding:0 12px;" disabled>&#8595; PDF</button>
+        </div>
+      </div>
+      <div class="sc-axis-field">
         <label>Top N on chart</label>
         <input type="number" id="sc-scatter-n" class="compat-input" min="5" max="200"
                value="30" style="width:72px;" oninput="onScatterTopNChange()">
@@ -516,6 +525,12 @@
         <label>Highlight Player</label>
         <select id="sc-highlight-select" class="compat-input" onchange="onHighlightSelect()" style="min-width:220px;">
           <option value="">-- select a player --</option>
+        </select>
+      </div>
+      <div class="sc-axis-field">
+        <label>Highlight Club</label>
+        <select id="sc-highlight-club-select" class="compat-input" onchange="onHighlightClubSelect()" style="min-width:200px;">
+          <option value="">-- select a club --</option>
         </select>
       </div>
       <div class="sc-axis-field">
@@ -571,6 +586,7 @@
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/scatter-export.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script>
@@ -769,6 +785,8 @@ let importedId      = '';
 let isZoomed        = false;
 let currentPoints   = [];
 let selectedSlug    = null;
+let selectedClub    = null;   // club highlight (league view) — exclusive with selectedSlug
+let exportingImage  = false;  // true while the PNG/PDF capture renders
 let rankSortCol     = 'x';
 let rankSortDir     = 'desc';
 let rankTopN        = 10;
@@ -893,6 +911,17 @@ function clearContractFilter() {
   if (playerData) renderChart();
 }
 
+// 'U21' / 'Prime (25–29)' / '18–24', or '' when no age filter is active
+function ageFilterLabel() {
+  if (ageMin === null && ageMax === null) return '';
+  const presetLabels = { u21:'U21', u23:'U23', u25:'U25', prime:'Prime (25\u201329)', veteran:'Veteran (30+)' };
+  const pLabel = activeAgePreset && presetLabels[activeAgePreset];
+  if (pLabel) return pLabel;
+  const lo = ageMin !== null ? ageMin : '\u2014';
+  const hi = ageMax !== null ? ageMax : '\u2014';
+  return lo + '\u2013' + hi;
+}
+
 function _markAgePreset(name) {
   ['all','u21','u23','u25','prime','veteran'].forEach(p => {
     const btn = document.getElementById('age-preset-' + p);
@@ -951,6 +980,7 @@ function onCompetitionChange() {
   document.getElementById('sc-info').style.display   = 'none';
   document.getElementById('sc-chart-area').style.display = 'none';
   document.getElementById('sc-export-btn').disabled = true;
+  setDownloadEnabled(false);
   playerData = null;
   const clubSel = document.getElementById('sc-club-filter');
   if (clubSel) { clubSel.innerHTML = '<option value="All">All Clubs</option>'; clubSel.disabled = true; }
@@ -991,6 +1021,7 @@ function loadScatterData() {
       document.getElementById('sc-info').style.display = 'block';
       document.getElementById('sc-chart-area').style.display = 'block';
       document.getElementById('sc-export-btn').disabled = false;
+      setDownloadEnabled(true);
       document.getElementById('sc-position-filter').value = 'All';
       resetAgeFilter();
       statMode = 'totals';
@@ -1138,11 +1169,15 @@ const labelPlugin = {
   afterDraw(chart) {
     const ctx  = chart.ctx;
     const meta = chart.getDatasetMeta(0);
+    const hasHL = selectedSlug !== null || selectedClub !== null;
     chart.data.datasets[0].data.forEach((point, i) => {
       const el = meta.data[i];
       if (!el) return;
+      const isHL = isHighlighted(point);
+      // Downloads drop the names of everything that isn't highlighted
+      if (exportingImage && hasHL && !isHL) return;
       let labelOffset = 10;
-      if (selectedSlug === null) {
+      if (!hasHL) {
         if (currentClubMode && !point.inTop20) {
           ctx.fillStyle = 'rgba(110,110,110,0.45)';
           ctx.font      = '10px "DM Mono", monospace';
@@ -1150,7 +1185,11 @@ const labelPlugin = {
           ctx.fillStyle = '#6E6E6E';
           ctx.font      = '11px "DM Mono", monospace';
         }
-      } else if (point.slug === selectedSlug) {
+      } else if (isHL && selectedClub !== null) {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font      = 'bold 12px "DM Mono", monospace';
+        labelOffset   = 13;
+      } else if (isHL) {
         ctx.fillStyle = '#FFFFFF';
         ctx.font      = 'bold 13px "DM Mono", monospace';
         labelOffset   = 18;
@@ -1224,9 +1263,10 @@ function renderChart() {
       const ix = getStatVal(imp, xKey), iy = getStatVal(imp, yKey);
       if (ix !== undefined && ix !== null && iy !== undefined && iy !== null) topN.push(imp);
     }
-    topN.forEach(p => {
+    topN.forEach((p, i) => {
       const grp = posGroup(p.position);
       points.push({
+        plotRank:          i < scatterTopN ? i + 1 : null,
         x:               getStatVal(p, xKey),
         y:               getStatVal(p, yKey),
         slug:              p.player_slug,
@@ -1260,6 +1300,7 @@ function renderChart() {
     // Compute league Top N slugs for reference styling (uses full candidate pool)
     const topNLeague = selectTopN(candidates, xKey, yKey);
     const topNSlugs  = new Set(topNLeague.map(p => p.player_slug));
+    const topNRank   = new Map(topNLeague.map((p, i) => [p.player_slug, i + 1]));
 
     // All qualifying players from the selected club
     const clubPlayers = candidates.filter(p => {
@@ -1272,6 +1313,7 @@ function renderChart() {
     clubPlayers.forEach(p => {
       const grp = posGroup(p.position);
       points.push({
+        plotRank:          topNRank.get(p.player_slug) || null,
         x:               getStatVal(p, xKey),
         y:               getStatVal(p, yKey),
         slug:              p.player_slug,
@@ -1318,6 +1360,7 @@ function renderChart() {
 
   currentPoints = points;
   selectedSlug  = null;
+  selectedClub  = null;
 
   // ── Chip text ─────────────────────────────────────────────────────────────
   const totalPool = candidates.filter(p => {
@@ -1336,17 +1379,8 @@ function renderChart() {
   }
   if (statMode === 'p90') chipText += ' \u00b7 Per 90 mins';
   // Age filter badge in chip
-  if (ageMin !== null || ageMax !== null) {
-    const presetLabels = { u21:'U21', u23:'U23', u25:'U25', prime:'Prime (25\u201329)', veteran:'Veteran (30+)' };
-    const pLabel = activeAgePreset && presetLabels[activeAgePreset];
-    if (pLabel) {
-      chipText += ' \u00b7 Age: ' + pLabel;
-    } else {
-      const lo = ageMin !== null ? ageMin : '\u2014';
-      const hi = ageMax !== null ? ageMax : '\u2014';
-      chipText += ' \u00b7 Age: ' + lo + '\u2013' + hi;
-    }
-  }
+  const ageLabel = ageFilterLabel();
+  if (ageLabel) chipText += ' \u00b7 Age: ' + ageLabel;
   chipText += ' \u00b7 Min. ' + Math.round(minThreshold) + ' mins played';
   document.getElementById('sc-chart-chip-text').textContent = chipText;
   document.getElementById('sc-chart-chip').style.display = 'block';
@@ -1491,6 +1525,19 @@ function computePointColors(pts) {
       radii.push(pt.slug === selectedSlug ? 13 : 10);
       return;
     }
+    if (selectedClub !== null) {
+      // Club highlight: its players solid in their position colour, rest dimmed
+      if (pt.club === selectedClub) {
+        bgColors.push(cols.border);
+        borderColors.push(cols.border);
+        radii.push(9);
+      } else {
+        bgColors.push('rgba(58,58,58,0.12)');
+        borderColors.push('rgba(110,110,110,0.22)');
+        radii.push(5);
+      }
+      return;
+    }
     if (selectedSlug === null) {
       if (isNonTop20 || isNoDimContract) {
         bgColors.push(colsDim.bg);
@@ -1515,22 +1562,13 @@ function computePointColors(pts) {
 }
 
 // ── Highlight entity ──────────────────────────────────────────────────────────
-function highlightEntity(slug) {
-  selectedSlug = (slug !== null && slug === selectedSlug) ? null : slug;
-  if (!chartInst) return;
-  const { bgColors, borderColors, radii } = computePointColors(currentPoints);
-  chartInst.data.datasets[0].backgroundColor = bgColors;
-  chartInst.data.datasets[0].borderColor     = borderColors;
-  chartInst.data.datasets[0].pointRadius     = radii;
-  chartInst.update('none');
-  const sel = document.getElementById('sc-highlight-select');
-  if (sel) sel.value = selectedSlug || '';
-  updateEntityCard();
-  renderRankingTable();
+function isHighlighted(pt) {
+  return (selectedSlug !== null && pt.slug === selectedSlug)
+      || (selectedClub !== null && pt.club === selectedClub);
 }
 
-function clearHighlight() {
-  selectedSlug = null;
+// Re-colour the chart and sync dropdowns / card / table to the highlight state
+function refreshHighlight() {
   if (chartInst) {
     const { bgColors, borderColors, radii } = computePointColors(currentPoints);
     chartInst.data.datasets[0].backgroundColor = bgColors;
@@ -1539,9 +1577,30 @@ function clearHighlight() {
     chartInst.update('none');
   }
   const sel = document.getElementById('sc-highlight-select');
-  if (sel) sel.value = '';
+  if (sel) sel.value = selectedSlug || '';
+  const clubSel = document.getElementById('sc-highlight-club-select');
+  if (clubSel) clubSel.value = selectedClub || '';
   updateEntityCard();
   renderRankingTable();
+}
+
+function highlightEntity(slug) {
+  selectedSlug = (slug !== null && slug === selectedSlug) ? null : slug;
+  selectedClub = null;
+  if (!chartInst) return;
+  refreshHighlight();
+}
+
+function highlightClub(club) {
+  selectedClub = club || null;
+  selectedSlug = null;
+  refreshHighlight();
+}
+
+function clearHighlight() {
+  selectedSlug = null;
+  selectedClub = null;
+  refreshHighlight();
 }
 
 // ── Entity info card ───────────────────────────────────────────────────────────
@@ -1582,9 +1641,78 @@ function tierInfo(pct) {
   return               { label: 'Below Average',  bg: 'rgba(199,123,123,0.12)', color: '#C77B7B' };
 }
 
+// Contract badge: { label, bg, color } or null when there's no contract data
+function contractStatus(ts) {
+  if (!ts) return null;
+  const nowTs     = Date.now() / 1000;
+  const remaining = (ts - nowTs) / 86400;
+  if (ts < nowTs)        return { bg: 'rgba(199,123,123,0.12)', color: '#C77B7B', label: 'Expired'       };
+  if (remaining <= 182)  return { bg: 'rgba(199,123,123,0.12)', color: '#C77B7B', label: 'Expiring Soon' };
+  if (remaining <= 365)  return { bg: 'rgba(250,204,21,0.15)',  color: '#FACC15', label: 'This Year'     };
+  return                        { bg: 'rgba(34,197,94,0.15)',   color: '#22C55E', label: 'Contracted'    };
+}
+
+function playerMetaText(pt) {
+  return pt.club + '  \u00b7  ' + pt.minutesPlayed + ' mins  \u00b7  ' + pt.appearances + ' apps' +
+    (pt.positionsDetailed && pt.positionsDetailed.length
+      ? '  \u00b7  ' + pt.positionsDetailed.join(' / ')
+      : (pt.position ? '  \u00b7  ' + pt.position : ''));
+}
+
+// X / Y values for one player, respecting p90 mode, with percentile + rank
+// against everyone plotted. Shared by the on-screen card and the download.
+function playerCardStats(pt) {
+  const xKey       = document.getElementById('x-axis-select').value;
+  const yKey       = document.getElementById('y-axis-select').value;
+  const altLabel   = statMode === 'p90' ? 'tot' : 'p90';
+  function one(key, raw, p90, rawKey, p90Key) {
+    const elig    = P90_ELIGIBLE.has(key);
+    const display = (statMode === 'p90' && elig && p90 !== null) ? p90 : raw;
+    const alt     = elig ? (statMode === 'p90' ? raw : p90) : null;
+    const pool    = currentPoints.map(p => (statMode === 'p90' && elig && p[p90Key] !== null) ? p[p90Key] : p[rawKey]);
+    return { label: baseLabelFor(key), display, alt, altLabel,
+             pct: calcPercentile(display, pool), rank: calcRank(display, pool) };
+  }
+  return [one(xKey, pt.rawX, pt.p90X, 'rawX', 'p90X'), one(yKey, pt.rawY, pt.p90Y, 'rawY', 'p90Y')];
+}
+
+// Club highlight: its plotted players in plot-rank order
+function clubCardRows() {
+  return currentPoints
+    .filter(p => p.club === selectedClub)
+    .sort((a, b) => (a.plotRank || 1e9) - (b.plotRank || 1e9));
+}
+
+function updateClubCard(card) {
+  const rows = clubCardRows();
+  if (!rows.length) { card.style.display = 'none'; return; }
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  document.getElementById('sc-ec-name').textContent = selectedClub;
+  document.getElementById('sc-ec-meta').textContent =
+    rows.length + ' of ' + currentPoints.length + ' plotted players';
+  document.getElementById('sc-ec-stats').innerHTML =
+    '<table class="sc-rank-table" style="width:auto; min-width:420px;">'
+    + '<thead><tr><th style="cursor:default;">#</th><th style="cursor:default;">Player</th><th style="cursor:default;">Pos</th>'
+    + '<th class="sc-rank-stat" style="cursor:default;">' + escHtml(labelFor(xKey)) + '</th>'
+    + '<th class="sc-rank-stat" style="cursor:default;">' + escHtml(labelFor(yKey)) + '</th></tr></thead><tbody>'
+    + rows.map(pt => {
+        const bc = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+        return '<tr style="cursor:pointer;" onclick="highlightEntity(\'' + escHtml(pt.slug) + '\')">'
+          + '<td class="sc-rank-num">' + (pt.plotRank || '\u2014') + '</td>'
+          + '<td class="sc-rank-name">' + escHtml(pt.player) + '</td>'
+          + '<td><span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span></td>'
+          + '<td class="sc-rank-stat">' + fmtNum2(pt.x) + '</td>'
+          + '<td class="sc-rank-stat">' + fmtNum2(pt.y) + '</td></tr>';
+      }).join('')
+    + '</tbody></table>';
+  card.style.display = 'block';
+}
+
 function updateEntityCard() {
   const card = document.getElementById('sc-entity-card');
   if (!card) return;
+  if (selectedClub) { updateClubCard(card); return; }
   if (!selectedSlug) {
     card.style.display = 'none';
     return;
@@ -1592,36 +1720,13 @@ function updateEntityCard() {
   const pt = currentPoints.find(p => p.slug === selectedSlug);
   if (!pt) { card.style.display = 'none'; return; }
 
-  const xKey          = document.getElementById('x-axis-select').value;
-  const yKey          = document.getElementById('y-axis-select').value;
-  const xBase         = baseLabelFor(xKey);
-  const yBase         = baseLabelFor(yKey);
-  const xIsP90Elig    = P90_ELIGIBLE.has(xKey);
-  const yIsP90Elig    = P90_ELIGIBLE.has(yKey);
-
   const bc   = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
   const badge = '<span class="sc-rank-pos" style="background:' + bc.bg + ';color:' + bc.color + ';">' + escHtml(pt.posGrp) + '</span>';
 
   document.getElementById('sc-ec-name').innerHTML = escHtml(pt.player) + '&nbsp;&nbsp;' + badge;
-  document.getElementById('sc-ec-meta').textContent =
-    escHtml(pt.club) + '  \u00b7  ' + pt.minutesPlayed + ' mins  \u00b7  ' + pt.appearances + ' apps' +
-    (pt.positionsDetailed && pt.positionsDetailed.length
-      ? '  \u00b7  ' + pt.positionsDetailed.join(' / ')
-      : (pt.position ? '  \u00b7  ' + pt.position : ''));
+  document.getElementById('sc-ec-meta').textContent = playerMetaText(pt);
 
-  // Respect p90 mode: pick display value and build comparison pool accordingly
-  const xDisplayVal = (statMode === 'p90' && xIsP90Elig && pt.p90X !== null) ? pt.p90X : pt.rawX;
-  const yDisplayVal = (statMode === 'p90' && yIsP90Elig && pt.p90Y !== null) ? pt.p90Y : pt.rawY;
-  const xAltVal     = xIsP90Elig ? (statMode === 'p90' ? pt.rawX : pt.p90X) : null;
-  const yAltVal     = yIsP90Elig ? (statMode === 'p90' ? pt.rawY : pt.p90Y) : null;
-  const altLabel    = statMode === 'p90' ? 'tot' : 'p90';
-
-  const allXVals = currentPoints.map(p => (statMode === 'p90' && xIsP90Elig && p.p90X !== null) ? p.p90X : p.rawX);
-  const allYVals = currentPoints.map(p => (statMode === 'p90' && yIsP90Elig && p.p90Y !== null) ? p.p90Y : p.rawY);
-  const xPct  = calcPercentile(xDisplayVal, allXVals);
-  const yPct  = calcPercentile(yDisplayVal, allYVals);
-  const xRank = calcRank(xDisplayVal, allXVals);
-  const yRank = calcRank(yDisplayVal, allYVals);
+  const [xs, ys] = playerCardStats(pt);
 
   function statBlock(label, displayVal, altVal, altLbl, pct, rankObj) {
     const valStr = (displayVal !== undefined && displayVal !== null) ? displayVal : '\u2014';
@@ -1647,19 +1752,10 @@ function updateEntityCard() {
 
   // Contract expiry block
   function contractBlock(ts, displayStr) {
-    const nowTs   = Date.now() / 1000;
-    let badgeHtml = '';
-    if (!ts) {
-      badgeHtml = '<span style="font-size:10px;color:var(--text3);font-style:italic;">No data</span>';
-    } else {
-      const remaining = (ts - nowTs) / 86400;
-      let bgC, fgC, lbl;
-      if (ts < nowTs)        { bgC = 'rgba(199,123,123,0.12)';  fgC = '#C77B7B'; lbl = 'Expired';     }
-      else if (remaining <= 182) { bgC = 'rgba(199,123,123,0.12)';  fgC = '#C77B7B'; lbl = 'Expiring Soon'; }
-      else if (remaining <= 365) { bgC = 'rgba(250,204,21,0.15)';  fgC = '#FACC15'; lbl = 'This Year';    }
-      else                   { bgC = 'rgba(34,197,94,0.15)';   fgC = '#22C55E'; lbl = 'Contracted';   }
-      badgeHtml = '<span class="sc-tier-badge" style="background:' + bgC + ';color:' + fgC + ';">' + lbl + '</span>';
-    }
+    const st = contractStatus(ts);
+    const badgeHtml = st
+      ? '<span class="sc-tier-badge" style="background:' + st.bg + ';color:' + st.color + ';">' + st.label + '</span>'
+      : '<span style="font-size:10px;color:var(--text3);font-style:italic;">No data</span>';
     return '<div class="sc-entity-stat">'
       + '<span class="sc-entity-stat-label">Contract Until</span>'
       + '<span class="sc-entity-stat-value" style="font-size:14px;">' + escHtml(displayStr || '\u2014') + '</span>'
@@ -1668,8 +1764,8 @@ function updateEntityCard() {
   }
 
   document.getElementById('sc-ec-stats').innerHTML =
-    statBlock(xBase, xDisplayVal, xAltVal, altLabel, xPct, xRank) +
-    statBlock(yBase, yDisplayVal, yAltVal, altLabel, yPct, yRank) +
+    statBlock(xs.label, xs.display, xs.alt, xs.altLabel, xs.pct, xs.rank) +
+    statBlock(ys.label, ys.display, ys.alt, ys.altLabel, ys.pct, ys.rank) +
     contractBlock(pt.contractUntilTs, pt.contractUntil);
 
   card.style.display = 'block';
@@ -1688,11 +1784,32 @@ function populateHighlightDropdown(pts) {
     sel.appendChild(opt);
   });
   sel.value = selectedSlug || '';
+
+  // Clubs with at least one plotted player. Pointless under the Club filter,
+  // where every point already belongs to the same club.
+  const clubSel = document.getElementById('sc-highlight-club-select');
+  if (!clubSel) return;
+  const counts = {};
+  pts.forEach(pt => { if (pt.club) counts[pt.club] = (counts[pt.club] || 0) + 1; });
+  clubSel.innerHTML = '<option value="">-- select a club --</option>';
+  Object.keys(counts).sort((a, b) => a.localeCompare(b)).forEach(club => {
+    const opt = document.createElement('option');
+    opt.value       = club;
+    opt.textContent = club + ' (' + counts[club] + ')';
+    clubSel.appendChild(opt);
+  });
+  clubSel.value    = selectedClub || '';
+  clubSel.disabled = currentClubMode;
 }
 
 function onHighlightSelect() {
   const val = document.getElementById('sc-highlight-select').value;
   highlightEntity(val || null);
+}
+
+function onHighlightClubSelect() {
+  const val = document.getElementById('sc-highlight-club-select').value;
+  if (val) highlightClub(val); else clearHighlight();
 }
 
 // ── Ranking table ─────────────────────────────────────────────────────────────
@@ -1778,7 +1895,7 @@ function renderRankingTable() {
   });
 
   tbody.innerHTML = visible.map((pt, i) => {
-    const isSelected  = pt.slug === selectedSlug;
+    const isSelected  = isHighlighted(pt);
     const isNotTop20  = currentClubMode && !pt.inTop20;
     const rowClass    = isSelected ? 'rank-selected' : (isNotTop20 ? 'rank-not-top20' : '');
     const xVal = typeof pt.x === 'number' ? fmtNum2(pt.x) : '\u2014';
@@ -1920,6 +2037,143 @@ function exportPlayerScatterXlsx() {
   if (ageMax !== null) params.set('age_max', ageMax);
   if (contractFilterYear !== null) params.set('contract_year', contractFilterYear);
   window.location.href = '/api/player_scatter_export_xlsx?' + params.toString();
+}
+
+// ── Image / PDF download ──────────────────────────────────────────────────────
+const EXPORT_APP_NAME = 'Orbis Scout';
+
+function setDownloadEnabled(on) {
+  ['sc-img-png', 'sc-img-pdf'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.disabled = !on;
+  });
+}
+
+function filterValue(id) {
+  const el = document.getElementById(id);
+  return el && el.value && el.value !== 'All' ? el.value : '';
+}
+
+// Card for the download, mirroring the on-screen #sc-entity-card
+function exportCard() {
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  if (selectedClub) {
+    const rows = clubCardRows();
+    if (!rows.length) return null;
+    return {
+      title: selectedClub,
+      meta:  rows.length + ' of ' + currentPoints.length + ' plotted players',
+      table: {
+        columns: ['Player', 'Pos', labelFor(xKey), labelFor(yKey)],
+        align:   ['left', 'left', 'right', 'right'],
+        rows:    rows.map(pt => [
+          (pt.plotRank ? '#' + pt.plotRank + '   ' : '') + pt.player,
+          pt.posGrp, fmtNum2(pt.x), fmtNum2(pt.y),
+        ]),
+      },
+    };
+  }
+  const pt = selectedSlug && currentPoints.find(p => p.slug === selectedSlug);
+  if (!pt) return null;
+  const blocks = playerCardStats(pt).map(s => {
+    const tier = s.pct !== null && s.pct !== undefined ? tierInfo(s.pct) : null;
+    return {
+      label: s.label,
+      value: s.display !== undefined && s.display !== null ? s.display : '\u2014',
+      sub:   s.alt !== null && s.alt !== undefined ? s.alt + ' ' + s.altLabel : '',
+      tag:   tier ? { text: tier.label, color: tier.color } : null,
+      note:  tier && s.rank ? 'Ranked ' + s.rank.rank + ' of ' + s.rank.total + ' players' : '',
+    };
+  });
+  const st = contractStatus(pt.contractUntilTs);
+  blocks.push({
+    label: 'Contract Until',
+    value: pt.contractUntil || '\u2014',
+    tag:   st ? { text: st.label, color: st.color } : null,
+    note:  st ? '' : 'No data',
+  });
+  const bc = POS_BADGE_COLORS[pt.posGrp] || POS_BADGE_COLORS.MID;
+  return {
+    title:  pt.player,
+    badge:  { text: pt.posGrp, color: bc.color },
+    meta:   playerMetaText(pt),
+    blocks: blocks,
+  };
+}
+
+function exportLegend() {
+  const items = ['GK', 'DEF', 'MID', 'FWD']
+    .filter(g => currentPoints.some(p => p.posGrp === g && !p.imported))
+    .map(g => ({ type: 'dot', color: POS_COLORS[g].bg, border: POS_COLORS[g].border, label: g }));
+  if (allQualifyingPoints.length) {
+    const pos = filterValue('sc-position-filter');
+    items.push({ type: 'dash', color: 'rgba(130,130,130,0.75)', label: pos ? pos + ' avg' : 'League avg' });
+  }
+  if (currentPoints.some(p => p.imported))
+    items.push({ type: 'dot', color: 'rgba(245,158,11,0.85)', border: '#F59E0B', label: 'Imported player' });
+  if (currentClubMode)
+    items.push({ type: 'cross', color: '#FFFFFF', label: 'Club avg' });
+  if (selectedSlug)
+    items.push({ type: 'dot', color: 'rgba(255,255,255,0.92)', border: '#FFFFFF', label: 'Highlighted' });
+  return items;
+}
+
+function exportChips() {
+  const chips = [statMode === 'p90' ? 'Per 90 mins' : 'Season totals'];
+  const club = filterValue('sc-club-filter');
+  if (club) {
+    chips.push('Club: ' + club);
+  } else {
+    const pool = allQualifyingPoints.length;
+    chips.push('Top ' + Math.min(scatterTopN, pool) + ' of ' + pool + ' players');
+  }
+  const pos = filterValue('sc-position-filter');
+  if (pos) chips.push('Position: ' + pos);
+  const detPos = filterValue('sc-detailed-position-filter');
+  if (detPos) chips.push('Role: ' + detPos);
+  const nat = filterValue('sc-nationality-filter');
+  if (nat) chips.push('Country: ' + nat);
+  const age = ageFilterLabel();
+  if (age) chips.push('Age: ' + age);
+  if (contractFilterYear !== null && !isNaN(contractFilterYear)) chips.push('Contract ends ' + contractFilterYear);
+  chips.push('Min. ' + Math.round(minThreshold) + ' mins played');
+  return chips;
+}
+
+async function downloadScatter(format) {
+  if (!chartInst || !currentPoints.length || !window.ScatterExport) return;
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  const hlPt = selectedSlug && currentPoints.find(p => p.slug === selectedSlug);
+  const highlight = selectedClub || (hlPt ? hlPt.player + ' \u00b7 ' + hlPt.club : '');
+
+  let subtitle = compLabel + (currentCountry ? '  \u00b7  ' + currentCountry.replace(/_/g, ' ') : '');
+  if (highlight) subtitle += '  \u00b7  Highlight: ' + highlight;
+
+  setDownloadEnabled(false);
+  try {
+    await ScatterExport.download({
+      chart:       chartInst,
+      format:      format,
+      filename:    ScatterExport.fileName(['player_scatter', currentComp, xKey, 'vs', yKey, statMode,
+                                           selectedClub || (hlPt ? hlPt.player : '')]),
+      title:       labelFor(xKey) + '  vs  ' + labelFor(yKey),
+      subtitle:    subtitle,
+      chips:       exportChips(),
+      legend:      exportLegend(),
+      card:        exportCard(),
+      footerLeft:  EXPORT_APP_NAME + '  \u00b7  Player scatter  \u00b7  ' + ScatterExport.today(),
+      footerRight: currentClubMode ? '' : 'Top N ranked by combined, normalised X + Y',
+      beforeCapture: () => { exportingImage = true; },
+      afterCapture:  () => { exportingImage = false; },
+    });
+  } catch (e) {
+    exportingImage = false;
+    showScError('Download failed \u2014 ' + (e && e.message ? e.message : e));
+  } finally {
+    setDownloadEnabled(true);
+  }
 }
 </script>
 {% endblock %}

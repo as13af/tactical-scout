@@ -39,7 +39,7 @@
   }
   .sc-axis-row {
     display: grid;
-    grid-template-columns: 1fr 1fr auto auto auto;
+    grid-template-columns: 1fr 1fr auto auto auto auto;
     gap: 12px;
     align-items: end;
     margin-bottom: 16px;
@@ -366,6 +366,15 @@
           &#8595; Export XLSX
         </button>
       </div>
+      <div class="sc-axis-field">
+        <label>Download</label>
+        <div style="display:flex; gap:4px;">
+          <button class="btn-ghost" id="sc-img-png" onclick="downloadScatter('png')"
+                  style="height:38px; padding:0 12px;" disabled>&#8595; PNG</button>
+          <button class="btn-ghost" id="sc-img-pdf" onclick="downloadScatter('pdf')"
+                  style="height:38px; padding:0 12px;" disabled>&#8595; PDF</button>
+        </div>
+      </div>
     </div>
 
     <!-- Highlight selector -->
@@ -424,6 +433,7 @@
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/scatter-export.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script>
@@ -520,6 +530,7 @@ let currentCountry = '';
 let isZoomed    = false;
 let currentPoints  = [];
 let selectedSlug   = null;
+let exportingImage = false;  // true while the PNG/PDF capture renders
 let rankSortCol    = 'x';
 let rankSortDir    = 'desc';
 let rankTopN       = 10;
@@ -558,6 +569,7 @@ function onCompetitionChange() {
   document.getElementById('sc-info').style.display   = 'none';
   document.getElementById('sc-chart-area').style.display = 'none';
   document.getElementById('sc-export-btn').disabled = true;
+  setDownloadEnabled(false);
   clubData = null;
 }
 
@@ -595,6 +607,7 @@ function loadScatterData() {
       document.getElementById('sc-info').style.display = 'block';
       document.getElementById('sc-chart-area').style.display = 'block';
       document.getElementById('sc-export-btn').disabled = false;
+      setDownloadEnabled(true);
       switchTab('attacking', false);
       renderChart();
     })
@@ -710,6 +723,8 @@ const labelPlugin = {
     chart.data.datasets[0].data.forEach((point, i) => {
       const el = meta.data[i];
       if (!el) return;
+      // Downloads drop the names of everything that isn't highlighted
+      if (exportingImage && selectedSlug !== null && point.slug !== selectedSlug) return;
       let labelOffset = 10;
       if (selectedSlug === null) {
         ctx.fillStyle = '#6E6E6E';
@@ -948,6 +963,23 @@ function tierInfo(pct) {
   return               { label: 'Below Average',  bg: 'rgba(199,123,123,0.12)', color: '#C77B7B' };
 }
 
+// X / Y values for one club, respecting p90 mode, with percentile + rank
+// against every plotted club. Shared by the on-screen card and the download.
+function clubCardStats(pt) {
+  const xKey     = document.getElementById('x-axis-select').value;
+  const yKey     = document.getElementById('y-axis-select').value;
+  const altLabel = statMode === 'p90' ? 'tot' : 'p90';
+  function one(key, raw, p90, rawKey, p90Key) {
+    const elig    = P90_ELIGIBLE.has(key);
+    const display = (statMode === 'p90' && elig && p90 !== null) ? p90 : raw;
+    const alt     = elig ? (statMode === 'p90' ? raw : p90) : null;
+    const pool    = currentPoints.map(p => (statMode === 'p90' && elig && p[p90Key] !== null) ? p[p90Key] : p[rawKey]);
+    return { label: baseLabelFor(key), display, alt, altLabel,
+             pct: calcPercentile(display, pool), rank: calcRank(display, pool) };
+  }
+  return [one(xKey, pt.rawX, pt.p90X, 'rawX', 'p90X'), one(yKey, pt.rawY, pt.p90Y, 'rawY', 'p90Y')];
+}
+
 function updateEntityCard() {
   const card = document.getElementById('sc-entity-card');
   if (!card) return;
@@ -958,30 +990,10 @@ function updateEntityCard() {
   const pt = currentPoints.find(p => p.slug === selectedSlug);
   if (!pt) { card.style.display = 'none'; return; }
 
-  const xKey   = document.getElementById('x-axis-select').value;
-  const yKey   = document.getElementById('y-axis-select').value;
-  const xBase  = baseLabelFor(xKey);
-  const yBase  = baseLabelFor(yKey);
-
   document.getElementById('sc-ec-name').textContent = pt.label;
   document.getElementById('sc-ec-meta').textContent = pt.matches + ' matches played';
 
-  const xIsP90Elig = P90_ELIGIBLE.has(xKey);
-  const yIsP90Elig = P90_ELIGIBLE.has(yKey);
-
-  // Respect p90 mode: pick display value and build comparison pool accordingly
-  const xDisplayVal = (statMode === 'p90' && xIsP90Elig && pt.p90X !== null) ? pt.p90X : pt.rawX;
-  const yDisplayVal = (statMode === 'p90' && yIsP90Elig && pt.p90Y !== null) ? pt.p90Y : pt.rawY;
-  const xAltVal     = xIsP90Elig ? (statMode === 'p90' ? pt.rawX : pt.p90X) : null;
-  const yAltVal     = yIsP90Elig ? (statMode === 'p90' ? pt.rawY : pt.p90Y) : null;
-  const altLabel    = statMode === 'p90' ? 'tot' : 'p90';
-
-  const allXVals = currentPoints.map(p => (statMode === 'p90' && xIsP90Elig && p.p90X !== null) ? p.p90X : p.rawX);
-  const allYVals = currentPoints.map(p => (statMode === 'p90' && yIsP90Elig && p.p90Y !== null) ? p.p90Y : p.rawY);
-  const xPct  = calcPercentile(xDisplayVal, allXVals);
-  const yPct  = calcPercentile(yDisplayVal, allYVals);
-  const xRank = calcRank(xDisplayVal, allXVals);
-  const yRank = calcRank(yDisplayVal, allYVals);
+  const [xs, ys] = clubCardStats(pt);
 
   function statBlock(label, displayVal, altVal, altLbl, pct, rankObj) {
     const valStr = (displayVal !== undefined && displayVal !== null) ? displayVal : '\u2014';
@@ -1006,8 +1018,8 @@ function updateEntityCard() {
   }
 
   document.getElementById('sc-ec-stats').innerHTML =
-    statBlock(xBase, xDisplayVal, xAltVal, altLabel, xPct, xRank) +
-    statBlock(yBase, yDisplayVal, yAltVal, altLabel, yPct, yRank);
+    statBlock(xs.label, xs.display, xs.alt, xs.altLabel, xs.pct, xs.rank) +
+    statBlock(ys.label, ys.display, ys.alt, ys.altLabel, ys.pct, ys.rank);
 
   card.style.display = 'block';
 }
@@ -1139,6 +1151,71 @@ function exportScatterXlsx() {
     stat_mode:   statMode,
   });
   window.location.href = '/api/scatter_export_xlsx?' + params.toString();
+}
+
+// ── Image / PDF download ──────────────────────────────────────────────────────
+const EXPORT_APP_NAME = 'Orbis Scout';
+
+function setDownloadEnabled(on) {
+  ['sc-img-png', 'sc-img-pdf'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.disabled = !on;
+  });
+}
+
+// Card for the download, mirroring the on-screen #sc-entity-card
+function exportCard() {
+  const pt = selectedSlug && currentPoints.find(p => p.slug === selectedSlug);
+  if (!pt) return null;
+  return {
+    title:  pt.label,
+    meta:   pt.matches + ' matches played',
+    blocks: clubCardStats(pt).map(s => {
+      const tier = s.pct !== null && s.pct !== undefined ? tierInfo(s.pct) : null;
+      return {
+        label: s.label,
+        value: s.display !== undefined && s.display !== null ? s.display : '\u2014',
+        sub:   s.alt !== null && s.alt !== undefined ? s.alt + ' ' + s.altLabel : '',
+        tag:   tier ? { text: tier.label, color: tier.color } : null,
+        note:  tier && s.rank ? 'Ranked ' + s.rank.rank + ' of ' + s.rank.total + ' clubs' : '',
+      };
+    }),
+  };
+}
+
+async function downloadScatter(format) {
+  if (!chartInst || !currentPoints.length || !window.ScatterExport) return;
+  const xKey = document.getElementById('x-axis-select').value;
+  const yKey = document.getElementById('y-axis-select').value;
+  const hlPt = selectedSlug && currentPoints.find(p => p.slug === selectedSlug);
+
+  let subtitle = compLabel + (currentCountry ? '  \u00b7  ' + currentCountry.replace(/_/g, ' ') : '');
+  if (hlPt) subtitle += '  \u00b7  Highlight: ' + hlPt.label;
+
+  setDownloadEnabled(false);
+  try {
+    await ScatterExport.download({
+      chart:       chartInst,
+      format:      format,
+      filename:    ScatterExport.fileName(['club_scatter', currentComp, xKey, 'vs', yKey, statMode,
+                                           hlPt ? hlPt.label : '']),
+      title:       labelFor(xKey) + '  vs  ' + labelFor(yKey),
+      subtitle:    subtitle,
+      chips:       [statMode === 'p90' ? 'Per 90 mins (matches \u00d7 90)' : 'Season totals',
+                    currentPoints.length + ' clubs'],
+      legend:      hlPt ? [{ type: 'dot', color: 'rgba(255,255,255,0.92)', border: '#FFFFFF', label: 'Highlighted' }] : [],
+      card:        exportCard(),
+      footerLeft:  EXPORT_APP_NAME + '  \u00b7  Club scatter  \u00b7  ' + ScatterExport.today(),
+      footerRight: '',
+      beforeCapture: () => { exportingImage = true; },
+      afterCapture:  () => { exportingImage = false; },
+    });
+  } catch (e) {
+    exportingImage = false;
+    showScError('Download failed \u2014 ' + (e && e.message ? e.message : e));
+  } finally {
+    setDownloadEnabled(true);
+  }
 }
 </script>
 {% endblock %}

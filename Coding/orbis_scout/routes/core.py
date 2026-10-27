@@ -2,14 +2,15 @@
 
 import os, io, csv, json, glob, re, uuid, threading
 import time as _time
-from flask import Blueprint, render_template, request, jsonify, send_file, abort
+from flask import Blueprint, render_template, request, jsonify, send_file, abort, redirect
 
 import context as ctx
 from context import (
     _logger,
     OUTPUT_DIR, MATCH_OUTPUT_DIR, _WEBAPP_DIR,
     get_all_competitions, get_competition, get_club, get_club_players,
-    get_player, search_players, get_all_players_flat, get_all_clubs_flat,
+    get_player, search_players, search_free_agents,
+    get_all_players_flat, get_all_clubs_flat,
     get_heatmap_path, get_home_stats,
     store_get, is_import_token, token_id, build_engine_candidate,
     get_all_matches, get_match, get_player_match_history, compute_per90,
@@ -121,6 +122,15 @@ def playing_styles(country, competition):
 def club(country, competition, club):
     club = club.replace('-', '_')
     data    = get_club(OUTPUT_DIR, country, competition, club)
+    if not data:
+        # Links built from a display name ("Dagenham_&_Redbridge") miss the folder
+        # slug, which the scraper builds with safe_name(): non-word chars → "_",
+        # runs collapsed. Redirect to that canonical slug instead of a blank page.
+        canonical = re.sub(r'_+', '_', re.sub(r'[^\w]', '_', club)).strip('_')
+        if canonical != club:
+            qs = request.query_string.decode()
+            return redirect(f'/competition/{country}/{competition}/{canonical}'
+                            + (f'?{qs}' if qs else ''))
     players = get_club_players(OUTPUT_DIR, country, competition, club)
     return render_template('club.html', data=data, players=players,
                            country=country, competition=competition, club=club)
@@ -295,6 +305,38 @@ def api_players():
     }
     result = search_players(OUTPUT_DIR, filters)
     return jsonify(result)
+
+
+@bp.route('/free_agents')
+def free_agents():
+    competitions = get_all_competitions(OUTPUT_DIR)
+    countries    = sorted({c['country'] for c in competitions if c.get('country')})
+    return render_template('free_agents.html',
+                           competitions=competitions, countries=countries)
+
+
+@bp.route('/api/free_agents')
+def api_free_agents():
+    filters = {
+        'q':           request.args.get('q', ''),
+        'country':     request.args.get('country', ''),
+        'competition': request.args.get('competition', ''),
+        'club':        request.args.get('club', ''),
+        'position':    request.args.get('position', ''),
+        'specific_pos': request.args.get('specific_pos', ''),
+        'nationality': request.args.get('nationality', ''),
+        'age_min':     request.args.get('age_min', ''),
+        'age_max':     request.args.get('age_max', ''),
+        'apps_min':    request.args.get('apps_min', ''),
+        'rating_min':  request.args.get('rating_min', ''),
+        'goals_min':   request.args.get('goals_min', ''),
+        'assists_min': request.args.get('assists_min', ''),
+        'sort_by':     request.args.get('sort_by', 'departure_date'),
+        'sort_dir':    request.args.get('sort_dir', 'desc'),
+        'page':        int(request.args.get('page', 1)),
+        'per_page':    int(request.args.get('per_page', 50)),
+    }
+    return jsonify(search_free_agents(OUTPUT_DIR, filters))
 
 
 @bp.route('/api/search')

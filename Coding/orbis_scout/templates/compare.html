@@ -48,6 +48,57 @@
     <div class="compare-col" id="profile-b"></div>
   </div>
 
+  <!-- Percentile radar: A, B and league average on one pool -->
+  <div class="card" id="cmp-radar-card" style="display:none; margin-bottom:20px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+      <div class="card-title" style="margin:0;">Percentile Radar</div>
+      <span id="cmp-radar-warn" class="cmp-radar-badge" style="display:none;"></span>
+    </div>
+    <div id="cmp-radar-sub" class="cmp-radar-sub"></div>
+    <div id="cmp-radar-legend" class="cmp-radar-legend"></div>
+    <div id="cmp-radar-mount" style="display:flex; justify-content:center;"></div>
+    <div id="cmp-radar-note" class="cmp-radar-sub" style="text-align:center; margin-top:6px;"></div>
+    <details class="cmp-radar-table">
+      <summary>Show as table</summary>
+      <div id="cmp-radar-table"></div>
+    </details>
+  </div>
+  <div id="cmp-radar-tip"></div>
+  <style>
+    /* Series colours, validated for CVD separation on each surface */
+    :root { --rdr-a: #3A82E0; --rdr-b: #C9701A; }
+    :root[data-theme="light"] { --rdr-a: #2a78d6; --rdr-b: #eb6834; }
+    .cmp-radar-sub { font-size:11px; color:var(--text3); margin-bottom:8px; }
+    .cmp-radar-badge { font-size:10px; color:var(--amber); border:1px solid var(--amber);
+      border-radius:3px; padding:1px 6px; letter-spacing:0.04em; }
+    .cmp-radar-legend { display:flex; gap:18px; flex-wrap:wrap; justify-content:center;
+      font-size:12px; color:var(--text2); margin:4px 0 2px; }
+    .cmp-radar-legend span { display:inline-flex; align-items:center; gap:6px; }
+    .cmp-radar-legend i { display:inline-block; width:18px; height:0; border-top:2px solid; }
+    .cmp-radar-legend i.avg { border-top:2px dashed var(--text3); }
+    .cmp-radar-table { margin-top:10px; font-size:12px; color:var(--text2); }
+    .cmp-radar-table summary { cursor:pointer; color:var(--text3); font-size:11px; }
+    .cmp-radar-table table { width:100%; border-collapse:collapse; margin-top:8px; }
+    .cmp-radar-table th, .cmp-radar-table td { padding:5px 8px; border-bottom:1px solid var(--border);
+      text-align:right; font-variant-numeric:tabular-nums; }
+    .cmp-radar-table th:first-child, .cmp-radar-table td:first-child { text-align:left; }
+    .cmp-radar-table th { color:var(--text3); font-weight:600; font-size:10px;
+      text-transform:uppercase; letter-spacing:0.06em; }
+    #cmp-radar-tip { position:fixed; z-index:9999; pointer-events:none; background:var(--bg2);
+      border:1px solid var(--border); border-radius:6px; padding:10px 12px; min-width:190px;
+      font-size:11px; color:var(--text2); box-shadow:0 6px 20px rgba(0,0,0,.4);
+      opacity:0; transition:opacity .1s; }
+    #cmp-radar-tip.vis { opacity:1; }
+    #cmp-radar-tip .rt-hd { font-size:12px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    #cmp-radar-tip .rt-row { display:flex; align-items:center; gap:8px; padding:2px 0; }
+    #cmp-radar-tip .rt-row .nm { flex:1; }
+    #cmp-radar-tip .rt-row b { color:var(--text); font-variant-numeric:tabular-nums; }
+    #cmp-radar-tip .rt-row em { font-style:normal; color:var(--text3); font-variant-numeric:tabular-nums;
+      min-width:44px; text-align:right; }
+    #cmp-radar-tip i { display:inline-block; width:12px; height:0; border-top:2px solid; }
+    #cmp-radar-tip i.avg { border-top:2px dashed var(--text3); }
+  </style>
+
   <!-- Stat rows -->
   <div class="card">
     <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
@@ -191,6 +242,7 @@ async function selectPlayer(side, path, name, team) {
 
   // Fetch league avg in the background; re-render when ready
   fetchLeagueAvg(side, path);
+  fetchCompareRadar();
 }
 
 function clearPlayer(side) {
@@ -203,6 +255,8 @@ function clearPlayer(side) {
   if (side === 'a') { selectedA = null; pathA = null; leagueAvgA = null; }
   else              { selectedB = null; pathB = null; leagueAvgB = null; }
   updateLeagueAvgControls();
+  radarReq++;
+  document.getElementById('cmp-radar-card').style.display = 'none';
   document.getElementById('compare-result').style.display      = 'none';
   document.getElementById('compare-placeholder').style.display = 'block';
   inp.focus();
@@ -275,6 +329,146 @@ function onPosModeChange() {
   leagueAvgB = null;
   if (pathA) fetchLeagueAvg('a', pathA);
   if (pathB) fetchLeagueAvg('b', pathB);
+  fetchCompareRadar();
+}
+
+// ── Percentile radar ────────────────────────────────────────────────────────
+// Both players are ranked against Player A's league + position pool, so the
+// three shapes share one 0–100 scale. Counting stats are per 90.
+let radarReq = 0;
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function fetchCompareRadar() {
+  const card = document.getElementById('cmp-radar-card');
+  if (!pathA || !pathB) { card.style.display = 'none'; return; }
+  const req  = ++radarReq;
+  const mode = document.getElementById('pos-mode-select')?.value || 'exact';
+  try {
+    const res  = await fetch(`/api/compare_radar?a=${encodeURIComponent(pathA)}` +
+                             `&b=${encodeURIComponent(pathB)}&pos_mode=${encodeURIComponent(mode)}`);
+    const data = await res.json();
+    if (req !== radarReq) return;   // a newer selection superseded this one
+    if (data.error || !data.metrics?.length) { card.style.display = 'none'; return; }
+    renderCompareRadar(data);
+  } catch (_) {
+    if (req === radarReq) card.style.display = 'none';
+  }
+}
+
+function renderCompareRadar(data) {
+  const M = data.metrics, n = M.length;
+  const CX = 200, CY = 200, MAXR = 128, LBLR = 150;
+  const ang = i => (-90 + i * 360 / n) * Math.PI / 180;
+  const pt  = (i, r) => [CX + r * Math.cos(ang(i)), CY + r * Math.sin(ang(i))];
+  const xy  = p => p.map(c => c.toFixed(1)).join(',');
+  const shape = sel => M.map((m, i) => pt(i, Math.max(0, Math.min(100, m[sel].pct)) / 100 * MAXR));
+  const nameA = data.player_a || 'Player A', nameB = data.player_b || 'Player B';
+  const svg = [];
+
+  svg.push('<svg viewBox="-20 36 440 326" role="img" aria-label="Percentile radar" ' +
+           'style="width:100%;max-width:440px;height:auto;overflow:visible;font-family:inherit;">');
+
+  // Grid rings (25 / 50 / 75 / 100th percentile) + ring labels on the top spoke
+  [25, 50, 75, 100].forEach(lv => {
+    const pts = M.map((_, i) => xy(pt(i, lv / 100 * MAXR))).join(' ');
+    svg.push(`<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="1" stroke-opacity="${lv === 100 ? 0.7 : 0.45}"/>`);
+    svg.push(`<text x="${CX + 3}" y="${(CY - lv / 100 * MAXR - 2).toFixed(1)}" font-size="8" fill="var(--text3)">${lv}</text>`);
+  });
+  M.forEach((_, i) => {
+    const [x, y] = pt(i, MAXR);
+    svg.push(`<line id="crax-${i}" x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="1" stroke-opacity="0.45"/>`);
+  });
+
+  // League average: dashed outline, no fill, so the players read on top of it
+  svg.push(`<polygon points="${shape('avg').map(xy).join(' ')}" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="4 3"/>`);
+
+  // Players
+  [['a', 'var(--rdr-a)'], ['b', 'var(--rdr-b)']].forEach(([k, col]) => {
+    const v = shape(k);
+    svg.push(`<polygon points="${v.map(xy).join(' ')}" fill="${col}" fill-opacity="0.14" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`);
+    v.forEach(([x, y], i) => svg.push(
+      `<circle class="crdot crdot-${i}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${col}" stroke="var(--bg2)" stroke-width="2"/>`));
+  });
+
+  // Axis labels
+  M.forEach((m, i) => {
+    const [lx, ly] = pt(i, LBLR);
+    const anc = Math.abs(lx - CX) < 6 ? 'middle' : (lx < CX ? 'end' : 'start');
+    svg.push(`<text x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}" text-anchor="${anc}" font-size="10" fill="var(--text2)">${esc(m.label)}</text>`);
+  });
+
+  // Hit zones: one wide transparent line per spoke, reaching past the label
+  M.forEach((_, i) => {
+    const [ex, ey] = pt(i, LBLR + 18);
+    svg.push(`<line class="cr-hit" data-idx="${i}" x1="${CX}" y1="${CY}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="transparent" stroke-width="36" stroke-linecap="round" style="cursor:pointer;"/>`);
+  });
+  svg.push('</svg>');
+
+  const mount = document.getElementById('cmp-radar-mount');
+  mount.innerHTML = svg.join('');
+
+  // Header, legend, notes
+  const pos = (data.positions_used || []).join('/');
+  const posLabel = data.pos_mode === 'grouped' ? data.group : pos;
+  document.getElementById('cmp-radar-sub').textContent =
+    `${posLabel} · ${data.competition} · ${data.peer_count} players · min ${Math.round(data.minutes_threshold)}' · per 90`;
+  const warn = document.getElementById('cmp-radar-warn');
+  warn.style.display = data.small_sample ? 'inline-block' : 'none';
+  warn.textContent   = `small sample (n=${data.peer_count})`;
+  document.getElementById('cmp-radar-legend').innerHTML =
+    `<span><i style="border-color:var(--rdr-a)"></i>${esc(nameA)}</span>` +
+    `<span><i style="border-color:var(--rdr-b)"></i>${esc(nameB)}</span>` +
+    `<span><i class="avg"></i>League Avg (${esc(posLabel)})</span>`;
+  document.getElementById('cmp-radar-note').innerHTML = data.same_pool
+    ? 'Percentile within the pool · centre = 0, outer ring = 100 · hover a spoke for values'
+    : `${esc(nameB)} is from a different league or position, so they are ranked against ${esc(nameA)}'s pool`;
+
+  // Table view
+  const fmtV = m => v => m.is_rate ? v.toFixed(1) : v.toFixed(2);
+  document.getElementById('cmp-radar-table').innerHTML =
+    `<table><thead><tr><th>Metric</th><th>${esc(nameA)}</th><th>${esc(nameB)}</th><th>League Avg</th></tr></thead><tbody>` +
+    M.map(m => { const f = fmtV(m); return `<tr><td>${esc(m.label)}${m.is_rate ? '' : ' /90'}</td>` +
+      ['a', 'b', 'avg'].map(k => `<td>${f(m[k].value)} <span style="color:var(--text3);">(${Math.round(m[k].pct)})</span></td>`).join('') +
+      '</tr>'; }).join('') + '</tbody></table>';
+
+  document.getElementById('cmp-radar-card').style.display = 'block';
+
+  // Hover tooltip
+  const tip = document.getElementById('cmp-radar-tip');
+  const setActive = idx => {
+    mount.querySelectorAll('.crdot').forEach(d => d.setAttribute('r', '4'));
+    M.forEach((_, i) => {
+      const a = document.getElementById('crax-' + i);
+      if (a) { a.setAttribute('stroke', i === idx ? 'var(--text3)' : 'var(--border)');
+               a.setAttribute('stroke-opacity', i === idx ? '0.9' : '0.45'); }
+    });
+    if (idx >= 0) mount.querySelectorAll('.crdot-' + idx).forEach(d => d.setAttribute('r', '5.5'));
+  };
+  mount.querySelectorAll('.cr-hit').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const i = +el.dataset.idx, m = M[i], f = fmtV(m);
+      const row = (sw, nm, o) => `<div class="rt-row">${sw}<span class="nm">${esc(nm)}</span>` +
+        `<b>${f(o.value)}${m.is_rate ? '' : '/90'}</b><em>${Math.round(o.pct)} pct</em></div>`;
+      tip.innerHTML = `<div class="rt-hd">${esc(m.label)}</div>` +
+        row('<i style="border-color:var(--rdr-a)"></i>', nameA, m.a) +
+        row('<i style="border-color:var(--rdr-b)"></i>', nameB, m.b) +
+        row('<i class="avg"></i>', 'League Avg', m.avg);
+      tip.classList.add('vis');
+      setActive(i);
+    });
+    el.addEventListener('mousemove', e => {
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      let x = e.clientX + 14, y = e.clientY + 14;
+      if (x + w > window.innerWidth - 8)  x = e.clientX - w - 14;
+      if (y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    el.addEventListener('mouseleave', () => { tip.classList.remove('vis'); setActive(-1); });
+  });
 }
 
 // [label, key, higherIsBetter, canBeP90, isPercent, category]

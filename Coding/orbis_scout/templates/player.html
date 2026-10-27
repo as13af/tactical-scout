@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ data.get('player_name','Player') }} — Scout{% endblock %}
 {% block body_class %}ui2{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/club-print.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/player-print.css') }}">
+{% endblock %}
 
 {% block content %}
 {% set profile = data.get('profile', {}).get('player', {}) %}
@@ -61,7 +65,14 @@
 
     <!-- Quick-action buttons -->
     {% if player_path is defined %}
-    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
+    <div id="player-actions" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;">
+      <button type="button" class="btn btn-ghost" style="font-size:12px; padding:6px 12px;"
+              data-player-print
+              data-name="{{ data.get('player_name','') }}"
+              data-competition="{{ competition }}"
+              data-season="{{ season_name or '' }}">
+        ⬇ Export PDF
+      </button>
       <a href="/compatibility?prefill={{ player_path | urlencode }}"
          class="btn btn-ghost" style="font-size:12px; padding:6px 12px;">
         🎯 Tactical Compatibility
@@ -181,7 +192,7 @@
 {% endif %}
 
 <!-- Stats + Heatmap grid -->
-<div class="grid-2" style="gap:20px; align-items:start;">
+<div class="grid-2" id="player-main-grid" style="gap:20px; align-items:start;">
 
   <!-- Stats -->
   <div>
@@ -236,7 +247,7 @@
     {% endif %}
 
     <!-- Core stats -->
-    <div class="card mb16">
+    <div class="card mb16" id="core-stats-card">
       <div class="card-title">Core Statistics</div>
       <div class="stat-grid">
         {% set core = [
@@ -412,7 +423,7 @@
     </div>
     {% endif %}
     {% if heatmap %}
-      <div class="heatmap-wrap mb16">
+      <div class="heatmap-wrap mb16" id="player-heatmap">
         <div class="card-title" style="margin-bottom:12px;">Position Heatmap</div>
         <img src="{{ heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
       </div>
@@ -421,7 +432,7 @@
     <!-- Career -->
     {% set career = data.get('career_statistics', {}) %}
     {% if career %}
-      <div class="card">
+      <div class="card" id="career-card">
         <div class="card-title">Career Seasons</div>
         <div class="table-wrap">
           <table>
@@ -461,7 +472,7 @@
 
 <!-- ── Match Data Insights ─────────────────────────────── -->
 {% if match_per90 and match_count > 0 %}
-<div class="card" style="margin-top:20px; border-color:#1A1A1A;">
+<div class="card" id="match-data-card" style="margin-top:20px; border-color:#1A1A1A;">
   <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
     <div style="display:flex; align-items:center; gap:10px;">
       <div class="card-title" style="margin:0;">Per-90 from Match Data</div>
@@ -541,6 +552,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/club-print.js') }}"></script>
 <script>
 /* ── Player team color accent ── */
 (function () {
@@ -668,6 +680,7 @@ function toggleP90(on) {
 
 // ── Position Average panel ───────────────────────────────────────────────────
 var setPosAvgMode = function() {};
+var posAvgForPrint = function() { return null; };  // { data, lowerIsBetter } once loaded
 (function () {
   const PLAYER_PATH = "{{ player_path | default('') }}";
   if (!PLAYER_PATH) return;
@@ -684,7 +697,7 @@ var setPosAvgMode = function() {};
   let posAvgData = null;
   let posAvgOn = false;
 
-  fetch('/api/league_position_avg?player=' + encodeURIComponent(PLAYER_PATH) + '&pos_mode=grouped')
+  PrintReady.track(fetch('/api/league_position_avg?player=' + encodeURIComponent(PLAYER_PATH) + '&pos_mode=grouped')
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data) {
       if (!data || data.error) return;
@@ -709,7 +722,7 @@ var setPosAvgMode = function() {};
         chip.textContent = 'vs ' + data.pool_size + ' ' + groupLabel + ' · ' + data.competition;
       }
     })
-    .catch(function() {});
+    .catch(function() {}));
 
   function renderPosAvg(on) {
     posAvgOn = on;
@@ -771,10 +784,130 @@ var setPosAvgMode = function() {};
   }
 
   setPosAvgMode = function(on) { renderPosAvg(on); };
+  posAvgForPrint = function() {
+    return posAvgData && { data: posAvgData, lowerIsBetter: LOWER_IS_BETTER };
+  };
 
   // Re-render when p90 toggle changes so deltas stay consistent
   var origToggleP90 = window.toggleP90 || function(){};
   window.toggleP90 = function(on) { origToggleP90(on); if (posAvgOn) renderPosAvg(true); };
+})();
+
+// ── PDF export: full statistics + how-to-read notes ──────────────────────────
+// On screen the stats show one category at a time, raw or per-90, with the
+// position average behind a toggle. The PDF gets every category with all three
+// side by side, and a one-line explanation under each card's title.
+(function () {
+  if (!window.PrintReady) return;
+  const p90Wrap = document.querySelector('.p90-toggle-wrap');
+  const minutes = p90Wrap ? parseInt(p90Wrap.dataset.mins, 10) : 0;
+  const NO_P90  = new Set(['appearances', 'minutesPlayed']);
+  const fmt = v => v >= 10 ? v.toFixed(1) : v.toFixed(2);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const NOTES = {
+    'role-card':         'Role archetypes the season stats match (FM24-style; "~" = near match, with the criteria met). ' +
+                         'The ring is the fitness score (0–100) for the role named beneath it; each bar is one category score and its weight in that total.',
+    'spatial-card':      'Where the player operates, from the season heatmap. Bars give the share of activity in each third of the pitch; ' +
+                         'on the mini-pitch the player attacks left → right, the dot is the centre of activity and the shading the zone worked in.',
+    'percentile-card':   'Rank against players in the same position line in this league: 90 = better than 90% of them. ' +
+                         'Green = top quarter (75+), amber = 50–74, red = below 50.',
+    'contribution-card': "The player's share of the team's season total for each stat. Red under 10%, green 10–25%, blue over 25%; " +
+                         'the figures on the right are player / team.',
+    'player-heatmap':    'Where on the pitch the player was active over the season — the denser the colour, the more often.',
+    'career-card':       "Season-by-season totals from SofaScore. Rating = SofaScore's average match rating (out of 10).",
+    'match-data-card':   'Calculated only from the individual matches scraped for this player, so it can differ from the season totals above.',
+  };
+
+  // Core blocks and category rows share data-statkey / data-raw; percentage
+  // rows carry no data-raw because they are rates and never go per-90.
+  function readRows(scope, isCore) {
+    return [...scope.querySelectorAll(isCore ? '.stat-block[data-statkey]' : 'tr[data-statkey]')].map(el => {
+      const valEl  = isCore ? el.querySelector('.value') : el.querySelector('.td-num:not(.td-pos-avg)');
+      const isRate = !valEl.hasAttribute('data-raw');
+      return {
+        key:   el.dataset.statkey,
+        label: (isCore ? el.querySelector('.label') : el.querySelector('td')).textContent.trim(),
+        raw:   parseFloat(isRate ? valEl.textContent : valEl.dataset.raw),
+        isRate,
+      };
+    });
+  }
+
+  function rowHtml(r, pa) {
+    const perGame = !r.isRate && !NO_P90.has(r.key) && minutes > 0;
+    const p90     = perGame ? r.raw / minutes * 90 : null;
+    let cells = '<td>' + esc(r.label) + '</td>' +
+      '<td class="td-num">' + (isNaN(r.raw) ? '—' : r.isRate ? r.raw.toFixed(1) + '%' : r.raw) + '</td>' +
+      '<td class="td-num">' + (p90 == null ? '—' : p90.toFixed(2)) + '</td>';
+    if (pa) {
+      // Like for like: per-90 against the per-90 average, rates and season
+      // counts against the plain average.
+      const avg  = perGame ? pa.data.p90_averages[r.key] : pa.data.averages[r.key];
+      const mine = perGame ? p90 : r.raw;
+      if (avg == null || avg === 0 || isNaN(mine)) {
+        cells += '<td class="td-num">—</td><td class="td-num">—</td>';
+      } else {
+        const delta = (mine - avg) / Math.abs(avg) * 100;
+        const good  = pa.lowerIsBetter.has(r.key) ? delta < 0 : delta > 0;
+        const cls   = delta === 0 ? '' : good ? 'print-good' : 'print-bad';
+        cells += '<td class="td-num">' + fmt(avg) + (r.isRate ? '%' : '') + '</td>' +
+          '<td class="td-num"><span class="' + cls + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%</span></td>';
+      }
+    }
+    return '<tr>' + cells + '</tr>';
+  }
+
+  function buildStats(pa) {
+    const groups = [['Core', document.getElementById('core-stats-card'), true]].concat(
+      [...document.querySelectorAll('#stat-categories .stat-pane')].map(p => [p.dataset.label, p, false]));
+    const head = '<tr><th>Stat</th><th class="td-num">Season</th><th class="td-num">Per 90</th>' +
+      (pa ? '<th class="td-num">Pos. avg</th><th class="td-num">vs avg</th>' : '') + '</tr>';
+    const tables = groups.map(([name, scope, isCore]) => {
+      const rows = scope ? readRows(scope, isCore) : [];
+      if (!rows.length) return '';
+      return '<div class="print-stat-group"><div class="print-subtitle">' + esc(name) + '</div>' +
+        '<table class="print-table"><thead>' + head + '</thead><tbody>' +
+        rows.map(r => rowHtml(r, pa)).join('') + '</tbody></table></div>';
+    }).join('');
+    if (!tables) return null;
+
+    let note = 'Season = total for the season. ' + (minutes > 0
+      ? 'Per 90 = season total ÷ ' + minutes + ' minutes played × 90, so players with different playing time compare fairly. '
+      : 'Per 90 needs minutes played, which this player has none of. ');
+    note += pa
+      ? 'Pos. avg = average of the ' + pa.data.pool_size + ' other players in the same position group in ' +
+        esc(pa.data.competition) + ' who played enough minutes (per 90 for counting stats, as-is for percentages); ' +
+        'vs avg = how far above (+) or below (−) that average the player is. Green is better, red is worse — ' +
+        'for cards, fouls, errors and possession lost, fewer counts as better.'
+      : 'Position averages are not available for this player.';
+
+    const sec = document.createElement('div');
+    sec.className = 'card mb16 print-only print-stats';
+    sec.innerHTML = '<div class="card-title">Detailed Statistics</div>' +
+      '<div class="print-note">' + note + '</div>' +
+      '<div class="print-stats-grid">' + tables + '</div>';
+    return sec;
+  }
+
+  PrintReady.onExport(function (added) {
+    document.documentElement.classList.add('player-printing');
+    Object.entries(NOTES).forEach(([id, text]) => {
+      const card = document.getElementById(id);
+      // Skip cards that stayed hidden (no data for this player).
+      if (!card || card.offsetParent === null || !card.firstElementChild) return;
+      const n = document.createElement('div');
+      n.className = 'print-only print-note';
+      n.textContent = text;
+      card.firstElementChild.after(n);
+      added.push(n);
+    });
+    const sec    = buildStats(posAvgForPrint());
+    const anchor = document.getElementById('stat-categories') || document.getElementById('core-stats-card');
+    if (sec && anchor) { anchor.after(sec); added.push(sec); }
+  }, function () {
+    document.documentElement.classList.remove('player-printing');
+  });
 })();
 
 // ── Percentile panel ──────────────────────────────────────────────────────────
@@ -803,7 +936,7 @@ var setPosAvgMode = function() {};
   const card = document.getElementById('percentile-card');
   if (!card) return;
 
-  fetch('/api/player_percentiles?player=' + encodeURIComponent(PLAYER_PATH))
+  PrintReady.track(fetch('/api/player_percentiles?player=' + encodeURIComponent(PLAYER_PATH))
     .then(r => r.json())
     .then(data => {
       if (data.error || !data.percentiles) return;
@@ -839,7 +972,7 @@ var setPosAvgMode = function() {};
 
       card.style.display = 'block';
     })
-    .catch(() => {});
+    .catch(() => {}));
 })();
 
 // ── Player Role Profile card ──────────────────────────────────────────────────
@@ -970,6 +1103,13 @@ var setPosAvgMode = function() {};
 
     // Score ring
     animateRoleRing(profile.overall_score);
+    // The ring animates in over 800ms; make sure the PDF gets the final value.
+    PrintReady.onExport(function () {
+      const ring  = document.getElementById('role-score-ring');
+      const label = document.getElementById('role-score-val');
+      if (ring)  ring.style.setProperty('--pct', profile.overall_score.toFixed(2));
+      if (label) label.textContent = Math.round(profile.overall_score).toString();
+    });
     const nameLabel = document.getElementById('role-name-label');
     if (nameLabel) nameLabel.textContent = profile.role_name;
 
@@ -1003,7 +1143,7 @@ var setPosAvgMode = function() {};
     fitWrap.style.display = 'block';
   }
 
-  fetch('/api/player_role?player=' + encodeURIComponent(PLAYER_PATH))
+  PrintReady.track(fetch('/api/player_role?player=' + encodeURIComponent(PLAYER_PATH))
     .then(function (r) { return r.json(); })
     .then(function (data) {
       const loading = document.getElementById('role-loading');
@@ -1035,7 +1175,7 @@ var setPosAvgMode = function() {};
       if (loading) loading.style.display = 'none';
       const errEl = document.getElementById('role-error');
       if (errEl) { errEl.textContent = 'Could not load role profile.'; errEl.style.display = 'block'; }
-    });
+    }));
 
   // ── Spatial Zone Profile card renderer ─────────────────────────────────────
   function renderSpatialCard(spatial) {
@@ -1273,7 +1413,7 @@ var setPosAvgMode = function() {};
   ]);
 
   // ── Fetch & render ────────────────────────────────────────────────────────
-  fetch('/api/player_radar?player=' + encodeURIComponent(PLAYER_PATH))
+  PrintReady.track(fetch('/api/player_radar?player=' + encodeURIComponent(PLAYER_PATH))
     .then(r => r.json())
     .then(data => {
       if (data.error || !data.metrics || !data.metrics.length) return;
@@ -1354,6 +1494,54 @@ var setPosAvgMode = function() {};
         'Dashed ring = league average (0σ) · outer edge = +3σ · hover any spoke for detail';
       card.style.display = 'block';
 
+      // ── PDF export: hovering can't happen on paper, so the export adds a
+      // full written explanation and every spoke's numbers as a table. ──────
+      const GROUP_NAME = { GK: 'goalkeepers', DEF: 'defenders', MID: 'midfielders', FWD: 'forwards' };
+      PrintReady.onExport(function (added) {
+        const peers = GROUP_NAME[data.group] || 'players';
+        const unit  = mm => RATE_KEYS.has(mm.key) ? '' : '<span class="u">/90</span>';
+        const rows  = M.map(mm =>
+          '<tr><td>' + mm.label + '</td>' +
+          '<td class="td-num">' + (mm.value != null ? mm.value : '—') + unit(mm) + '</td>' +
+          '<td class="td-num">' + (mm.mean  != null ? mm.mean  : '—') + unit(mm) + '</td>' +
+          '<td class="td-num">' + (mm.std   != null ? mm.std   : '—') + '</td>' +
+          '<td class="td-num"><b>' + (mm.z >= 0 ? '+' : '') + mm.z + 'σ</b></td>' +
+          '<td>' + tTier(mm.z) + '</td>' +
+          '<td class="td-num">' + (mm.percentile != null ? Math.round(mm.percentile) : '—') + '</td></tr>'
+        ).join('');
+
+        const box = document.createElement('div');
+        box.className = 'print-only print-radar-explain';
+        box.innerHTML =
+          '<div class="print-subtitle">How to read this radar</div>' +
+          '<p><b>Who the player is compared with.</b> Each spoke compares the player with the other ' + peers +
+            ' in ' + data.competition + ' this season who played at least ' + Math.round(data.minutes_threshold) +
+            "' — the cut-off that leaves out the lowest-minute third of the group — " + data.peer_count +
+            ' qualifying players in all.</p>' +
+          '<p><b>What is measured.</b> Counting stats (goals, passes, tackles…) are per 90 minutes, so playing time ' +
+            "doesn't skew them; percentages and the rating are used as they are. The spokes come from a fixed " +
+            peers + ' template and only appear when this league records that stat, so lower-coverage leagues show ' +
+            'fewer. They are picked so that further out means better.</p>' +
+          '<p><b>The σ number on each spoke is a z-score:</b> how many standard deviations (σ) the player is above (+) ' +
+            'or below (−) the group average, i.e. (player − group average) ÷ group spread. 0σ is exactly average. ' +
+            'In a typical spread about two in three players sit between −1σ and +1σ, so +1σ or more marks a clear ' +
+            'strength and −1σ or less a clear weakness; ±2σ is rare.</p>' +
+          '<p><b>The shape.</b> The centre of the radar is −3σ, the dashed ring is the group average (0σ) and the ' +
+            'outer edge is +3σ; anything beyond ±3σ is drawn at the centre or edge. A large, even shape means an ' +
+            'all-round player for the position; spikes show specialisms.</p>' +
+          '<p><b>Percentile</b> is the share of the qualifying group the player is ahead of on that stat ' +
+            '(50 = middle of the group, 90 = ahead of 90%).</p>' +
+          (data.small_sample
+            ? '<p class="print-warn">Small sample: only ' + data.peer_count +
+              ' qualifying players, so treat these z-scores as indicative only.</p>'
+            : '') +
+          '<table class="print-table"><thead><tr><th>Stat</th><th class="td-num">Player</th>' +
+            '<th class="td-num">Group avg</th><th class="td-num">Spread (σ)</th><th class="td-num">z-score</th>' +
+            '<th>Reading</th><th class="td-num">Percentile</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        document.getElementById('radar-legend').after(box);
+        added.push(box);
+      });
+
       // ── Interactivity ────────────────────────────────────────────────────
       let activeIdx = -1;
 
@@ -1430,7 +1618,7 @@ var setPosAvgMode = function() {};
         el.addEventListener('touchend', function() { tip.classList.remove('vis'); setActive(-1); });
       });
     })
-    .catch(() => {});
+    .catch(() => {}));
 })();
 </script>
 {% endblock %}

@@ -147,7 +147,7 @@
                   {% endif %}
                 </td>
                 <td>
-                  <a href="/competition/{{ country }}/{{ competition }}/{{ row.team.name | replace(' ','_') }}"
+                  <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}"
                      style="font-size:12px;">{{ row.team.name }}</a>
                 </td>
                 <td class="td-num">{{ row.matches }}</td>
@@ -301,6 +301,13 @@
 {% endblock %}
 
 {# ── Reusable macros ─────────────────────────────────────────────────────── #}
+{# Club URL slug for a standings row. The scraper names club folders with
+   safe_name(), which drops "&", "." etc. — so "Dagenham & Redbridge" lives at
+   Dagenham_Redbridge, not the name with spaces swapped. Match by team id. #}
+{% macro _team_slug(team) -%}
+  {%- for c in data.clubs if c.team_id|string == team.id|string -%}{{ c.slug }}
+  {%- else -%}{{ team.name | replace(' ','_') }}{%- endfor -%}
+{%- endmacro %}
 {% macro _standings_table(rows) %}
 <div class="table-wrap">
   <table>
@@ -334,7 +341,7 @@
             {% endif %}
           </td>
           <td>
-            <a href="/competition/{{ country }}/{{ competition }}/{{ row.team.name | replace(' ','_') }}">
+            <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}">
               {{ row.team.name }}
             </a>
           </td>
@@ -364,11 +371,11 @@
     </div>
     {% if club.stats %}
       <div style="text-align:right; font-size:11px; color:var(--text2);">
-        {% if club.stats.get('goals') %}
-          <div>{{ club.stats.goals }} goals</div>
+        {% if club.stats.get('goalsScored') is not none %}
+          <div>{{ club.stats.goalsScored }} goals</div>
         {% endif %}
-        {% if club.stats.get('rating') %}
-          {%- set _cr = club.stats.rating|float -%}
+        {% if club.stats.get('avgRating') %}
+          {%- set _cr = club.stats.avgRating|float -%}
           {%- set _cc = '#2D3FC9' if _cr >= 9.0 else
                        ('#008EA1' if _cr >= 8.0 else
                        ('#00A01D' if _cr >= 7.0 else

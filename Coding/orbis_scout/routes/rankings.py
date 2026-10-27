@@ -158,6 +158,27 @@ def api_player_radar():
         return jsonify({'error': str(e)}), 500
 
 
+@bp.route('/api/compare_radar')
+def api_compare_radar():
+    """Percentile radar for two players + league average (see player_engine.py)."""
+    path_a   = request.args.get('a', '').strip()
+    path_b   = request.args.get('b', '').strip()
+    pos_mode = request.args.get('pos_mode', 'exact')
+    if pos_mode not in ('exact', 'grouped'):
+        pos_mode = 'exact'
+    if not path_a or not path_b:
+        return jsonify({'error': 'a and b are required'}), 400
+    try:
+        from player_engine import build_compare_radar
+        result = build_compare_radar(path_a, path_b, OUTPUT_DIR, pos_mode)
+        if result is None:
+            return jsonify({'error': 'player not found'}), 404
+        return jsonify(result)
+    except Exception as e:
+        _logger.exception(f'compare_radar error: {e}')
+        return jsonify({'error': str(e)}), 500
+
+
 @bp.route('/api/player_role')
 def api_player_role():
     """Return FM24 role classification + role fitness + spatial heatmap analysis."""

@@ -381,7 +381,7 @@ def _proj_cell(label: str, value: float, fmt: str) -> Table:
     s_val = ParagraphStyle('pcv', textColor=_ACCENT, fontSize=11,
                             fontName='Helvetica-Bold', alignment=TA_CENTER)
     t = Table(
-        [[P(fmt.format(value), s_val)], [P(label, s_lbl)]],
+        [[Paragraph(fmt.format(value), s_val)], [Paragraph(label, s_lbl)]],
         rowHeights=[24, 16],
     )
     t.setStyle(TableStyle([

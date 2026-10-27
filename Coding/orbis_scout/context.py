@@ -102,6 +102,11 @@ get_club              = _loader.get_club
 get_club_players      = _loader.get_club_players
 get_player            = _loader.get_player
 search_players        = _loader.search_players
+# Free agents — departures whose SofaScore destination is "No team" (id 241802).
+# Both loaders implement it; getattr keeps an older loader copy from breaking boot.
+search_free_agents    = getattr(_loader, 'search_free_agents',
+                                lambda *a, **k: {'players': [], 'total': 0, 'page': 1,
+                                                 'per_page': 50, 'total_pages': 0})
 get_all_players_flat  = _loader.get_all_players_flat
 get_all_clubs_flat    = _loader.get_all_clubs_flat
 get_heatmap_path      = _loader.get_heatmap_path
