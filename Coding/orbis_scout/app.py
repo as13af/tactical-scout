@@ -18,8 +18,10 @@ the dev runner rely on.
 
 import os
 import sys
+import re
 import time as _timing
 import unicodedata
+from urllib.parse import unquote
 
 # Make this directory importable as top-level modules (`context`, `services`,
 # `routes`) regardless of how the app is launched: `python app.py` from webapp/,
@@ -52,6 +54,9 @@ _BLUEPRINTS = [
 
 _AUTH_PUBLIC = frozenset(['/signin', '/signup', '/logout'])
 
+# A percent-escape (%C4) left in a route param that the runtime didn't decode.
+_PCT_ESCAPE = re.compile(r'%[0-9A-Fa-f]{2}')
+
 
 def _register_request_hooks(app: Flask) -> None:
     """Cross-cutting request/response logging + error handling + globals."""
@@ -72,10 +77,16 @@ def _register_request_hooks(app: Flask) -> None:
         # the exact lookup misses and the page shows "unknown" — happens on Vercel
         # but not locally. Normalize every string route param to NFC so lookups
         # match regardless of the form the client sent.
+        #
+        # Vercel's runtime can also hand over the path still percent-encoded
+        # ("Luka_%C4%8Cumi%C4%87_..."), so a player like Luka Čumić 404s there
+        # while working locally. Decode any leftover %XX escapes first.
         if not values:
             return
         for k, v in list(values.items()):
             if isinstance(v, str):
+                if _PCT_ESCAPE.search(v):
+                    v = unquote(v)
                 values[k] = unicodedata.normalize("NFC", v)
 
     @app.before_request
