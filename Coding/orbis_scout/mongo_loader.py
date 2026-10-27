@@ -170,15 +170,36 @@ def profile_category(positions, fallback_position):
 
 # ── Home stats ────────────────────────────────────────────────────────────────
 
+def _current_season_scope(output_dir):
+    """(league_count, filter) selecting each league's current season only.
+
+    A league keeps every scraped season side by side, so unscoped home stats
+    count each club and player once per season, and the top-rated list fills
+    up with last season's complete ratings over the current season's."""
+    db = _db()
+    leagues = set()
+    for doc in db.standings.find(_NOT_WORLDCUP, {"_country": 1, "_competition": 1}):
+        if doc.get("_country") and doc.get("_competition"):
+            leagues.add((doc["_country"], doc["_competition"]))
+    clauses = []
+    for country, competition in sorted(leagues):
+        season_id = _resolve_season(output_dir, country, competition, None)
+        clauses.append({"_country": country, "_competition": competition,
+                        **({"season_id": season_id} if season_id else {})})
+    if not clauses:
+        return 0, dict(_NOT_WORLDCUP)
+    return len(leagues), {"$and": [_NOT_WORLDCUP, {"$or": clauses}]}
+
+
 def get_home_stats(output_dir):
     db = _db()
 
-    total_players      = db.players.count_documents(_NOT_WORLDCUP)
-    total_clubs        = db.clubs.count_documents(_NOT_WORLDCUP)
-    total_competitions = db.standings.count_documents(_NOT_WORLDCUP)
+    total_competitions, scope = _current_season_scope(output_dir)
+    total_players      = db.players.count_documents(scope)
+    total_clubs        = db.clubs.count_documents(scope)
 
     pipeline = [
-        {"$match": _NOT_WORLDCUP},
+        {"$match": scope},
         {"$project": {
             "player_name": 1,
             "team": 1,
