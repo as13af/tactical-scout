@@ -158,23 +158,88 @@ def _pct_rank(value: float, pool: list[float]) -> float:
     return round((below + 0.5 * equal) / len(pool) * 100.0, 1)
 
 
+# ── Document source: MongoDB when the app runs on it, else output/ JSON ──────
+# A Mongo player doc is the on-disk JSON plus _country/_competition/_club/
+# _file/season_id, so both paths hand callers the same shape. On Vercel there
+# is no output/ tree, so reading files directly made every radar/percentile
+# request 404.
+
+# Fields the radar/percentile pools read — skips the heavy heatmap points.
+_POOL_PROJECTION = {'positions': 1, 'profile.player': 1, 'statistics.statistics': 1,
+                    '_club': 1, '_file': 1, 'season_id': 1}
+
+
+def _mongo_db():
+    """Handle for the active Mongo data layer, or None on the file-system loader.
+
+    Imported lazily so this module stays free of app imports at load time."""
+    try:
+        import context as _ctx
+        if getattr(_ctx, '_USING_MONGO', False):
+            return _ctx._loader._db()
+    except Exception:                                 # noqa: BLE001
+        pass
+    return None
+
+
+def load_player_raw(output_dir: str, player_path: str):
+    """Load a player from a 'Country/Competition/Club/file' path.
+
+    Returns (parts, target_file, raw) or None if the path is bad / missing."""
+    parts = player_path.split('/')
+    if len(parts) != 4:
+        return None
+    country, competition, club_slug, filename = parts
+    target_file = filename if filename.endswith('.json') else filename + '.json'
+    db = _mongo_db()
+    if db is not None:
+        raw = db.players.find_one({'_country': country, '_competition': competition,
+                                   '_club': club_slug, '_file': target_file}, {'_id': 0})
+        return (parts, target_file, raw) if raw else None
+    full_path = os.path.join(output_dir, country, competition, club_slug, 'Players', target_file)
+    if not os.path.exists(full_path):
+        return None
+    with open(full_path, encoding='utf-8') as f:
+        return parts, target_file, json.load(f)
+
+
+def season_pool_docs(output_dir: str, country: str, competition: str,
+                     target_file: str, target_raw: dict):
+    """Yield every player doc of the target's league season (target included).
+
+    Mongo keeps a league's seasons side by side, so the pool is filtered on the
+    target's season_id; on disk the _Season_<id> filename suffix does the same.
+    Disk docs get _club/_file set like Mongo's, so callers can skip the target."""
+    db = _mongo_db()
+    if db is not None:
+        flt = {'_country': country, '_competition': competition}
+        if target_raw.get('season_id'):
+            flt['season_id'] = str(target_raw['season_id'])
+        yield from db.players.find(flt, _POOL_PROJECTION)
+        return
+    from data_loader import same_season_glob
+    comp_dir = os.path.join(output_dir, country, competition)
+    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(target_file))):
+        try:
+            with open(fpath, encoding='utf-8') as f:
+                doc = json.load(f)
+        except Exception:                             # noqa: BLE001
+            continue
+        doc.setdefault('_club', os.path.basename(os.path.dirname(os.path.dirname(fpath))))
+        doc.setdefault('_file', os.path.basename(fpath))
+        yield doc
+
+
 def build_radar(player_path: str, output_dir: str) -> dict | None:
     """Build the z-score radar payload for one player.
 
     Returns None if the path is malformed or the player file is missing.
     Returns a dict with ``error`` set when the player has no usable stats.
     """
-    parts = player_path.split('/')
-    if len(parts) != 4:
+    loaded = load_player_raw(output_dir, player_path)
+    if loaded is None:
         return None
-    country, competition, club_slug, filename = parts
-    target_file = filename if filename.endswith('.json') else filename + '.json'
-    full_path = os.path.join(output_dir, country, competition, club_slug, 'Players', target_file)
-    if not os.path.exists(full_path):
-        return None
-
-    with open(full_path, encoding='utf-8') as f:
-        target_raw = json.load(f)
+    (country, competition, _, _), target_file, target_raw = loaded
 
     target_stats = target_raw.get('statistics', {}).get('statistics', {})
     if not isinstance(target_stats, dict) or not target_stats:
@@ -188,13 +253,9 @@ def build_radar(player_path: str, output_dir: str) -> dict | None:
     template = POSITION_TEMPLATES.get(group, POSITION_TEMPLATES['MID'])
 
     # ── Pass 1: every same-group player in the league season who appeared ─────
-    from data_loader import same_season_glob
-    comp_dir = os.path.join(output_dir, country, competition)
     peers = []   # list of (minutes, stats-dict)
-    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(target_file))):
+    for pd in season_pool_docs(output_dir, country, competition, target_file, target_raw):
         try:
-            with open(fpath, encoding='utf-8') as f:
-                pd = json.load(f)
             if _group_for(pd) != group:
                 continue
             ps = pd.get('statistics', {}).get('statistics', {})
@@ -265,22 +326,6 @@ def build_radar(player_path: str, output_dir: str) -> dict | None:
 
 # ── Compare radar: two players + league average, as percentiles ──────────────
 
-def _load_player(output_dir: str, player_path: str):
-    """Load a player file from a 'Country/Competition/Club/file' path.
-
-    Returns (parts, target_file, raw) or None if the path is bad / missing."""
-    parts = player_path.split('/')
-    if len(parts) != 4:
-        return None
-    country, competition, club_slug, filename = parts
-    target_file = filename if filename.endswith('.json') else filename + '.json'
-    full_path = os.path.join(output_dir, country, competition, club_slug, 'Players', target_file)
-    if not os.path.exists(full_path):
-        return None
-    with open(full_path, encoding='utf-8') as f:
-        return parts, target_file, json.load(f)
-
-
 def _pos_codes(raw: dict) -> list[str]:
     """Upper-cased position codes, same source order as get_league_position_avg."""
     profile = raw.get('profile', {}).get('player', {})
@@ -312,8 +357,8 @@ def build_compare_radar(path_a: str, path_b: str, output_dir: str,
     Axes come from A's position-group template (POSITION_TEMPLATES).
     Countable stats are per-90; rate stats are used as-is.
     """
-    loaded_a = _load_player(output_dir, path_a)
-    loaded_b = _load_player(output_dir, path_b)
+    loaded_a = load_player_raw(output_dir, path_a)
+    loaded_b = load_player_raw(output_dir, path_b)
     if loaded_a is None or loaded_b is None:
         return None
     (country, competition, _, _), file_a, raw_a = loaded_a
@@ -332,12 +377,9 @@ def build_compare_radar(path_a: str, path_b: str, output_dir: str,
 
     # ── Pool: same league season + position as A, minutes-gated ──────────────
     from data_loader import same_season_glob
-    comp_dir = os.path.join(output_dir, country, competition)
     peers = []   # list of (minutes, stats-dict)
-    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(file_a))):
+    for pd in season_pool_docs(output_dir, country, competition, file_a, raw_a):
         try:
-            with open(fpath, encoding='utf-8') as f:
-                pd = json.load(f)
             if not _pos_match(pos_a, _pos_codes(pd), pos_mode):
                 continue
             ps = pd.get('statistics', {}).get('statistics', {})

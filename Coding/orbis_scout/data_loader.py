@@ -914,11 +914,12 @@ def get_league_position_avg(output_dir, player_path, pos_mode='exact'):
         return None
 
     country, competition, club_slug, filename = parts
-    target_file = filename if filename.endswith('.json') else filename + '.json'
-    target_full = Path(output_dir) / country / competition / club_slug / 'Players' / target_file
-    target_data = _load_json(str(target_full))
-    if not target_data:
+    # Mongo-or-disk document source (shared with the radar/percentile code).
+    from player_engine import load_player_raw, season_pool_docs
+    loaded = load_player_raw(output_dir, player_path)
+    if not loaded or not loaded[2]:
         return None
+    _, target_file, target_data = loaded
 
     # Determine target player's position codes
     t_profile = target_data.get('profile', {}).get('player', {})
@@ -933,46 +934,35 @@ def get_league_position_avg(output_dir, player_path, pos_mode='exact'):
 
     target_broad = {_BROAD_GROUP.get(p) for p in pos_list} - {None}
 
-    comp_dir = Path(output_dir) / country / competition
-    if not comp_dir.is_dir():
-        return None
-
     # First pass: gather all position-matching candidates with stats + minutes
     candidates = []
-    for club_dir in comp_dir.iterdir():
-        if not club_dir.is_dir():
+    for d in season_pool_docs(output_dir, country, competition, target_file, target_data):
+        if d.get('_club') == club_slug and d.get('_file') == target_file:
             continue
-        players_dir = club_dir / 'Players'
-        if not players_dir.exists():
-            continue
-        for f in players_dir.glob(same_season_glob(target_file)):
-            if f.name == target_file and club_dir.name == club_slug:
+        try:
+            p_prof = d.get('profile', {}).get('player', {})
+            p_pos  = [
+                str(p).upper()
+                for p in (p_prof.get('positionsDetailed') or
+                          d.get('positions', [p_prof.get('position', '')]))
+                if p
+            ]
+            if not p_pos:
                 continue
-            try:
-                d      = _load_json(str(f))
-                p_prof = d.get('profile', {}).get('player', {})
-                p_pos  = [
-                    str(p).upper()
-                    for p in (p_prof.get('positionsDetailed') or
-                              d.get('positions', [p_prof.get('position', '')]))
-                    if p
-                ]
-                if not p_pos:
+
+            if pos_mode == 'grouped':
+                p_broad = {_BROAD_GROUP.get(p) for p in p_pos} - {None}
+                if not target_broad.intersection(p_broad):
+                    continue
+            else:
+                if not any(p in pos_list for p in p_pos):
                     continue
 
-                if pos_mode == 'grouped':
-                    p_broad = {_BROAD_GROUP.get(p) for p in p_pos} - {None}
-                    if not target_broad.intersection(p_broad):
-                        continue
-                else:
-                    if not any(p in pos_list for p in p_pos):
-                        continue
-
-                s    = d.get('statistics', {}).get('statistics', {})
-                mins = float(s.get('minutesPlayed', 0) or 0)
-                candidates.append((mins, s))
-            except Exception:
-                continue
+            s    = d.get('statistics', {}).get('statistics', {})
+            mins = float(s.get('minutesPlayed', 0) or 0)
+            candidates.append((mins, s))
+        except Exception:
+            continue
 
     if not candidates:
         return {

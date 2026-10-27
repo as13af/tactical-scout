@@ -83,30 +83,23 @@ def api_player_percentiles():
         return jsonify({'error': 'invalid player path'}), 400
 
     country, competition, club_slug, filename = parts
-    target_file = filename if filename.endswith('.json') else filename + '.json'
-    full_path = os.path.join(OUTPUT_DIR, country, competition, club_slug, 'Players', target_file)
-    if not os.path.exists(full_path):
+    from player_engine import load_player_raw, season_pool_docs
+    loaded = load_player_raw(OUTPUT_DIR, player_path)
+    if loaded is None:
         return jsonify({'error': 'player file not found'}), 404
 
     try:
-        import glob as _glob
-        import json as _json
         from tactical_match_engine.engine.normalization import percentile_score
 
-        with open(full_path, encoding='utf-8') as f:
-            raw = _json.load(f)
+        _, target_file, raw = loaded
         player_stats = raw.get('statistics', {}).get('statistics', {})
         player_pos_raw = raw.get('positions') or [raw.get('profile', {}).get('player', {}).get('position', '')]
         player_line = get_position_line([str(p).upper() for p in player_pos_raw])
 
         # Collect pool: all players in same competition + season with same position line
-        from data_loader import same_season_glob
         pool_stats: dict[str, list] = {}
-        comp_dir = os.path.join(OUTPUT_DIR, country, competition)
-        for fpath in _glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(target_file))):
+        for pd in season_pool_docs(OUTPUT_DIR, country, competition, target_file, raw):
             try:
-                with open(fpath, encoding='utf-8') as f:
-                    pd = _json.load(f)
                 pos_raw = pd.get('positions') or [pd.get('profile', {}).get('player', {}).get('position', '')]
                 if get_position_line([str(p).upper() for p in pos_raw]) != player_line:
                     continue
@@ -327,10 +320,8 @@ def api_player_role():
         # ── Spatial heatmap analysis ─────────────────────────────────────────
         spatial_out = None
         try:
-            fname     = parts[3] if parts[3].endswith('.json') else parts[3] + '.json'
-            full_path = os.path.join(OUTPUT_DIR, parts[0], parts[1], parts[2], 'Players', fname)
-            with open(full_path, 'r', encoding='utf-8') as _fh:
-                _raw = _json.load(_fh)
+            from player_engine import load_player_raw
+            _raw = load_player_raw(OUTPUT_DIR, player_path)[2]
             heatmap_points = _raw.get('heatmap', {}).get('points', [])
             player_name    = _raw.get('player_name', cand.get('name', 'Player'))
             spatial_result = _heatmap_analyze(heatmap_points, raw_stats, player_name)
