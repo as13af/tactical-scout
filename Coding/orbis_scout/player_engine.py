@@ -187,10 +187,11 @@ def build_radar(player_path: str, output_dir: str) -> dict | None:
     group    = _group_for(target_raw)
     template = POSITION_TEMPLATES.get(group, POSITION_TEMPLATES['MID'])
 
-    # ── Pass 1: every same-group player in the league who appeared ────────────
+    # ── Pass 1: every same-group player in the league season who appeared ─────
+    from data_loader import same_season_glob
     comp_dir = os.path.join(output_dir, country, competition)
     peers = []   # list of (minutes, stats-dict)
-    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', '*.json')):
+    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(target_file))):
         try:
             with open(fpath, encoding='utf-8') as f:
                 pd = json.load(f)
@@ -264,15 +265,6 @@ def build_radar(player_path: str, output_dir: str) -> dict | None:
 
 # ── Compare radar: two players + league average, as percentiles ──────────────
 
-
-def _same_season_glob(target_file: str) -> str:
-    """Glob for files of the same season as *target_file* (``*_Season_<id>.json``).
-
-    Files without a season suffix keep matching everything."""
-    m = re.search(r'_Season_(\d+)\.json$', target_file)
-    return f'*_Season_{m.group(1)}.json' if m else '*.json'
-
-
 def _load_player(output_dir: str, player_path: str):
     """Load a player file from a 'Country/Competition/Club/file' path.
 
@@ -339,9 +331,10 @@ def build_compare_radar(path_a: str, path_b: str, output_dir: str,
         return {'error': "Could not determine Player A's position."}
 
     # ── Pool: same league season + position as A, minutes-gated ──────────────
+    from data_loader import same_season_glob
     comp_dir = os.path.join(output_dir, country, competition)
     peers = []   # list of (minutes, stats-dict)
-    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', _same_season_glob(file_a))):
+    for fpath in glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(file_a))):
         try:
             with open(fpath, encoding='utf-8') as f:
                 pd = json.load(f)
@@ -359,7 +352,7 @@ def build_compare_radar(path_a: str, path_b: str, output_dir: str,
     qualified = [ps for m, ps in peers if m >= minutes_threshold]
 
     same_pool = (country_b == country and competition_b == competition
-                 and _same_season_glob(file_b) == _same_season_glob(file_a)
+                 and same_season_glob(file_b) == same_season_glob(file_a)
                  and _pos_match(pos_a, _pos_codes(raw_b), pos_mode))
 
     group    = _group_for(raw_a)

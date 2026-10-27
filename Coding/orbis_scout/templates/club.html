@@ -9,7 +9,7 @@
 <div class="breadcrumb">
   <a href="/competitions">Competitions</a>
   <span>/</span>
-  <a href="/competition/{{ country }}/{{ competition }}">{{ competition.replace('_',' ') }}</a>
+  <a href="/competition/{{ country }}/{{ competition }}{% if season %}?season={{ season }}{% endif %}">{{ competition.replace('_',' ') }}</a>
   <span>/</span>
   <span>{{ data.get('team_name', club) }}</span>
 </div>
@@ -18,9 +18,31 @@
      id="club-page-header"
      data-tc-primary="{{ (data.get('profile') or {}).get('team', {}).get('teamColors', {}).get('primary', '#6E6E6E') }}"
      data-tc-secondary="{{ (data.get('profile') or {}).get('team', {}).get('teamColors', {}).get('secondary', '#D9D9D9') }}">
+  {% set mgr = (data.get('profile') or {}).get('team', {}).get('manager') %}
+  {% set mgr_details = (data.get('details') or {}).get('manager') %}
+  {% set formation = (mgr_details or {}).get('preferred_formation') %}
   <div>
     <h1>{{ data.get('team_name', club.replace('_',' ')) }}</h1>
-    <div class="sub">{{ competition.replace('_',' ') }} · {{ country.replace('_',' ') }}</div>
+    <div class="sub">{{ competition.replace('_',' ') }} · {{ country.replace('_',' ') }}{% if season_name %} · {{ season_name }}{% endif %}</div>
+    <div class="sub" style="margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+      {% if mgr %}
+        <span title="Head coach">👔
+          <span class="flag" data-alpha2="{{ (mgr.country or {}).get('alpha2','') }}"></span>
+          {% if mgr.slug and mgr.id %}
+            <a href="https://www.sofascore.com/manager/{{ mgr.slug }}/{{ mgr.id }}" target="_blank" rel="noopener"
+               style="color:var(--text2);text-decoration:none;">{{ mgr.name }}</a>
+          {% else %}{{ mgr.name }}{% endif %}
+        </span>
+      {% elif mgr_details %}
+        <span title="Head coach">👔 {{ mgr_details.name }}</span>
+      {% endif %}
+      {% if formation %}
+        <span title="Preferred formation"
+              style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;
+                     background:var(--bg3);color:var(--accent);border:1px solid var(--border);">{{ formation }}</span>
+      {% endif %}
+      <span id="foreign-count" style="color:var(--text3);font-size:12px;"></span>
+    </div>
   </div>
   <div style="display:flex; gap:8px;">
     {% if data.team_id and data.unique_tournament_id %}
@@ -214,11 +236,153 @@
 
 </div><!-- /.cards-carousel -->
 
+<!-- ── League Rank Panel (club) ── -->
+<div class="card mb16" id="club-percentile-card" style="display:none;">
+  <div class="card-title" style="margin-bottom:2px;">League Rank</div>
+  <div style="font-size:11px; color:var(--text3); margin-bottom:12px;" id="club-pct-label">Loading…</div>
+  <div id="club-pct-bars"></div>
+</div>
+
+<!-- ── Manager card ── -->
+<div class="card mb16">
+  <div class="card-title">Manager</div>
+  {% if mgr or mgr_details %}
+    {% set mgr_alpha2  = (mgr.country or {}).get('alpha2','') if mgr else '' %}
+    {% set mgr_country = (mgr.country or {}).get('name','') if mgr else (mgr_details or {}).get('country','') %}
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;">
+        <span class="flag" data-alpha2="{{ mgr_alpha2 }}"></span>
+        {{ mgr.name if mgr else mgr_details.name }}
+      </div>
+      {% if mgr_country %}
+        <span style="color:var(--text3);font-size:12px;">{{ mgr_country }}</span>
+      {% endif %}
+      {% if formation %}
+        <span title="Preferred formation"
+              style="font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;
+                     background:var(--bg3);color:var(--accent);border:1px solid var(--border);">{{ formation }}</span>
+      {% else %}
+        <span style="color:var(--text3);font-size:11px;">No preferred formation yet — re-scrape with “+ Coach Formation”.</span>
+      {% endif %}
+      {% if mgr and mgr.slug and mgr.id %}
+        <a href="https://www.sofascore.com/manager/{{ mgr.slug }}/{{ mgr.id }}"
+           target="_blank" rel="noopener"
+           style="margin-left:auto;font-size:12px;color:var(--accent);text-decoration:none;
+                  padding:4px 10px;border:1px solid var(--border);border-radius:4px;">→ SofaScore profile</a>
+      {% endif %}
+    </div>
+
+    {# ── Rich coach profile (from + Coach Profile scrape) ── #}
+    {% set md = mgr_details or {} %}
+    {% if md.get('age') or md.get('matches') %}
+      <div class="stat-grid" style="margin-top:14px;">
+        {% set mgr_cells = [
+          ('Age',        md.get('age')),
+          ('Matches',    md.get('matches')),
+          ('Pts/Match',  md.get('points_per_match')),
+        ] %}
+        {% for label, val in mgr_cells %}
+          {% if val is not none and val != '' %}
+            <div class="stat-block">
+              <div class="label">{{ label }}</div>
+              <div class="value">{{ val }}</div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% set w = md.get('wins') or 0 %}{% set d = md.get('draws') or 0 %}{% set l = md.get('losses') or 0 %}
+      {% set tot = w + d + l %}
+      {% if tot > 0 %}
+        <div style="margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+            <span style="color:var(--green,#27ae60);">{{ w }} W</span>
+            <span style="color:var(--text3);">{{ d }} D</span>
+            <span style="color:var(--red,#e74c3c);">{{ l }} L</span>
+          </div>
+          <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;">
+            <div style="width:{{ (w / tot * 100)|round(1) }}%;background:var(--green,#27ae60);"></div>
+            <div style="width:{{ (d / tot * 100)|round(1) }}%;background:var(--text3,#888);"></div>
+            <div style="width:{{ (l / tot * 100)|round(1) }}%;background:var(--red,#e74c3c);"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Record at this club</div>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <div style="color:var(--text3);font-size:12px;">No manager data — re-scrape to populate.</div>
+  {% endif %}
+</div>
+
+<!-- ── Arrivals / Departures card ── -->
+{% set transfers = data.get('transfers') or {} %}
+{% set t_in  = transfers.get('transfersIn')  or [] %}
+{% set t_out = transfers.get('transfersOut') or [] %}
+<div class="card mb16" id="transfers-card">
+  <div class="card-title">Arrivals &amp; Departures</div>
+  {% if t_in or t_out %}
+    <div class="grid-2" style="gap:24px; align-items:start;">
+      <!-- Arrivals -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--green,#27ae60);margin-bottom:8px;
+                    text-transform:uppercase;letter-spacing:.05em;">⬇ Arrivals — {{ t_in|length }}</div>
+        {% if t_in %}
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            {% for t in t_in %}
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;
+                          padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);">
+                <span style="font-weight:600;">{{ (t.player or {}).get('name','—') }}</span>
+                <span style="color:var(--text3);white-space:nowrap;">← {{ (t.transferFrom or {}).get('name','—') }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="color:var(--text3);font-size:12px;">None.</div>
+        {% endif %}
+      </div>
+      <!-- Departures -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--red,#e74c3c);margin-bottom:8px;
+                    text-transform:uppercase;letter-spacing:.05em;">⬆ Departures — {{ t_out|length }}</div>
+        {% if t_out %}
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            {% for t in t_out %}
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;
+                          padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg3);">
+                <span style="font-weight:600;">{{ (t.player or {}).get('name','—') }}</span>
+                <span style="color:var(--text3);white-space:nowrap;">→ {{ (t.transferTo or {}).get('name','—') }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="color:var(--text3);font-size:12px;">None.</div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div style="color:var(--text3);font-size:12px;">
+      No transfer data for this club yet — re-scrape the competition to populate arrivals &amp; departures.
+    </div>
+  {% endif %}
+</div>
+
 <!-- Players table -->
 <div class="card" id="squad-card">
   <div class="card-title flex-between" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-    <span>Squad — {{ players|length }} players</span>
+    {# Default basis is 'current', so exclude departed players here too — otherwise
+       the label renders the full season roster and visibly jumps when the table
+       script rebuilds it. rejectattr on an explicit False keeps rows whose loader
+       never set the flag. #}
+    <span id="squad-count-label">Squad — {{ players|rejectattr('in_current_squad','equalto',False)|list|length }} players</span>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <!-- Squad basis toggle: current registered squad vs full season roster -->
+      <div class="squad-basis-toggle" style="display:flex;gap:4px;">
+        <button type="button" id="basis-current" class="basis-btn active"
+                onclick="setSquadBasis('current')" title="Players currently at the club">Current squad</button>
+        <button type="button" id="basis-season" class="basis-btn"
+                onclick="setSquadBasis('season')" title="Everyone who played this season (incl. departed)">Season roster</button>
+      </div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
       <!-- P90 Toggle -->
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
         <input type="checkbox" id="p90-toggle" style="cursor:pointer;">
@@ -337,6 +501,43 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/club-print.js') }}"></script>
+<script>
+/* ── Shared helpers: flags + squad-basis toggle ── */
+const SEASON = {{ season | tojson }};
+
+function flagEmoji(a2) {
+  if (!a2 || a2.length !== 2) return '';
+  const cc = a2.toUpperCase();
+  return String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0)));
+}
+function applyFlags(root) {
+  (root || document).querySelectorAll('.flag[data-alpha2]').forEach(el => {
+    if (el.dataset.done) return;
+    el.textContent = flagEmoji(el.dataset.alpha2);
+    el.dataset.done = '1';
+  });
+}
+
+// 'current' = players still registered at the club; 'season' = full season roster (incl. departed)
+function getSquadBasis() { return localStorage.getItem('squadBasis') || 'current'; }
+function setSquadBasis(basis) {
+  localStorage.setItem('squadBasis', basis);
+  const bc = document.getElementById('basis-current');
+  const bs = document.getElementById('basis-season');
+  if (bc) bc.classList.toggle('active', basis === 'current');
+  if (bs) bs.classList.toggle('active', basis === 'season');
+  if (window.rebuildSquadTable) window.rebuildSquadTable();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyFlags();
+  const basis = getSquadBasis();
+  const bc = document.getElementById('basis-current');
+  const bs = document.getElementById('basis-season');
+  if (bc) bc.classList.toggle('active', basis === 'current');
+  if (bs) bs.classList.toggle('active', basis === 'season');
+});
+</script>
 <script>
 /* ── Club team color accent ── */
 (function () {
@@ -527,6 +728,136 @@ document.getElementById('squad-search').addEventListener('input', applySquadFilt
   } else {
     loadFormData();
   }
+})();
+</script>
+
+<script>
+/* ── League Rank panel (club) ──────────────────────────────────────────────
+   Rank, not percentile: an 18-club pool only yields ~18 distinct percentile
+   values, so the percentile was the rank with false precision bolted on. */
+(function () {
+  const COUNTRY     = {{ country     | tojson }};
+  const COMPETITION = {{ competition | tojson }};
+  const CLUB_SLUG   = {{ club        | tojson }};
+
+  // Fixed sections so a stat sits in the same place on every club page.
+  const CATEGORIES = [
+    ['Attacking', [
+      ['goalsScored',        'Goals Scored'],
+      ['assists',            'Assists'],
+      ['shots',              'Shots'],
+      ['successfulDribbles', 'Dribbles Won'],
+      ['dribbleAttempts',    'Dribble Attempts'],
+      ['corners',            'Corners'],
+      ['penaltyGoals',       'Penalty Goals'],
+      ['offsides',           'Offsides'],
+    ]],
+    ['Passing & Possession', [
+      ['averageBallPossession',       'Possession %'],
+      ['accuratePassesPercentage',    'Pass Acc %'],
+      ['totalPasses',                 'Total Passes'],
+      ['accuratePasses',              'Accurate Passes'],
+      ['totalLongBalls',              'Long Balls'],
+      ['accurateLongBallsPercentage', 'Long Ball %'],
+      ['totalCrosses',                'Crosses'],
+      ['accurateCrossesPercentage',   'Cross Acc %'],
+    ]],
+    ['Defending', [
+      ['goalsConceded',            'Goals Conceded'],
+      ['cleanSheets',              'Clean Sheets'],
+      ['shotsAgainst',             'Shots Against'],
+      ['saves',                    'Saves'],
+      ['interceptions',            'Interceptions'],
+      ['ballRecovery',             'Ball Recoveries'],
+      ['duelsWonPercentage',       'Duels Won %'],
+      ['aerialDuelsWonPercentage', 'Aerials Won %'],
+      ['errorsLeadingToShot',      'Errors → Shot'],
+    ]],
+    ['Discipline', [
+      ['fouls',          'Fouls'],
+      ['yellowCards',    'Yellow Cards'],
+      ['yellowRedCards', 'Second Yellows'],
+      ['redCards',       'Red Cards'],
+    ]],
+  ];
+
+  const card = document.getElementById('club-percentile-card');
+  if (!card) return;
+
+  const ord = n => {
+    const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  const qs = new URLSearchParams({ club: `${COUNTRY}/${COMPETITION}/${CLUB_SLUG}` });
+  if (SEASON) qs.set('season', SEASON);
+
+  PrintReady.track(fetch('/api/club_percentiles?' + qs.toString())
+    .then(r => r.json())
+    .then(data => {
+      const ranks = data.ranks;
+      if (data.error || !ranks || !Object.keys(ranks).length) return;
+
+      const lowerBetter = new Set(data.lower_is_better || []);
+      const rateStats   = new Set(data.rate_stats || []);
+      const perMatch    = data.basis === 'per_match';
+
+      let label = `${data.club} · ${data.pool_size} clubs in ${data.competition}`;
+      label += perMatch
+        ? ` · ranked per match (clubs played ${data.matches_min}–${data.matches_max})`
+        : ` · season totals · ${data.matches} matches played`;
+      document.getElementById('club-pct-label').textContent = label;
+
+      const wrap = document.getElementById('club-pct-bars');
+
+      CATEGORIES.forEach(([catName, stats]) => {
+        const present = stats.filter(([k]) => ranks[k] !== undefined);
+        if (!present.length) return;
+
+        const head = document.createElement('div');
+        head.style.cssText = 'font-size:10px;font-weight:600;color:var(--text3);'
+          + 'text-transform:uppercase;letter-spacing:.06em;margin:14px 0 7px;'
+          + 'padding-bottom:4px;border-bottom:1px solid var(--border);';
+        head.textContent = catName;
+        wrap.appendChild(head);
+
+        // Best rank first inside each section.
+        present.sort((a, b) => ranks[a[0]].rank - ranks[b[0]].rank);
+
+        present.forEach(([key, text]) => {
+          const { rank, total, value } = ranks[key];
+          // Bar is filled by rank position: 1st = full, last = empty.
+          const fill = total > 1 ? ((total - rank) / (total - 1)) * 100 : 100;
+          const top  = rank / total;
+          const col  = top <= 0.25 ? 'var(--green)' : top <= 0.6 ? 'var(--amber)' : 'var(--red)';
+
+          // "Fewer is better" stats are ranked inverted, so flag them or 1st on
+          // Goals Conceded reads as "conceded the most".
+          const inv = lowerBetter.has(key)
+            ? ' <span title="Fewer is better — 1st means the lowest in the league" style="color:var(--text3);">↓</span>'
+            : '';
+          // Rates are never divided by matches, so mark them when the rest are.
+          const shown = (perMatch && !rateStats.has(key))
+            ? `${value}<span style="color:var(--text3);font-size:9px;">/m</span>`
+            : value;
+
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+          row.innerHTML = `
+            <span style="min-width:140px;font-size:11px;color:var(--text2);font-family:'CoFoSans',monospace;">${text}${inv}</span>
+            <div style="flex:1;height:4px;background:var(--bg);border:1px solid var(--border);border-radius:2px;overflow:hidden;">
+              <div style="width:${fill}%;height:100%;background:${col};transition:width 0.6s;"></div>
+            </div>
+            <span title="Rank ${rank} of ${total}" style="min-width:42px;text-align:right;font-size:11px;font-family:'BasementGrotesque',sans-serif;font-weight:900;color:${col};">${ord(rank)}</span>
+            <span style="min-width:34px;text-align:right;font-size:10px;color:var(--text3);">of ${total}</span>
+            <span style="min-width:62px;text-align:right;font-size:11px;color:var(--text);font-family:'CoFoSans',monospace;">${shown}</span>`;
+          wrap.appendChild(row);
+        });
+      });
+
+      card.style.display = 'block';
+    })
+    .catch(() => {}));
 })();
 </script>
 
@@ -846,7 +1177,11 @@ function populateStatTabs(row, detailRow) {
     const tbody = document.getElementById('squad-table-body');
     tbody.innerHTML = '';
 
-    sortedPlayers().forEach((player) => {
+    const basis = getSquadBasis();
+    const visiblePlayers = sortedPlayers().filter(p =>
+      basis === 'season' ? true : (p.in_current_squad !== false));
+
+    visiblePlayers.forEach((player) => {
       // Main row
       const mainRow = document.createElement('tr');
       mainRow.className = 'squad-row';
@@ -859,13 +1194,21 @@ function populateStatTabs(row, detailRow) {
       mainRow.style.cursor = 'pointer';
 
       // Cells: #, Name, Pos
+      const flag = player.is_foreign ? flagEmoji(player.country_alpha2) : '';
+      const foreignBadge = player.is_foreign
+        ? ` <span class="foreign-flag" title="Foreign player — ${player.nationality || ''}">${flag || '🌍'}</span>`
+        : '';
+      const departedTag = (player.in_current_squad === false || player.departed)
+        ? ` <span class="departed-tag" title="Left the club this season">departed</span>`
+        : '';
+      const playerHref = `/player/${COUNTRY}/${COMPETITION}/${CLUB_SLUG}/${player.file}${SEASON ? '?season=' + SEASON : ''}`;
       mainRow.innerHTML = `
         <td style="color:var(--text3);">${player.shirt_number || '—'}</td>
         <td>
           <span class="expand-toggle" style="display:inline-block;margin-right:6px;transition:transform .2s;">▶</span>
-          <a href="/player/${COUNTRY}/${COMPETITION}/${CLUB_SLUG}/${player.file}" onclick="event.stopPropagation();">
+          <a href="${playerHref}" onclick="event.stopPropagation();">
             ${player.name}
-          </a>
+          </a>${foreignBadge}${departedTag}
         </td>
         <td><span class="pos-badge">${player.position || '?'}</span></td>
       `;
@@ -908,6 +1251,23 @@ function populateStatTabs(row, detailRow) {
       // Add row click handler
       mainRow.addEventListener('click', () => toggleRow(mainRow));
     });
+
+    // ── Recompute squad-derived figures for the visible (basis) set ──
+    const squadSize   = visiblePlayers.length;
+    const foreignN    = visiblePlayers.filter(p => p.is_foreign).length;
+    const ages        = visiblePlayers.map(p => parseInt(p.age)).filter(a => !isNaN(a) && a > 0);
+    const avgAge      = ages.length ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : null;
+
+    const countLabel = document.getElementById('squad-count-label');
+    if (countLabel) countLabel.textContent = `Squad — ${squadSize} players`;
+
+    const foreignEl = document.getElementById('foreign-count');
+    if (foreignEl) {
+      foreignEl.textContent =
+        `🌍 ${foreignN} foreign / ${squadSize}` + (avgAge ? ` · Ø age ${avgAge}` : '');
+    }
+
+    applyFlags(tbody);
 
     // Re-apply filters
     applySquadFilters();
@@ -986,7 +1346,7 @@ function populateStatTabs(row, detailRow) {
   const COMPETITION = {{ competition | tojson }};
   const CLUB_SLUG = {{ club | tojson }};
   
-  const seasonId = new URLSearchParams(window.location.search).get('season_id') || 'latest';
+  const seasonId = SEASON || 'latest';
   
   function loadHeatmap() {
     const loadingDiv = document.getElementById('heatmap-loading');
@@ -1114,6 +1474,38 @@ document.getElementById('stat-settings-save').addEventListener('click', () => {
   }
 });
 </script>
+
+<style>
+.basis-btn {
+  background: var(--bg3, #2a2a2a);
+  border: 1px solid var(--border, #444);
+  color: var(--text3, #888);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: 'CoFoSans', sans-serif;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.basis-btn:hover { color: var(--text, #eee); }
+.basis-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.foreign-flag { font-size: 13px; margin-left: 2px; }
+.departed-tag {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--amber, #f0a500);
+  border: 1px solid var(--amber, #f0a500);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+</style>
 
 <style>
 /* Sortable squad headers — scoped here so the arrows don't depend on style.css */

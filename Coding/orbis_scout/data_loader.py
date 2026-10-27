@@ -10,6 +10,13 @@ from functools import lru_cache
 # Populated on first call, reused for all subsequent requests in the same process.
 _cache: dict = {}
 
+# World Cup data is scraped via the same generic scraper_cli.py into
+# output/World/World_Championship/ before being migrated out to
+# output_worldcup/ (see Coding/output_worldcup/README.md). Exclude it here so
+# it never leaks into club-league Browse/Players/Scatter/Compare/search even
+# while it's sitting in output/ mid-migration.
+_EXCLUDED_COUNTRIES = {'World'}
+
 
 def _nrm(s: str) -> str:
     """NFC-normalize, strip combining diacritics (Mn), then lowercase.
@@ -35,6 +42,92 @@ def _load_json(path):
             return json.load(f)
     except Exception:
         return {}
+
+
+_SEASON_RE = re.compile(r'_Season_(\d+)(?:\.json)?$')
+
+
+def season_of_file(name):
+    """Season id encoded in a scraped file name (…_Season_<sid>.json), or None."""
+    m = _SEASON_RE.search(Path(str(name)).name)
+    return m.group(1) if m else None
+
+
+def same_season_glob(target_file):
+    """Glob pattern for files of the same season as *target_file*.
+
+    Several seasons of a league share one folder tree, so a comparison pool
+    must be narrowed to the target's own season. Files without a season suffix
+    (older single-season scrapes) keep matching everything, as before."""
+    sid = season_of_file(target_file)
+    return f'*_Season_{sid}.json' if sid else '*.json'
+
+
+def _latest_season(sids):
+    """Newest season from a set of season ids (SofaScore ids grow over time)."""
+    sids = [s for s in sids if s]
+    return max(sids, key=int) if sids else None
+
+
+def _matches_played(standings):
+    return sum(int(r.get('matches') or 0)
+               for g in (standings.get('standings') or []) for r in (g.get('rows') or []))
+
+
+def _pick_standings_file(files):
+    """Pick one standings file when a season holds several — see
+    mongo_loader._pick_standings_doc: prefer the file named by the
+    uniqueTournament id, then the most complete table."""
+    best, best_key = None, None
+    for f in files:
+        d = _load_json(f)
+        uniq = ''
+        for g in d.get('standings') or []:
+            ut = (g.get('tournament') or {}).get('uniqueTournament') or {}
+            if ut.get('id'):
+                uniq = str(ut['id'])
+                break
+        m = re.search(r'_(\d+)_Season_\d+$', f.stem)
+        key = (bool(uniq) and bool(m) and m.group(1) == uniq, _matches_played(d), f.stat().st_mtime)
+        if best_key is None or key > best_key:
+            best, best_key = f, key
+    return best
+
+
+def _season_file(folder, prefix, season_id):
+    """First `<prefix>_*` file in *folder* for *season_id* (any file when None)."""
+    pattern = f'{prefix}_*_Season_{season_id}.json' if season_id else f'{prefix}_*.json'
+    return next(Path(folder).glob(pattern), None)
+
+
+def _player_glob(season_id):
+    return f'*_Season_{season_id}.json' if season_id else '*.json'
+
+
+def get_competition_seasons(output_dir, country, competition):
+    """File-system twin of mongo_loader.get_competition_seasons, newest-first.
+
+    Seasons come from the Standings_*_Season_<sid>.json file names; the label
+    from the matching SeasonInfo file's info.season.year (e.g. "25/26")."""
+    base = Path(output_dir) / country / competition
+    if not base.is_dir():
+        return []
+    # Only seasons with club files — see mongo_loader.get_competition_seasons.
+    sids = ({season_of_file(f) for f in base.glob('Standings_*.json')}
+            & {season_of_file(f) for f in base.glob('*/Club_*.json')}) - {None}
+    result = []
+    for sid in sorted(sids, key=int, reverse=True):
+        info_f = _season_file(base, 'SeasonInfo', sid)
+        year   = ((_load_json(info_f).get('info') or {}).get('season') or {}).get('year') if info_f else None
+        result.append({'season_id': sid, 'season_name': year or sid, 'season_order': None})
+    return result
+
+
+def _resolve_season(output_dir, country, competition, season_id):
+    if season_id:
+        return str(season_id)
+    seasons = get_competition_seasons(output_dir, country, competition)
+    return seasons[0]['season_id'] if seasons else None
 
 
 def _parse_player_row(json_path, country, competition, club_name):
@@ -117,7 +210,7 @@ def _get_home_stats(output_dir):
     top_players        = []
 
     for country_dir in sorted(base.iterdir()):
-        if not country_dir.is_dir():
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES:
             continue
         for comp_dir in sorted(country_dir.iterdir()):
             if not comp_dir.is_dir():
@@ -178,7 +271,7 @@ def _get_all_competitions(output_dir):
         return result
 
     for country_dir in sorted(base.iterdir()):
-        if not country_dir.is_dir():
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES:
             continue
         for comp_dir in sorted(country_dir.iterdir()):
             if not comp_dir.is_dir():
@@ -194,15 +287,23 @@ def _get_all_competitions(output_dir):
     return result
 
 
-def get_competition(output_dir, country, competition):
-    """Return standings + club list for a competition."""
+def get_competition(output_dir, country, competition, season_id=None):
+    """Return standings + club list for a competition season.
+
+    Several seasons share one folder tree; every file carries its season in
+    the name (…_Season_<sid>.json), so the season picks the files. Without
+    `season_id` the newest season is shown."""
     base         = Path(output_dir) / country / competition
-    standings_f  = next(base.glob('Standings_*.json'), None)
+    seasons      = get_competition_seasons(output_dir, country, competition)
+    season_id    = _resolve_season(output_dir, country, competition, season_id)
+    if season_id:
+        standings_f = _pick_standings_file(list(base.glob(f'Standings_*_Season_{season_id}.json')))
+    else:
+        standings_f = next(base.glob('Standings_*.json'), None)
     standings    = _load_json(standings_f) if standings_f else {}
 
     # ── Extract scraping metadata ──────────────────────────────────────────────
     tid = ''
-    season_id = ''
     uniq_tid = ''
 
     if standings_f:
@@ -223,11 +324,26 @@ def get_competition(output_dir, country, competition):
     for club_dir in sorted(base.iterdir()):
         if not club_dir.is_dir():
             continue
-        club_json  = next(club_dir.glob('Club_*.json'), None)
+        club_json  = _season_file(club_dir, 'Club', season_id)
+        if season_id and not club_json:
+            continue   # club not in this season (promoted/relegated)
         club_data  = _load_json(club_json) if club_json else {}
         profile    = club_data.get('profile', {}).get('team', {})
         season_stats = club_data.get('season_statistics', {}).get('statistics', {})
-        player_count = len(list((club_dir / 'Players').glob('*.json'))) if (club_dir / 'Players').exists() else 0
+        # Current squad only, to match the Mongo path — a player JSON carries
+        # in_current_squad=False once he has left, and the card should not count
+        # him as part of the squad.
+        season_player_count = 0
+        player_count        = 0
+        if (club_dir / 'Players').exists():
+            for _pf in (club_dir / 'Players').glob(_player_glob(season_id)):
+                season_player_count += 1
+                try:
+                    _pd = _load_json(_pf) or {}
+                except Exception:
+                    _pd = {}
+                if _pd.get('in_current_squad', True):
+                    player_count += 1
 
         # Extract competition colors from the first club that has them
         if competition_colors is None:
@@ -250,6 +366,7 @@ def get_competition(output_dir, country, competition):
             'name':         club_data.get('team_name', club_dir.name),
             'team_id':      club_data.get('team_id', ''),
             'player_count': player_count,
+            'season_player_count': season_player_count,
             'stats':        season_stats,
             'profile':      profile,
             'team_colors':  team_colors,
@@ -272,11 +389,11 @@ def get_competition(output_dir, country, competition):
         })
 
     # Load cup trees (playoff brackets)
-    cuptrees_f = next(base.glob('CupTrees_*.json'), None)
+    cuptrees_f = _season_file(base, 'CupTrees', season_id)
     cup_trees = _load_json(cuptrees_f).get('cupTrees', []) if cuptrees_f else []
 
     # Load season info
-    info_f = next(base.glob('SeasonInfo_*.json'), None)
+    info_f = _season_file(base, 'SeasonInfo', season_id)
     season_info = _load_json(info_f).get('info', {}) if info_f else {}
 
     # Derive competition type from stored field or infer from shape
@@ -286,6 +403,24 @@ def get_competition(output_dir, country, competition):
                            (len(standings.get("standings", [])) == 1 and cup_trees)) else
         "league"
     )
+
+    # Group scope (conference picker) — cached on the sidecar written by the
+    # scraper, then on the standings file, else derived from what's present.
+    saved_scope = {}
+    if uniq_tid and season_id:
+        try:
+            import scrape_filter
+            saved_scope = scrape_filter.load_filter(
+                uniq_tid, season_id, out_dir=output_dir) or {}
+        except Exception:
+            saved_scope = {}
+    available_groups = (saved_scope.get('available_groups')
+                        or standings.get('available_groups')
+                        or [{'phase_name':    p['phase_name'],
+                             'tournament_id': p.get('tournament_id'),
+                             'team_count':    len(p.get('rows') or [])}
+                            for p in standings_phases])
+    group_filter = saved_scope.get('group_names') or standings.get('group_filter')
 
     return {
         'competition':        competition,
@@ -297,32 +432,66 @@ def get_competition(output_dir, country, competition):
         'season_info':        season_info,
         'tid':                tid,
         'uniq_tid':           uniq_tid,
-        'season_id':          season_id,
+        'season_id':          season_id or '',
+        'season_name':        next((x['season_name'] for x in seasons if x['season_id'] == season_id), season_id),
+        'seasons':            seasons,
         'competition_colors': competition_colors or {'primary': '#6E6E6E', 'secondary': '#D9D9D9'},
         'competition_type':   comp_type,
+        'available_groups':   available_groups,
+        'group_filter':       group_filter or None,
     }
 
 
 # ── Club ──────────────────────────────────────────────────────────────────────
-def get_club(output_dir, country, competition, club):
+def get_club(output_dir, country, competition, club, season_id=None):
     base      = Path(output_dir) / country / competition / club
-    club_json = next(base.glob('Club_*.json'), None)
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    club_json = _season_file(base, 'Club', season_id)
     data      = _load_json(club_json) if club_json else {}
     return data
 
 
-def get_club_players(output_dir, country, competition, club):
+def get_competition_club_stats(output_dir, country, competition, season_id=None):
+    """File-system twin of mongo_loader.get_competition_club_stats."""
+    base = Path(output_dir) / country / competition
+    if not base.is_dir():
+        return []
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    rows = []
+    for club_dir in sorted(p for p in base.iterdir() if p.is_dir()):
+        club_json = _season_file(club_dir, 'Club', season_id)
+        if not club_json:
+            continue
+        doc = _load_json(club_json) or {}
+        raw = doc.get('season_statistics', {}).get('statistics', {})
+        if not raw:
+            continue
+        stats = {
+            k: v for k, v in raw.items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and v is not None
+        }
+        rows.append({
+            'club_slug': club_dir.name,
+            'club':      doc.get('team_name', club_dir.name.replace('_', ' ')),
+            'matches':   stats.get('matches') or 0,
+            'stats':     stats,
+        })
+    return rows
+
+
+def get_club_players(output_dir, country, competition, club, season_id=None):
     players_dir = Path(output_dir) / country / competition / club / 'Players'
     if not players_dir.exists():
         return []
+    season_id = _resolve_season(output_dir, country, competition, season_id)
     players = []
-    for f in sorted(players_dir.glob('*.json')):
+    for f in sorted(players_dir.glob(_player_glob(season_id))):
         players.append(_parse_player_row(f, country, competition, club))
     return players
 
 
 # ── Player ────────────────────────────────────────────────────────────────────
-def get_player(output_dir, country, competition, club, player_file):
+def get_player(output_dir, country, competition, club, player_file, season_id=None):
     path = Path(output_dir) / country / competition / club / 'Players' / player_file
     return _load_json(path)
 
@@ -375,7 +544,7 @@ def search_players(output_dir, filters):
 
     # Walk all Players/ folders
     for country_dir in base.iterdir():
-        if not country_dir.is_dir(): continue
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES: continue
         comp_filter = filters.get('competition', '')
         for comp_dir in country_dir.iterdir():
             if not comp_dir.is_dir(): continue
@@ -591,7 +760,7 @@ def search_free_agents(output_dir, filters):
         return _fa_sort_paginate([], filters)
 
     for country_dir in base.iterdir():
-        if not country_dir.is_dir(): continue
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES: continue
         for comp_dir in country_dir.iterdir():
             if not comp_dir.is_dir(): continue
             for club_dir in comp_dir.iterdir():
@@ -669,7 +838,7 @@ def get_all_players_flat(output_dir, query='', limit=20):
     base   = Path(output_dir)
     result = []
     for country_dir in base.iterdir():
-        if not country_dir.is_dir(): continue
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES: continue
         for comp_dir in country_dir.iterdir():
             if not comp_dir.is_dir(): continue
             for club_dir in comp_dir.iterdir():
@@ -776,7 +945,7 @@ def get_league_position_avg(output_dir, player_path, pos_mode='exact'):
         players_dir = club_dir / 'Players'
         if not players_dir.exists():
             continue
-        for f in players_dir.glob('*.json'):
+        for f in players_dir.glob(same_season_glob(target_file)):
             if f.name == target_file and club_dir.name == club_slug:
                 continue
             try:
@@ -880,7 +1049,7 @@ def get_all_clubs_flat(output_dir, query='', limit=20, league_filter=''):
     lf_comp    = lf_parts[1] if len(lf_parts) >= 2 else ''
 
     for country_dir in sorted(base.iterdir()):
-        if not country_dir.is_dir(): continue
+        if not country_dir.is_dir() or country_dir.name in _EXCLUDED_COUNTRIES: continue
         if lf_country and country_dir.name != lf_country: continue
         for comp_dir in sorted(country_dir.iterdir()):
             if not comp_dir.is_dir(): continue

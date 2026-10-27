@@ -33,6 +33,14 @@ from composite_club_stats import compute_club_composites, CLUB_COMPOSITE_KEYS
 bp = Blueprint('scatter', __name__)
 
 
+def _latest_season_filter(country, competition):
+    """Mongo filter for a league's latest season. Mongo keeps several seasons of
+    a league side by side, so an unscoped query pools them and counts every
+    player and club once per season."""
+    sid = ctx._loader._resolve_season(OUTPUT_DIR, country, competition, None)
+    return {'season_id': sid} if sid else {}
+
+
 # ── League data access: MongoDB-first, filesystem fallback ────────────────────
 # These yield the raw club/player JSON docs for a league. On MongoDB (Vercel and
 # local when Mongo is up) they read the `clubs`/`players` collections; otherwise
@@ -48,7 +56,8 @@ def _league_exists(country, competition):
 def _league_club_docs(country, competition):
     if ctx._USING_MONGO:
         yield from ctx._loader._db().clubs.find(
-            {'_country': country, '_competition': competition})
+            {'_country': country, '_competition': competition,
+             **_latest_season_filter(country, competition)})
         return
     league_dir = os.path.join(OUTPUT_DIR, country, competition)
     if not os.path.isdir(league_dir):
@@ -71,7 +80,8 @@ def _league_club_docs(country, competition):
 def _league_player_docs(country, competition):
     if ctx._USING_MONGO:
         yield from ctx._loader._db().players.find(
-            {'_country': country, '_competition': competition})
+            {'_country': country, '_competition': competition,
+             **_latest_season_filter(country, competition)})
         return
     league_dir = os.path.join(OUTPUT_DIR, country, competition)
     if not os.path.isdir(league_dir):

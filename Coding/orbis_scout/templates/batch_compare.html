@@ -265,7 +265,7 @@ function searchPlayer(q) {
           const d = document.createElement('div');
           d.className = 'ac-item';
           d.innerHTML = `<div>${esc(p.name)}</div>
-            <div class="ac-sub">${esc(p.position || '')} · ${esc(p.team || '')} · ${esc(p.competition || '')} · ${esc(p.country || '')}</div>`;
+            <div class="ac-sub">${esc(p.position || '')} · ${esc(p.team || '')} · ${esc(p.competition || '')}${p.season_name ? ' ' + esc(p.season_name) : ''} · ${esc(p.country || '')}</div>`;
           d.onmousedown = () => addPlayer(p);
           list.appendChild(d);
         });

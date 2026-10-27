@@ -14,9 +14,9 @@
 <div class="breadcrumb">
   <a href="/competitions">Competitions</a>
   <span>/</span>
-  <a href="/competition/{{ country }}/{{ competition }}">{{ competition.replace('_',' ') }}</a>
+  <a href="/competition/{{ country }}/{{ competition }}{% if season %}?season={{ season }}{% endif %}">{{ competition.replace('_',' ') }}</a>
   <span>/</span>
-  <a href="/competition/{{ country }}/{{ competition }}/{{ club }}">{{ data.get('team', club) }}</a>
+  <a href="/competition/{{ country }}/{{ competition }}/{{ club }}{% if season %}?season={{ season }}{% endif %}">{{ data.get('team', club) }}</a>
   <span>/</span>
   <span>{{ data.get('player_name','') }}</span>
 </div>
@@ -30,7 +30,37 @@
     <h1>{{ data.get('player_name','') }}</h1>
     <div class="team-line">
       {{ data.get('team','') }} · {{ competition.replace('_',' ') }} · {{ country.replace('_',' ') }}
+      {% if data.get('departed') or data.get('in_current_squad') == false %}
+        <span title="Left the club this season"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:.04em;margin-left:8px;
+                     padding:1px 7px;border-radius:4px;color:var(--amber,#f0a500);
+                     border:1px solid var(--amber,#f0a500);white-space:nowrap;">
+          Departed{% if season_name %} — {{ season_name }}{% endif %}
+        </span>
+      {% else %}
+        <span title="Currently registered with the club"
+              style="font-size:10px;text-transform:uppercase;letter-spacing:.04em;margin-left:8px;
+                     padding:1px 7px;border-radius:4px;color:var(--green,#27ae60);
+                     border:1px solid var(--green,#27ae60);white-space:nowrap;">Current squad</span>
+      {% endif %}
     </div>
+    {# Same player_id, other competitions — e.g. a league record and a national-cup one. #}
+    {% if player_competitions and player_competitions|length > 1 %}
+      <div class="team-line" style="margin-bottom:10px;">
+        <select id="competition-switcher"
+                onchange="if(this.value){window.location='/player/'+this.value;}"
+                title="Switch competition"
+                style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+                       color:var(--text);padding:3px 8px;font-size:12px;
+                       font-family:'CoFoSans',sans-serif;cursor:pointer;">
+          {% for c in player_competitions %}
+            <option value="{{ c.path }}" {% if c.path == player_path %}selected{% endif %}>
+              {{ c.competition.replace('_',' ') }}{% if c.season_name %} — {{ c.season_name }}{% endif %} · {{ c.team }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
     <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">
       {% for p in pos %}
         <span class="tag">{{ p }}</span>
@@ -425,7 +455,7 @@
     {% if heatmap %}
       <div class="heatmap-wrap mb16" id="player-heatmap">
         <div class="card-title" style="margin-bottom:12px;">Position Heatmap</div>
-        <img src="{{ heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
+        <img src="{{ heatmap if heatmap.startswith('/') else '/heatmap/' + heatmap }}" alt="Heatmap for {{ data.get('player_name','') }}">
       </div>
     {% endif %}
 

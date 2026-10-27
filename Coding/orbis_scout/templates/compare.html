@@ -296,7 +296,7 @@ function heatmapHtml(json, name) {
   if (!h) return `<div style="color:var(--text3);font-size:12px;text-align:center;padding:24px;">No heatmap available</div>`;
   return `
     <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${name}</div>
-    <img src="${h}" style="max-width:100%;border-radius:4px;">
+    <img src="/heatmap/${h}" style="max-width:100%;border-radius:4px;">
   `;
 }
 

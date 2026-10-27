@@ -10,7 +10,7 @@ from context import (
     OUTPUT_DIR, MATCH_OUTPUT_DIR, _WEBAPP_DIR,
     get_all_competitions, get_competition, get_club, get_club_players,
     get_player, search_players, get_all_players_flat, get_all_clubs_flat,
-    get_heatmap_path, get_home_stats,
+    get_heatmap_path, get_home_stats, get_competition_club_stats,
     store_get, is_import_token, token_id, build_engine_candidate,
     get_all_matches, get_match, get_player_match_history, compute_per90,
     MATCH_STATS_META, _DERIVED_STATS,
@@ -99,10 +99,11 @@ def api_player_percentiles():
         player_pos_raw = raw.get('positions') or [raw.get('profile', {}).get('player', {}).get('position', '')]
         player_line = get_position_line([str(p).upper() for p in player_pos_raw])
 
-        # Collect pool: all players in same competition with same position line
+        # Collect pool: all players in same competition + season with same position line
+        from data_loader import same_season_glob
         pool_stats: dict[str, list] = {}
         comp_dir = os.path.join(OUTPUT_DIR, country, competition)
-        for fpath in _glob.glob(os.path.join(comp_dir, '*', 'Players', '*.json')):
+        for fpath in _glob.glob(os.path.join(comp_dir, '*', 'Players', same_season_glob(target_file))):
             try:
                 with open(fpath, encoding='utf-8') as f:
                     pd = _json.load(f)
@@ -138,6 +139,111 @@ def api_player_percentiles():
             'percentiles':  percentiles,
         })
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+"""Club stats where a LOWER value is the better outcome."""
+_CLUB_LOWER_IS_BETTER = frozenset({
+    'goalsConceded', 'shotsAgainst', 'errorsLeadingToShot',
+    'fouls', 'yellowCards', 'yellowRedCards', 'redCards', 'offsides',
+})
+
+# Bookkeeping fields — not performance, never worth a percentile.
+_CLUB_PCT_EXCLUDE = frozenset({'id', 'matches', 'statisticsType', 'awardedMatches'})
+
+
+@bp.route('/api/club_percentiles')
+def api_club_percentiles():
+    """League rank for each of a club's season statistics, against every other
+    club in the same competition and season.
+
+    Rank rather than percentile: with an 18-club league the percentile can only
+    take ~18 distinct values, so it *is* the rank, just with false precision
+    (seven of Persib's stats all read 97.2 — every one of them meant "1st").
+
+    `basis` is "per_match" when clubs in the pool have played markedly different
+    numbers of matches (a group-stage cup), otherwise "total". Without that, a
+    team that played one match ranks last on every counting stat by construction.
+    Rate stats (percentages, average possession) are never divided.
+    """
+    club_path = request.args.get('club', '').strip()
+    if not club_path:
+        return jsonify({'error': 'club is required'}), 400
+    parts = club_path.split('/')
+    if len(parts) != 3:
+        return jsonify({'error': 'invalid club path'}), 400
+
+    country, competition, club_slug = parts
+    season = request.args.get('season') or None
+    basis_arg = (request.args.get('basis') or 'auto').lower()
+
+    try:
+        pool_rows = get_competition_club_stats(OUTPUT_DIR, country, competition,
+                                               season_id=season)
+        target = next((r for r in pool_rows if r['club_slug'] == club_slug), None)
+        if target is None:
+            return jsonify({'error': 'club not found or has no season statistics'}), 404
+
+        played = [r.get('matches') or 0 for r in pool_rows]
+        matches_vary = bool(played) and (max(played) - min(played)) > 2
+        if basis_arg in ('total', 'per_match'):
+            basis = basis_arg
+        else:
+            basis = 'per_match' if matches_vary else 'total'
+
+        def _value(row, stat):
+            """The comparable figure for one club/stat under the active basis."""
+            raw = row['stats'].get(stat)
+            if raw is None:
+                return None
+            if basis == 'total' or stat in _CLUB_P90_EXCLUDE:
+                return float(raw)
+            n = row.get('matches') or 0
+            return float(raw) / n if n else None
+
+        # value lists per stat, for ranking
+        pool_vals: dict[str, list] = {}
+        for row in pool_rows:
+            for stat in row['stats']:
+                if stat in _CLUB_PCT_EXCLUDE or stat not in CLUB_STAT_FIELDS:
+                    continue
+                v = _value(row, stat)
+                if v is not None:
+                    pool_vals.setdefault(stat, []).append(v)
+
+        ranks = {}
+        for stat, pop in pool_vals.items():
+            mine = _value(target, stat)
+            if mine is None or len(pop) < 2:
+                continue
+            # Standard competition ranking: count strictly better, +1. Ties share
+            # a rank (1,1,3) rather than being ordered arbitrarily.
+            if stat in _CLUB_LOWER_IS_BETTER:
+                better = sum(1 for v in pop if v < mine)
+            else:
+                better = sum(1 for v in pop if v > mine)
+            ranks[stat] = {
+                'rank':  better + 1,
+                'total': len(pop),
+                'value': round(mine, 2) if isinstance(mine, float) else mine,
+            }
+
+        return jsonify({
+            'club_path':       club_path,
+            'club':            target['club'],
+            'competition':     competition.replace('_', ' '),
+            'pool_size':       len(pool_rows),
+            'matches':         target.get('matches') or 0,
+            'matches_min':     min(played) if played else 0,
+            'matches_max':     max(played) if played else 0,
+            'matches_vary':    matches_vary,
+            'basis':           basis,
+            'lower_is_better': sorted(_CLUB_LOWER_IS_BETTER),
+            'rate_stats':      sorted(_CLUB_P90_EXCLUDE),
+            'ranks':           ranks,
+        })
+    except Exception as e:
+        _logger.exception(f'club_percentiles error: {e}')
         return jsonify({'error': str(e)}), 500
 
 

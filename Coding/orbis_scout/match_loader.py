@@ -174,22 +174,40 @@ def get_match(event_id: int | str, match_output_dir: str | None = None) -> dict 
 def get_player_match_history(
     player_id: int | str,
     match_output_dir: str | None = None,
+    tournament_id: int | str | None = None,
+    season_id: int | str | None = None,
 ) -> list[dict]:
     """
     Return a list of per-match records for *player_id* from MongoDB, oldest first.
+
+    Pass *tournament_id* (a uniqueTournament id) and optionally *season_id* to
+    scope the history to one competition. A player who appears in several
+    competitions — a league and a national-team cup, say — otherwise has all of
+    them concatenated into a single history, which skews compute_per90().
+    Omitting both keeps the original unfiltered behaviour.
     """
     try:
         from mongo_loader import _db
         db = _db()
         player_id = int(player_id)
-        
+
         # Find matches where this player is in either home or away lineup
-        query = {
+        query: dict = {
             "$or": [
                 {"player_statistics.home.player_id": player_id},
                 {"player_statistics.away.player_id": player_id}
             ]
         }
+        if tournament_id not in (None, ""):
+            try:
+                query["unique_tournament_id"] = int(tournament_id)
+            except (TypeError, ValueError):
+                query["unique_tournament_id"] = tournament_id
+        if season_id not in (None, ""):
+            try:
+                query["season_id"] = int(season_id)
+            except (TypeError, ValueError):
+                query["season_id"] = season_id
         docs = list(db.matches.find(query).sort("match_date", 1))
         
         appearances: list[dict] = []

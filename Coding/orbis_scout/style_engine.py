@@ -175,7 +175,7 @@ STYLE_KEYS = list(STYLE_WEIGHTS.keys())
 # ── Display stats table definition ───────────────────────────────────────────
 # (sofascore_field, display_label, is_raw_percentage, lower_is_better)
 DISPLAY_STATS = [
-    ('goals',                       'Goals',            False, False),
+    ('goalsScored',                 'Goals',            False, False),
     ('goalsConceded',               'Goals Conceded',   False, True),
     ('shots',                       'Shots',            False, False),
     ('shotsAgainst',                'Shots Against',    False, True),

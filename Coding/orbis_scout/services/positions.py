@@ -118,8 +118,12 @@ def _get_squad_role_analysis(country, competition, club, role_path, cand_line=No
     squad = []
     if ctx._USING_MONGO:
         exclude_file = os.path.basename(exclude_path) if exclude_path else None
+        # Latest season only — a club holding several seasons would otherwise
+        # have every returning player counted once per season.
+        sid = ctx._loader._resolve_season(OUTPUT_DIR, country, competition, None)
         for doc in ctx._loader._db().players.find({
             '_country': country, '_competition': competition, '_club': club,
+            **({'season_id': sid} if sid else {}),
         }):
             if exclude_file and doc.get('_file') == exclude_file:
                 continue

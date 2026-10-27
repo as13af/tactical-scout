@@ -46,6 +46,13 @@ def _db():
         )
     return _client[_DB_NAME]
 
+# World Cup docs land in Mongo with _country == "World" the same way they land
+# in output/World/World_Championship/ on disk (scraper_cli.py writes both
+# when Mongo is reachable). Exclude them here too — see _EXCLUDED_COUNTRIES
+# in data_loader.py and Coding/output_worldcup/README.md for the full story.
+_EXCLUDED_COUNTRIES = {"World"}
+_NOT_WORLDCUP = {"_country": {"$nin": list(_EXCLUDED_COUNTRIES)}}
+
 # ── Shared helpers (kept identical to data_loader) ────────────────────────────
 
 def _nrm(s: str) -> str:
@@ -132,6 +139,9 @@ def _parse_player_doc(doc: dict) -> dict:
         "position":          profile.get("position", pos_list[0] if pos_list else ""),
         "positions":         pos_list,
         "nationality":       (profile.get("country") or {}).get("name", "") or profile.get("nationality", ""),
+        "country_alpha2":    (profile.get("country") or {}).get("alpha2", ""),
+        "in_current_squad":  doc.get("in_current_squad", True),
+        "departed":          doc.get("departed", False),
         "age":               age,
         "height":            profile.get("height", ""),
         "preferred_foot":    profile.get("preferredFoot", ""),
@@ -163,11 +173,12 @@ def profile_category(positions, fallback_position):
 def get_home_stats(output_dir):
     db = _db()
 
-    total_players      = db.players.count_documents({})
-    total_clubs        = db.clubs.count_documents({})
-    total_competitions = db.standings.count_documents({})
+    total_players      = db.players.count_documents(_NOT_WORLDCUP)
+    total_clubs        = db.clubs.count_documents(_NOT_WORLDCUP)
+    total_competitions = db.standings.count_documents(_NOT_WORLDCUP)
 
     pipeline = [
+        {"$match": _NOT_WORLDCUP},
         {"$project": {
             "player_name": 1,
             "team": 1,
@@ -215,35 +226,212 @@ def get_home_stats(output_dir):
 def get_all_competitions(output_dir):
     db     = _db()
     result = []
-    # Use standings docs — one per league
-    for doc in db.standings.find({}, {"_country": 1, "_competition": 1, "_file": 1}).sort(
+    seen   = set()
+    # Use standings docs — one per league per season, so deduplicate
+    for doc in db.standings.find(_NOT_WORLDCUP, {"_country": 1, "_competition": 1}).sort(
             [("_country", 1), ("_competition", 1)]):
         country     = doc.get("_country", "")
         competition = doc.get("_competition", "")
-        club_count  = db.clubs.count_documents({"_country": country, "_competition": competition})
+        if (country, competition) in seen:
+            continue
+        seen.add((country, competition))
+        # Count the latest season only — a league holding several seasons
+        # otherwise reports every season's clubs added together.
+        season_id  = _resolve_season(output_dir, country, competition, None)
+        club_count = db.clubs.count_documents({
+            "_country": country, "_competition": competition,
+            **({"season_id": season_id} if season_id else {})})
         result.append({
             "country":        country,
             "competition":    competition,
             "club_count":     club_count,
             "standings_path": None,   # not needed; kept for template compat
         })
-    # deduplicate (multiple standings docs per league are possible)
-    seen = set()
-    deduped = []
-    for r in result:
-        key = (r["country"], r["competition"])
-        if key not in seen:
-            seen.add(key)
-            deduped.append(r)
-    return deduped
+    return result
 
-def get_competition(output_dir, country, competition):
+# ── Seasons ───────────────────────────────────────────────────────────────────
+
+def _season_year(db, country, competition, season_id):
+    """Season label (e.g. "25/26") from the season_info doc — lets docs that
+    predate the season_name backfill show a real name without going online."""
+    doc = db.season_info.find_one(
+        {"_country": country, "_competition": competition, "season_id": season_id},
+        {"info.season.year": 1}) or {}
+    return (((doc.get("info") or {}).get("season") or {}).get("year")) or None
+
+
+def _matches_played(doc) -> int:
+    return sum(int(r.get("matches") or 0)
+               for g in (doc.get("standings") or []) for r in (g.get("rows") or []))
+
+
+def _pick_standings_doc(docs):
+    """Pick one standings doc when a season holds several (older scrapes named
+    files by tournament.id instead of uniqueTournament.id, leaving a stale
+    partial table next to the real one). Prefer the doc whose tournament_id is
+    the uniqueTournament id, then the most complete table, then the newest."""
+    if not docs:
+        return {}
+
+    def _uniq(doc):
+        for g in doc.get("standings") or []:
+            ut = (g.get("tournament") or {}).get("uniqueTournament") or {}
+            if ut.get("id"):
+                return str(ut["id"])
+        return ""
+
+    def _tid(doc):
+        tid = str(doc.get("tournament_id") or "")
+        if not tid:
+            m = re.search(r"_(\d+)_Season_\d+$", Path(doc.get("_file", "")).stem)
+            tid = m.group(1) if m else ""
+        return tid
+
+    def _key(doc):
+        uniq = _uniq(doc)
+        return (bool(uniq) and _tid(doc) == uniq, _matches_played(doc), str(doc.get("_id", "")))
+
+    return max(docs, key=_key)
+
+
+def get_competition_seasons(output_dir, country, competition):
+    """Return [{season_id, season_name, season_order}] for a league, newest-first.
+
+    Ordering: `season_order` ascending when present (0 = current season). For docs
+    predating the season-name backfill (no season_order), fall back to numeric
+    season_id descending so the highest id (latest) sorts first.
+    """
+    db = _db()
+    # Only seasons with clubs — a scrape writes standings first, so a new season
+    # that is half-scraped (or abandoned) would otherwise become the default
+    # and render an empty competition page.
+    with_clubs = {str(s) for s in db.clubs.distinct(
+        "season_id", {"_country": country, "_competition": competition})}
+    seasons: dict[str, dict] = {}
+    for doc in db.standings.find(
+            {"_country": country, "_competition": competition},
+            {"season_id": 1, "season_name": 1, "season_order": 1}):
+        sid = str(doc.get("season_id") or "")
+        if not sid or sid in seasons or sid not in with_clubs:
+            continue
+        seasons[sid] = {
+            "season_id":    sid,
+            "season_name":  doc.get("season_name") or _season_year(db, country, competition, sid) or sid,
+            "season_order": doc.get("season_order"),
+        }
+    result = list(seasons.values())
+
+    def _key(s):
+        o   = s.get("season_order")
+        sid = int(s["season_id"]) if s["season_id"].isdigit() else 0
+        return (o if o is not None else 9999, -sid)
+
+    result.sort(key=_key)
+    return result
+
+
+def get_competition_club_stats(output_dir, country, competition, season_id=None):
+    """Return [{club_slug, club, matches, stats}] for every club in a competition
+    season — the comparison pool behind the club percentile panel.
+
+    One query with a projection rather than get_club() per club, since the pool
+    is rebuilt on every club page load.
+    """
+    db = _db()
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    _sf = {"season_id": season_id} if season_id else {}
+
+    rows = []
+    for doc in db.clubs.find(
+            {"_country": country, "_competition": competition, **_sf},
+            {"_club": 1, "team_name": 1, "season_statistics.statistics": 1}):
+        raw = ((doc.get("season_statistics") or {}).get("statistics") or {})
+        if not raw:
+            continue
+        stats = {
+            k: v for k, v in raw.items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and v is not None
+        }
+        slug = doc.get("_club") or ""
+        rows.append({
+            "club_slug": slug,
+            "club":      doc.get("team_name") or slug.replace("_", " "),
+            "matches":   stats.get("matches") or 0,
+            "stats":     stats,
+        })
+    return rows
+
+
+def get_player_competitions(player_id):
+    """Return [{country, competition, club, season_id, season_name, path}] for
+    every competition/season this player_id appears in, newest-first.
+
+    The same SofaScore player_id shows up under different uniqueTournament ids
+    (e.g. Thom Haye in Indonesia Super League 1015 and the AFF Championship 602),
+    stored as separate docs by the (player_id, tournament_id, season_id) key.
+    This links those records so the player page can switch between them.
+    """
+    db = _db()
+    rows = []
+    for doc in db.players.find(
+            {"player_id": str(player_id), **_NOT_WORLDCUP},
+            {"_country": 1, "_competition": 1, "_club": 1, "_file": 1,
+             "tournament_id": 1, "season_id": 1, "season_name": 1,
+             "season_order": 1, "competition_name": 1, "team": 1,
+             "player_name": 1}):
+        country     = doc.get("_country") or ""
+        competition = doc.get("_competition") or ""
+        club        = doc.get("_club") or ""
+        fname       = doc.get("_file") or ""
+        if not (country and competition and club and fname):
+            continue
+        sid = str(doc.get("season_id") or "")
+        rows.append({
+            "country":       country,
+            "competition":   competition,
+            "club":          club,
+            "team":          doc.get("team") or club.replace("_", " "),
+            "player_name":   doc.get("player_name") or "",
+            "tournament_id": str(doc.get("tournament_id") or ""),
+            "season_id":     sid,
+            "season_name":   doc.get("season_name") or sid,
+            "season_order":  doc.get("season_order"),
+            "path":          f"{country}/{competition}/{club}/{fname[:-5] if fname.endswith('.json') else fname}",
+        })
+
+    # Same ordering as get_competition_seasons: season_order asc (0 = current),
+    # falling back to numeric season_id desc for docs predating the backfill.
+    def _key(r):
+        o   = r.get("season_order")
+        sid = int(r["season_id"]) if r["season_id"].isdigit() else 0
+        return (o if o is not None else 9999, -sid, r["competition"])
+
+    rows.sort(key=_key)
+    return rows
+
+
+def _resolve_season(output_dir, country, competition, season_id):
+    """Return an explicit season_id — the given one, or the latest if None."""
+    if season_id:
+        return str(season_id)
+    seasons = get_competition_seasons(output_dir, country, competition)
+    return seasons[0]["season_id"] if seasons else None
+
+
+# ── Competition ───────────────────────────────────────────────────────────────
+
+def get_competition(output_dir, country, competition, season_id=None):
     db = _db()
 
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    seasons   = get_competition_seasons(output_dir, country, competition)
+    _season_filter = {"season_id": season_id} if season_id else {}
+
     # Standings
-    standings_doc = db.standings.find_one({"_country": country, "_competition": competition}) or {}
-    tid       = str(standings_doc.get("tournament_id", ""))
-    season_id = str(standings_doc.get("season_id", ""))
+    standings_doc = _pick_standings_doc(list(db.standings.find(
+        {"_country": country, "_competition": competition, **_season_filter})))
+    tid       = str(standings_doc.get("tournament_id") or "")
+    season_id = str(standings_doc.get("season_id") or season_id or "")
     # derive uniq_tid from the nested standings data
     uniq_tid = ""
     for group in standings_doc.get("standings", []):
@@ -263,14 +451,33 @@ def get_competition(output_dir, country, competition):
     clubs = []
     competition_colors = None
     for club_doc in db.clubs.find(
-            {"_country": country, "_competition": competition},
+            {"_country": country, "_competition": competition, **_season_filter},
             sort=[("team_name", 1)]):
         profile      = club_doc.get("profile", {}).get("team", {})
         season_stats = club_doc.get("season_statistics", {}).get("statistics", {})
-        player_count = db.players.count_documents({
+        _team_filter = {
             "_country": country, "_competition": competition,
-            "team_id": str(club_doc.get("team_id", "")),
-        })
+            "team_id": str(club_doc.get("team_id", "")), **_season_filter,
+        }
+        # Current squad only — a club card should say who is there now, not
+        # everyone who turned out this season. The foreign count below already
+        # excluded departed players, so without this the two disagreed.
+        player_count        = db.players.count_documents(
+            {**_team_filter, "departed": {"$ne": True}})
+        season_player_count = db.players.count_documents(_team_filter)
+
+        # Foreign count for the club card: prefer the scraper's precomputed
+        # details.foreign_players; else count current-squad players whose country
+        # differs from the club's (older docs lack the details block).
+        foreign_players = (club_doc.get("details") or {}).get("foreign_players")
+        if foreign_players is None:
+            club_a2 = ((profile.get("country") or {}).get("alpha2") or "").upper()
+            if club_a2:
+                foreign_players = db.players.count_documents({
+                    **_team_filter,
+                    "departed": {"$ne": True},
+                    "profile.player.country.alpha2": {"$ne": club_a2, "$exists": True},
+                })
 
         if competition_colors is None:
             ut = profile.get("tournament", {}).get("uniqueTournament", {})
@@ -282,12 +489,14 @@ def get_competition(output_dir, country, competition):
 
         tc = profile.get("teamColors", {})
         clubs.append({
-            "slug":         club_doc.get("_club", ""),
-            "name":         club_doc.get("team_name", ""),
-            "team_id":      str(club_doc.get("team_id", "")),
-            "player_count": player_count,
-            "stats":        season_stats,
-            "profile":      profile,
+            "slug":            club_doc.get("_club", ""),
+            "name":            club_doc.get("team_name", ""),
+            "team_id":         str(club_doc.get("team_id", "")),
+            "player_count":        player_count,
+            "season_player_count": season_player_count,
+            "foreign_players":     foreign_players,
+            "stats":           season_stats,
+            "profile":         profile,
             "team_colors":  {
                 "primary":   tc.get("primary",   "#6E6E6E"),
                 "secondary": tc.get("secondary", "#D9D9D9"),
@@ -309,11 +518,13 @@ def get_competition(output_dir, country, competition):
         })
 
     # Cup trees
-    ct_doc   = db.cup_trees.find_one({"_country": country, "_competition": competition}) or {}
+    ct_doc   = db.cup_trees.find_one(
+        {"_country": country, "_competition": competition, **_season_filter}) or {}
     cup_trees = ct_doc.get("cupTrees", [])
 
     # Season info
-    si_doc     = db.season_info.find_one({"_country": country, "_competition": competition}) or {}
+    si_doc     = db.season_info.find_one(
+        {"_country": country, "_competition": competition, **_season_filter}) or {}
     season_info = si_doc.get("info", {})
 
     # Derive competition type from stored field or infer from shape
@@ -323,6 +534,12 @@ def get_competition(output_dir, country, competition):
                            (len(standings_doc.get("standings", [])) == 1 and cup_trees)) else
         "league"
     )
+
+    season_name = standings_doc.get("season_name") or (
+        next((s["season_name"] for s in seasons if s["season_id"] == season_id), season_id))
+
+    available_groups, group_filter = _group_scope(uniq_tid, season_id,
+                                                  standings_doc, standings_phases)
 
     return {
         "competition":        competition,
@@ -335,34 +552,90 @@ def get_competition(output_dir, country, competition):
         "tid":                tid,
         "uniq_tid":           uniq_tid,
         "season_id":          season_id,
+        "season_name":        season_name,
+        "seasons":            seasons,
         "competition_colors": competition_colors or {"primary": "#6E6E6E", "secondary": "#D9D9D9"},
         "competition_type":   comp_type,
+        "available_groups":   available_groups,
+        "group_filter":       group_filter,
     }
+
+
+def _group_scope(uniq_tid, season_id, standings_doc, standings_phases):
+    """(available_groups, group_filter) for the competition page's scope picker.
+
+    available_groups is the FULL group list a scoped competition was trimmed
+    from — cached on the saved scope, then on the standings doc, and finally
+    falling back to whatever groups are actually present. group_filter is the
+    active selection, or None when the competition is unscoped.
+    """
+    saved = {}
+    if uniq_tid and season_id:
+        try:
+            import scrape_filter
+            saved = scrape_filter.load_filter(uniq_tid, season_id) or {}
+        except Exception:
+            saved = {}
+
+    groups = (saved.get("available_groups")
+              or standings_doc.get("available_groups")
+              or [{"phase_name":    p["phase_name"],
+                   "tournament_id": p.get("tournament_id"),
+                   "team_count":    len(p.get("rows") or [])}
+                  for p in standings_phases])
+
+    group_filter = saved.get("group_names") or standings_doc.get("group_filter")
+    return groups, (group_filter or None)
 
 # ── Club ──────────────────────────────────────────────────────────────────────
 
-def get_club(output_dir, country, competition, club):
-    doc = _db().clubs.find_one({"_country": country, "_competition": competition, "_club": club})
+def get_club(output_dir, country, competition, club, season_id=None):
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    _sf = {"season_id": season_id} if season_id else {}
+    doc = _db().clubs.find_one(
+        {"_country": country, "_competition": competition, "_club": club, **_sf})
     if doc:
         doc.pop("_id", None)
         return doc
     return {}
 
-def get_club_players(output_dir, country, competition, club):
+def get_club_players(output_dir, country, competition, club, season_id=None):
+    db = _db()
+    season_id = _resolve_season(output_dir, country, competition, season_id)
+    _sf = {"season_id": season_id} if season_id else {}
+
+    # The club's own country (alpha2) — the yardstick for who counts as foreign.
+    club_doc = db.clubs.find_one(
+        {"_country": country, "_competition": competition, "_club": club, **_sf},
+        {"profile.team.country.alpha2": 1})
+    club_a2 = ((((club_doc or {}).get("profile") or {}).get("team") or {})
+               .get("country") or {}).get("alpha2", "")
+    club_a2 = (club_a2 or "").upper()
+
     players = []
-    for doc in _db().players.find(
-            {"_country": country, "_competition": competition, "_club": club},
+    for doc in db.players.find(
+            {"_country": country, "_competition": competition, "_club": club, **_sf},
             sort=[("player_name", 1)]):
-        players.append(_parse_player_doc(doc))
+        p = _parse_player_doc(doc)
+        p_a2 = (p.get("country_alpha2") or "").upper()
+        p["is_foreign"] = bool(club_a2 and p_a2 and p_a2 != club_a2)
+        players.append(p)
     return players
 
 # ── Player ────────────────────────────────────────────────────────────────────
 
-def get_player(output_dir, country, competition, club, player_file):
+def get_player(output_dir, country, competition, club, player_file, season_id=None):
     """Return the full player document from MongoDB."""
     fname = player_file if player_file.endswith(".json") else player_file + ".json"
+    # Player files are season-specific (…_Season_<sid>.json), so without an
+    # explicit season the filename's own season wins — resolving to the latest
+    # season would miss every older-season file.
+    if not season_id:
+        m = re.search(r"_Season_(\d+)\.json$", fname)
+        season_id = m.group(1) if m else _resolve_season(output_dir, country, competition, None)
+    _sf = {"season_id": str(season_id)} if season_id else {}
     doc = _db().players.find_one({"_country": country, "_competition": competition,
-                                   "_club": club, "_file": fname})
+                                   "_club": club, "_file": fname, **_sf})
     if doc:
         doc.pop("_id", None)
         return doc
@@ -401,7 +674,7 @@ def search_players(output_dir, filters):
     db = _db()
 
     # Build MongoDB query
-    mongo_filter: dict = {}
+    mongo_filter: dict = dict(_NOT_WORLDCUP)
 
     if filters.get("competition"):
         mongo_filter["_competition"] = {
@@ -541,16 +814,6 @@ def search_players(output_dir, filters):
 _NO_TEAM_ID = 241802
 
 
-def _fa_fmt_date(ts) -> str:
-    """Epoch seconds → 'YYYY-MM-DD', matching scraper_cli._fmt_epoch_date()."""
-    if not ts:
-        return ""
-    try:
-        return datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%d")
-    except Exception:
-        return ""
-
-
 def _fa_sort_paginate(rows, filters):
     """Filter / sort / paginate free-agent rows. Kept identical to data_loader."""
     def _f(val, key, cast=str):
@@ -632,7 +895,8 @@ def search_free_agents(output_dir, filters):
     Two sources, unioned and deduped by player_id:
       * players.transfer_out.team_id == 241802  → fully enriched rows
       * clubs.transfers.transfersOut[].transferTo.id == 241802 → bare rows for
-        players we hold no player document for.
+        players we hold no player document for (never appeared in a scraped
+        season for that club).
 
     A player can show up under several club/season documents; the record with
     the newest departure timestamp wins — the same rule scraper_cli.py's
@@ -642,7 +906,7 @@ def search_free_agents(output_dir, filters):
     by_id: dict = {}
 
     # ── Enriched: player documents carry the flattened transfer_out summary ────
-    for doc in db.players.find({"transfer_out.team_id": _NO_TEAM_ID}):
+    for doc in db.players.find({**_NOT_WORLDCUP, "transfer_out.team_id": _NO_TEAM_ID}):
         t   = doc.get("transfer_out") or {}
         row = _parse_player_doc(doc)
         row["departure_ts"]   = int(t.get("timestamp") or 0)
@@ -656,7 +920,7 @@ def search_free_agents(output_dir, filters):
 
     # ── Bare: raw club transfer records for players with no player document ───
     for club in db.clubs.find(
-        {"transfers.transfersOut.transferTo.id": _NO_TEAM_ID},
+        {**_NOT_WORLDCUP, "transfers.transfersOut.transferTo.id": _NO_TEAM_ID},
         {"transfers.transfersOut": 1, "_country": 1, "_competition": 1,
          "_club": 1, "team_name": 1, "team_id": 1},
     ):
@@ -707,6 +971,16 @@ def search_free_agents(output_dir, filters):
     return _fa_sort_paginate(list(by_id.values()), filters)
 
 
+def _fa_fmt_date(ts) -> str:
+    """Epoch seconds → 'YYYY-MM-DD', matching scraper_cli._fmt_epoch_date()."""
+    if not ts:
+        return ""
+    try:
+        return datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
+
 # ── All-players flat (compare autocomplete) ───────────────────────────────────
 
 _PLAYER_CACHE = None
@@ -717,9 +991,10 @@ def get_all_players_flat(output_dir, query="", limit=20):
         db = _db()
         _PLAYER_CACHE = []
         # Fetch all players once to cache names and metadata
-        for doc in db.players.find({}, {
+        for doc in db.players.find(_NOT_WORLDCUP, {
                 "player_name": 1, "team": 1,
                 "_competition": 1, "_country": 1, "_club": 1, "_file": 1,
+                "season_id": 1, "season_name": 1,
                 "profile.player.position": 1,
                 "profile.player.positionsDetailed": 1, "positions": 1}):
             name  = doc.get("player_name", "")
@@ -730,6 +1005,9 @@ def get_all_players_flat(output_dir, query="", limit=20):
                 "team":        doc.get("team", ""),
                 "position":    _prof.get("position") or (_pos[0] if _pos else ""),
                 "competition": (doc.get("_competition") or "").replace("_", " "),
+                # One player_id can appear in several competitions/seasons; the
+                # season label is what tells two otherwise-identical rows apart.
+                "season_name": doc.get("season_name") or str(doc.get("season_id") or ""),
                 "path":        f"{doc.get('_country','')}/{doc.get('_competition','')}/{doc.get('_club','')}/{doc.get('_file','')}",
                 "nrm":         _nrm(name)
             })
@@ -752,7 +1030,7 @@ def get_all_players_flat(output_dir, query="", limit=20):
 
 def get_all_clubs_flat(output_dir, query="", limit=20, league_filter=""):
     db = _db()
-    mfilter: dict = {}
+    mfilter: dict = dict(_NOT_WORLDCUP)
     if league_filter:
         parts = league_filter.split("/")
         if len(parts) >= 1 and parts[0]:
@@ -984,35 +1262,73 @@ def load_sofascore_player_for_engine(doc: dict) -> dict:
 
 # ── Storage Management ────────────────────────────────────────────────────────
 
-def purge_league_matches(uniq_tid: int | str):
-    """Delete all match documents for a specific unique_tournament_id."""
+def _team_scope_clause(team_ids):
+    """Mongo clause matching only matches involving `team_ids`, or {} for none.
+
+    Lets a group-scoped competition (e.g. the Big East inside the NCAA) purge or
+    optimise its own matches without touching another conference's.
+    """
+    if not team_ids:
+        return {}
+    ids = []
+    for t in team_ids:
+        try:
+            ids.append(int(t))
+        except (TypeError, ValueError):
+            continue
+    if not ids:
+        return {}
+    return {"$or": [{"home_team_id": {"$in": ids}},
+                    {"away_team_id": {"$in": ids}}]}
+
+
+def purge_league_matches(uniq_tid: int | str, team_ids=None):
+    """Delete all match documents for a specific unique_tournament_id.
+
+    team_ids restricts the purge to a group scope, so purging the Big East
+    leaves any other NCAA conference already scraped intact.
+    """
     db = _db()
     try:
-        tid = int(uniq_tid)
-        res = db.matches.delete_many({"unique_tournament_id": tid})
+        tid   = int(uniq_tid)
+        scope = _team_scope_clause(team_ids)
+        res = db.matches.delete_many({"unique_tournament_id": tid, **scope})
         # Also clear average heatmaps for this league
-        db.team_last5match_average_heatmap.delete_many({"unique_tournament_id": tid})
+        hm_filter = {"unique_tournament_id": tid}
+        if scope:
+            hm_filter["team_id"] = {"$in": [int(t) for t in team_ids
+                                            if str(t).lstrip('-').isdigit()]}
+        db.team_last5match_average_heatmap.delete_many(hm_filter)
         return res.deleted_count
     except Exception:
         return 0
 
-def optimize_league_storage(uniq_tid: int | str, n: int = 5):
+def optimize_league_storage(uniq_tid: int | str, n: int = 5, team_ids=None):
     """Keep only the N most recent matches for every team in a league.
-    
+
     A match is kept if it's in the 'top N' for EITHER the home or away team.
     Matches not belonging to any team's 'top N' in this league are deleted.
+
+    team_ids restricts both the teams considered and the matches eligible for
+    deletion, so optimising a scoped competition can't discard another group's
+    history.
     """
     db = _db()
     try:
-        tid = int(uniq_tid)
+        tid   = int(uniq_tid)
+        scope = _team_scope_clause(team_ids)
         # 1. Find all teams that have matches in this league
-        team_ids = set()
+        league_teams = set()
         for side in ["home_team_id", "away_team_id"]:
-            team_ids.update(db.matches.distinct(side, {"unique_tournament_id": tid}))
-        
+            league_teams.update(
+                db.matches.distinct(side, {"unique_tournament_id": tid, **scope}))
+        if team_ids:
+            allowed = {int(t) for t in team_ids if str(t).lstrip('-').isdigit()}
+            league_teams &= allowed
+
         # 2. For each team, get their top N match event_ids
         keep_ids = set()
-        for t_id in team_ids:
+        for t_id in league_teams:
             if t_id is None: continue
             recent = list(db.matches.find(
                 {
@@ -1023,11 +1339,12 @@ def optimize_league_storage(uniq_tid: int | str, n: int = 5):
             ).sort("match_date", -1).limit(n))
             for m in recent:
                 keep_ids.add(m["event_id"])
-        
+
         # 3. Delete matches in this league that are NOT in keep_ids
         res = db.matches.delete_many({
             "unique_tournament_id": tid,
-            "event_id": {"$nin": list(keep_ids)}
+            "event_id": {"$nin": list(keep_ids)},
+            **scope,
         })
         return res.deleted_count
     except Exception:

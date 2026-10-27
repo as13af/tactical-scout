@@ -22,9 +22,31 @@
     {% else %}
       <span class="comp-type-badge comp-type-league">League</span>
     {% endif %}
+    {% if data.seasons and data.seasons|length > 1 %}
+      <select id="season-switcher"
+              onchange="if(this.value){var u=new URL(window.location);u.searchParams.set('season',this.value);window.location=u;}"
+              title="Switch season"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+                     color:var(--text);padding:3px 8px;font-size:12px;font-family:'CoFoSans',sans-serif;cursor:pointer;">
+        {% for s in data.seasons %}
+          <option value="{{ s.season_id }}" {% if s.season_id == data.season_id %}selected{% endif %}>{{ s.season_name }}</option>
+        {% endfor %}
+      </select>
+    {% elif data.season_name %}
+      <span class="comp-type-badge" title="Season">{{ data.season_name }}</span>
+    {% endif %}
   </div>
   <div class="sub">
     {{ country.replace('_',' ') }} · {{ data.clubs|length }} teams
+    {% if scrapers_enabled %}{# admin-only: scraping lives in the admin app #}
+    {% if data.group_filter %}
+      &nbsp;·&nbsp;
+      <span class="scope-chip"
+            title="Scraping is scoped to: {{ data.group_filter|join(', ') }}">
+        ◱ {{ data.group_filter|length }} group{{ 's' if data.group_filter|length != 1 }} scoped
+      </span>
+    {% endif %}
+    {% endif %}
     {% if cvs_score is defined and cvs_score %}
       &nbsp;·&nbsp;
       <span title="IFFHS Competitive Value Score — England Premier League = 100" style="
@@ -37,6 +59,77 @@
     {% endif %}
   </div>
   <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
+    {% if scrapers_enabled %}{# admin-only: scraping lives in the admin app #}
+    {% if data.tid and data.uniq_tid and data.season_id %}
+    <button id="update-btn"
+            class="btn-update"
+            data-tid="{{ data.tid }}"
+            data-uniq-tid="{{ data.uniq_tid }}"
+            data-season="{{ data.season_id }}">
+      ↻ Update Data
+    </button>
+    <label id="form-flag-wrap"
+           style="display:flex;align-items:center;gap:5px;font-size:11px;
+                  color:var(--text3);cursor:pointer;user-select:none;"
+           title="Also scrape last 5 matches per team in this competition for form fingerprint and tactical heatmaps. When a group scope is active, only in-scope (e.g. conference) matches count.">
+      <input type="checkbox" id="include-form-chk" style="cursor:pointer;">
+      + Form &amp; Heatmaps
+    </label>
+    <label id="form-formation-wrap"
+           style="display:flex;align-items:center;gap:5px;font-size:11px;
+                  color:var(--text3);cursor:pointer;user-select:none;"
+           title="Also resolve each head coach's preferred formation (extra requests per team — slower). Off = leave any existing formation untouched.">
+      <input type="checkbox" id="include-formation-chk" style="cursor:pointer;">
+      + Coach Formation
+    </label>
+    <label id="form-profile-wrap"
+           style="display:flex;align-items:center;gap:5px;font-size:11px;
+                  color:var(--text3);cursor:pointer;user-select:none;"
+           title="Also capture each coach's Details card (nationality, age, matches, points/match, W-D-L). One extra request per team.">
+      <input type="checkbox" id="include-profile-chk" style="cursor:pointer;">
+      + Coach Profile
+    </label>
+    <button id="form-refresh-btn"
+            class="btn-update"
+            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);"
+            data-uniq-tid="{{ data.uniq_tid }}"
+            data-season="{{ data.season_id }}">
+      ↺ Refresh Form Data
+    </button>
+    <button id="manager-refresh-btn"
+            class="btn-update"
+            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);"
+            title="Re-fetch just the head coaches (preferred formation + profile) for every club in this competition — fast, no player re-scrape"
+            data-uniq-tid="{{ data.uniq_tid }}"
+            data-season="{{ data.season_id }}">
+      👔 Refresh Coach Data
+    </button>
+    {% if data.available_groups and data.available_groups|length > 1 %}
+    <button id="scope-btn"
+            class="btn-update"
+            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);"
+            title="Choose which groups/conferences of this competition get scraped. Applies to every scrape and refresh below."
+            data-uniq-tid="{{ data.uniq_tid }}"
+            data-season="{{ data.season_id }}">
+      ◱ {% if data.group_filter %}Change Scope{% else %}Set Scope{% endif %}
+    </button>
+    {% endif %}
+    <button id="optimize-btn"
+            class="btn-update"
+            style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);"
+            title="Keep only the 5 most recent matches for every team"
+            data-uniq-tid="{{ data.uniq_tid }}">
+      ⚙ Optimize Storage
+    </button>
+    <button id="purge-btn"
+            class="btn-update"
+            style="background:var(--bg3);border:1px solid var(--border);color:var(--red);"
+            title="Delete all match data for this competition"
+            data-uniq-tid="{{ data.uniq_tid }}">
+      🗑 Purge Matches
+    </button>
+    {% endif %}
+    {% endif %}
     <a href="/competition/{{ country }}/{{ competition }}/playing-styles"
        class="btn-update"
        style="text-decoration:none; display:inline-block;">
@@ -45,6 +138,65 @@
   </div>
 </div>
 
+{% if scrapers_enabled %}{# admin-only: scraping lives in the admin app #}
+<!-- Scrape progress modal -->
+<div id="scrape-modal" class="scrape-modal" style="display:none;">
+  <div class="scrape-modal-inner">
+    <div class="scrape-modal-header">
+      <span id="scrape-modal-title">Scraping SofaScore…</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button id="scrape-stop" class="scrape-close" style="display:none;border-color:var(--red,#e74c3c);color:var(--red,#e74c3c);">⏹ Stop</button>
+        <button id="scrape-force-kill" class="scrape-close" style="display:none;background:var(--red,#e74c3c);color:#fff;border-color:var(--red,#e74c3c);" title="Immediately kill all browser processes">⚡ Force Kill</button>
+        <button id="scrape-close" class="scrape-close" disabled>✕</button>
+      </div>
+    </div>
+    <div class="scrape-progress-wrap">
+      <div id="scrape-bar" class="scrape-bar" style="width:0%"></div>
+    </div>
+    <div id="scrape-pct" style="font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+      <span id="scrape-pct-num">0%</span>
+      <span id="scrape-eta-stat" style="display:none;"></span>
+    </div>
+    <div id="scrape-clubs-stat" style="display:none;font-size:11px;color:var(--text3);margin-bottom:6px;"></div>
+    <!-- Shown when a scrape pauses to ask which groups/conferences to pull -->
+    <div id="scrape-group-picker" class="gp-wrap" style="display:none;margin-bottom:8px;"></div>
+    <textarea id="scrape-log" class="scrape-log" readonly></textarea>
+    <div id="scrape-done-msg" style="display:none; margin-top:10px; font-size:13px;"></div>
+  </div>
+</div>
+
+<!-- Group / conference scope editor -->
+<div id="scope-modal" class="scrape-modal" style="display:none;">
+  <div class="scrape-modal-inner">
+    <div class="scrape-modal-header">
+      <span>Scrape Scope</span>
+      <button id="scope-close" class="scrape-close">✕</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.5;">
+      Only the selected groups are scraped — teams, coaches, form matches and
+      match-storage maintenance all follow this scope. Leave everything ticked
+      to scrape the whole competition.
+    </div>
+    <div id="scope-picker" class="gp-wrap"></div>
+    <div class="gp-buttons">
+      <button type="button" id="scope-save" class="gp-btn gp-btn-primary">Save scope</button>
+      <button type="button" id="scope-clear" class="gp-btn">Scrape everything</button>
+      <button type="button" id="scope-refresh" class="gp-btn"
+              title="Re-read the competition's group list from SofaScore (opens a browser, ~1 min)">
+        ↻ Refresh group list
+      </button>
+    </div>
+    <div id="scope-msg" style="display:none;font-size:12px;"></div>
+  </div>
+</div>
+
+<script type="application/json" id="comp-groups-data">
+  {{ (data.available_groups or []) | tojson }}
+</script>
+<script type="application/json" id="comp-scope-data">
+  {{ (data.group_filter or []) | tojson }}
+</script>
+{% endif %}
 
 {# ═══════════════════════════════════════════════════════════════════════════
    LEAGUE LAYOUT — single standings table
@@ -67,14 +219,14 @@
 
     {% if data.standings %}
       <div id="standings-all-view">
-        {{ _standings_table(data.standings) }}
+        {{ _standings_table(data.standings, data.season_id) }}
       </div>
       {% if data.standings_phases | length > 1 %}
       <div id="standings-phase-view" style="display:none;">
         {% for phase in data.standings_phases %}
         <div class="phase-section" {% if not loop.first %}style="margin-top:20px;"{% endif %}>
           <div class="phase-title">{{ phase.phase_name }}</div>
-          {{ _standings_table(phase.rows) }}
+          {{ _standings_table(phase.rows, data.season_id) }}
         </div>
         {% endfor %}
       </div>
@@ -89,7 +241,7 @@
     <div class="card-title" style="margin-bottom:12px;">Clubs</div>
     <div style="display:flex; flex-direction:column; gap:8px;">
       {% for club in data.clubs %}
-        {{ _club_card(club, country, competition) }}
+        {{ _club_card(club, country, competition, data.season_id) }}
       {% endfor %}
     </div>
   </div>
@@ -147,7 +299,7 @@
                   {% endif %}
                 </td>
                 <td>
-                  <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}"
+                  <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}{% if data.season_id %}?season={{ data.season_id }}{% endif %}"
                      style="font-size:12px;">{{ row.team.name }}</a>
                 </td>
                 <td class="td-num">{{ row.matches }}</td>
@@ -218,7 +370,7 @@
         {% for row in phase.rows %}{% set _ = phase_team_names.append(row.team.name) %}{% endfor %}
         {% for club in data.clubs %}
           {% if club.name in phase_team_names %}
-            {{ _club_card(club, country, competition) }}
+            {{ _club_card(club, country, competition, data.season_id) }}
           {% endif %}
         {% endfor %}
       </div>
@@ -232,13 +384,13 @@
     <div style="margin-bottom:20px;">
       <div class="card-title" style="margin-bottom:10px;">Other Teams</div>
       <div class="group-clubs-grid">
-        {% for club in ungrouped %}{{ _club_card(club, country, competition) }}{% endfor %}
+        {% for club in ungrouped %}{{ _club_card(club, country, competition, data.season_id) }}{% endfor %}
       </div>
     </div>
     {% endif %}
   {% else %}
     <div class="group-clubs-grid">
-      {% for club in data.clubs %}{{ _club_card(club, country, competition) }}{% endfor %}
+      {% for club in data.clubs %}{{ _club_card(club, country, competition, data.season_id) }}{% endfor %}
     </div>
   {% endif %}
 </div>
@@ -291,7 +443,7 @@
 <div>
   <div class="card-title" style="margin-bottom:12px;">Teams</div>
   <div class="group-clubs-grid">
-    {% for club in data.clubs %}{{ _club_card(club, country, competition) }}{% endfor %}
+    {% for club in data.clubs %}{{ _club_card(club, country, competition, data.season_id) }}{% endfor %}
   </div>
 </div>
 
@@ -308,7 +460,7 @@
   {%- for c in data.clubs if c.team_id|string == team.id|string -%}{{ c.slug }}
   {%- else -%}{{ team.name | replace(' ','_') }}{%- endfor -%}
 {%- endmacro %}
-{% macro _standings_table(rows) %}
+{% macro _standings_table(rows, season='') %}
 <div class="table-wrap">
   <table>
     <thead>
@@ -341,7 +493,7 @@
             {% endif %}
           </td>
           <td>
-            <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}">
+            <a href="/competition/{{ country }}/{{ competition }}/{{ _team_slug(row.team) }}{% if season %}?season={{ season }}{% endif %}">
               {{ row.team.name }}
             </a>
           </td>
@@ -360,14 +512,21 @@
 </div>
 {% endmacro %}
 
-{% macro _club_card(club, country, competition) %}
-<a href="/competition/{{ country }}/{{ competition }}/{{ club.slug }}" class="competition-card" style="padding:12px 16px;"
+{% macro _club_card(club, country, competition, season='') %}
+<a href="/competition/{{ country }}/{{ competition }}/{{ club.slug }}{% if season %}?season={{ season }}{% endif %}" class="competition-card" style="padding:12px 16px;"
    data-tc-primary="{{ club.team_colors.primary }}"
    data-tc-secondary="{{ club.team_colors.secondary }}">
   <div class="flex-between">
     <div>
       <div class="name" style="font-size:13px;">{{ club.name }}</div>
-      <div class="meta">{{ club.player_count }} players</div>
+      {# player_count is the CURRENT squad. season_player_count includes players
+         who have since left — surfaced as a tooltip so the number stays clean. #}
+      {%- set _departed = (club.season_player_count or club.player_count) - club.player_count -%}
+      <div class="meta"
+           {% if _departed > 0 %}title="{{ club.season_player_count }} played this season · {{ _departed }} since departed"{% endif %}>
+        {{ club.player_count }} players{% if club.foreign_players %} · {{ club.foreign_players }} foreign 🌍{% endif %}
+        {%- if _departed > 0 %} <span style="color:var(--text3);opacity:.75;">(+{{ _departed }} left)</span>{% endif %}
+      </div>
     </div>
     {% if club.stats %}
       <div style="text-align:right; font-size:11px; color:var(--text2);">
@@ -407,6 +566,567 @@
   });
 })();
 </script>
+{% if scrapers_enabled %}{# admin-only: scraping lives in the admin app #}
+<script>
+(function () {
+  const SEASON_ID     = {{ (data.season_id or '') | tojson }};
+  const UNIQ_TID      = {{ (data.uniq_tid  or '') | tojson }};
+  const btn           = document.getElementById('update-btn');
+  const refreshBtn    = document.getElementById('form-refresh-btn');
+  const managerBtn    = document.getElementById('manager-refresh-btn');
+  const optimizeBtn   = document.getElementById('optimize-btn');
+  const purgeBtn      = document.getElementById('purge-btn');
+  const modal         = document.getElementById('scrape-modal');
+  const modalTitle    = document.getElementById('scrape-modal-title');
+  const closeBtn      = document.getElementById('scrape-close');
+  const stopBtn       = document.getElementById('scrape-stop');
+  const forceKillBtn  = document.getElementById('scrape-force-kill');
+  const bar           = document.getElementById('scrape-bar');
+  const pctNum        = document.getElementById('scrape-pct-num');
+  const etaStat       = document.getElementById('scrape-eta-stat');
+  const clubsStat     = document.getElementById('scrape-clubs-stat');
+  const logEl         = document.getElementById('scrape-log');
+  const doneMsg       = document.getElementById('scrape-done-msg');
+  const groupPickerEl = document.getElementById('scrape-group-picker');
+
+  const LS_KEY = 'scrape_log_last';
+
+  let jobStartTime    = null;
+  let _activeTrigger  = null;
+  let _activeJobId    = null;
+  let _pollStopped    = false;
+  let _clubsDone      = 0;
+  let _playersScraped = 0;
+  // Time spent waiting on the group prompt is think time, not scrape time —
+  // excluded so the ETA isn't skewed by how long you deliberated.
+  let _pausedMs       = 0;
+  let _pausedSince    = null;
+  let _pickerShown    = false;
+
+  function elapsedSeconds() {
+    if (!jobStartTime) return 0;
+    const paused = _pausedMs + (_pausedSince ? Date.now() - _pausedSince : 0);
+    return Math.max(0, Math.floor((Date.now() - jobStartTime - paused) / 1000));
+  }
+
+  (function () {
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (!saved) return;
+      const p = JSON.parse(saved);
+      if (!p.done) return;
+      if (Date.now() - p.ts > 86400000) return;
+      logEl.value = p.lines || '';
+      bar.style.width = '100%';
+      pctNum.textContent = '100%';
+      doneMsg.style.color = p.error ? 'var(--red,#e74c3c)' : 'var(--green,#27ae60)';
+      doneMsg.textContent = p.error
+        ? '✗ Last scrape failed — log restored from previous session.'
+        : '✓ Last scrape completed — log restored from previous session.';
+      doneMsg.style.display = 'block';
+      closeBtn.disabled = false;
+      stopBtn.style.display = 'none';
+      forceKillBtn.style.display = 'none';
+      _showDownloadBtn();
+    } catch (_) {}
+  })();
+
+  function _persistLog(done, error) {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        lines: logEl.value, done: !!done, error: !!error, ts: Date.now(),
+      }));
+    } catch (_) {}
+  }
+
+  function _showDownloadBtn() {
+    if (document.getElementById('scrape-download-btn')) return;
+    const dl = document.createElement('button');
+    dl.id = 'scrape-download-btn';
+    dl.textContent = '⬇ Download Log';
+    dl.style.cssText = 'margin-top:8px;background:var(--bg3);border:1px solid var(--border);'
+      + 'color:var(--text2);border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;';
+    dl.addEventListener('click', function () {
+      const blob = new Blob([logEl.value], { type: 'text/plain' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = 'scrape_log_' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    doneMsg.insertAdjacentElement('afterend', dl);
+  }
+
+  function fmtSec(s) {
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return r > 0 ? m + 'm ' + r + 's' : m + 'm';
+  }
+
+  function _summarySuffix() {
+    const parts = [];
+    if (_playersScraped > 0) parts.push(_playersScraped + ' players scraped');
+    if (_clubsDone > 0)      parts.push(_clubsDone + ' clubs done');
+    const elapsed = elapsedSeconds();
+    if (elapsed > 0) parts.push(fmtSec(elapsed) + ' elapsed');
+    return parts.length ? '\n\nSo far: ' + parts.join(' · ') : '';
+  }
+
+  function resetModal(title) {
+    jobStartTime    = Date.now();
+    _clubsDone      = 0;
+    _playersScraped = 0;
+    _pausedMs       = 0;
+    _pausedSince    = null;
+    _pickerShown    = false;
+    if (groupPickerEl) { groupPickerEl.style.display = 'none'; groupPickerEl.innerHTML = ''; }
+    modalTitle.textContent = title;
+    bar.style.width = '0%';
+    pctNum.textContent = '0%';
+    etaStat.style.display = 'none';
+    etaStat.textContent = '';
+    clubsStat.style.display = 'none';
+    clubsStat.textContent = '';
+    logEl.value = '';
+    doneMsg.style.display = 'none';
+    doneMsg.textContent = '';
+    closeBtn.disabled = true;
+    stopBtn.style.display = '';
+    stopBtn.disabled = false;
+    stopBtn.textContent = '⏹ Stop';
+    forceKillBtn.style.display = '';
+    forceKillBtn.disabled = false;
+    forceKillBtn.textContent = '⚡ Force Kill';
+    const old = document.getElementById('scrape-download-btn');
+    if (old) old.remove();
+    _pollStopped = false;
+    modal.style.display = 'flex';
+  }
+
+  function disableButtons() {
+    if (btn)         btn.disabled         = true;
+    if (refreshBtn)  refreshBtn.disabled  = true;
+    if (managerBtn)  managerBtn.disabled  = true;
+    if (optimizeBtn) optimizeBtn.disabled = true;
+    if (purgeBtn)    purgeBtn.disabled    = true;
+  }
+
+  function enableButtons() {
+    if (btn)         btn.disabled         = false;
+    if (refreshBtn)  refreshBtn.disabled  = false;
+    if (managerBtn)  managerBtn.disabled  = false;
+    if (optimizeBtn) optimizeBtn.disabled = false;
+    if (purgeBtn)    purgeBtn.disabled    = false;
+  }
+
+  if (optimizeBtn) {
+    optimizeBtn.addEventListener('click', function() {
+      if (!confirm('Optimize Match Storage? This will delete all match data except the last 5 games for every team in this competition.')) return;
+      disableButtons();
+      const uniqTid = optimizeBtn.dataset.uniqTid;
+      fetch('/api/optimize_league', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({uniq_tid: uniqTid, season_id: SEASON_ID}),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          alert(`Success! Deleted ${data.deleted_count} old matches.`);
+          window.location.reload();
+        } else {
+          alert('Error: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .finally(() => enableButtons());
+    });
+  }
+
+  if (purgeBtn) {
+    purgeBtn.addEventListener('click', function() {
+      if (!confirm('PURGE ALL MATCH DATA? This will delete EVERY match and tactical heatmap for this competition. This cannot be undone.')) return;
+      disableButtons();
+      const uniqTid = purgeBtn.dataset.uniqTid;
+      fetch('/api/purge_league', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({uniq_tid: uniqTid, season_id: SEASON_ID}),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          alert(`Purge Complete. Deleted ${data.deleted_count} matches.`);
+          window.location.reload();
+        } else {
+          alert('Error: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .finally(() => enableButtons());
+    });
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      _activeTrigger = btn;
+      resetModal('Scraping SofaScore…');
+      disableButtons();
+      const tid     = btn.dataset.tid;
+      const uniqTid = btn.dataset.uniqTid;
+      const season  = btn.dataset.season;
+      const includeForm = document.getElementById('include-form-chk')?.checked || false;
+      const includeFormation = document.getElementById('include-formation-chk')?.checked || false;
+      const includeProfile = document.getElementById('include-profile-chk')?.checked || false;
+      if (includeForm) {
+        document.getElementById('scrape-modal-title').textContent =
+          'Scraping SofaScore + Form Data (cross-competition)…';
+      }
+      fetch('/api/scrape', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({tid, uniq_tid: uniqTid, season_id: season, skip: false,
+                              include_form: includeForm,
+                              include_manager_formation: includeFormation,
+                              include_manager_profile: includeProfile}),
+      })
+      .then(r => r.json())
+      .then(data => { if (data.error) { showError(data.error); return; } _activeJobId = data.job_id; poll(data.job_id, 0); })
+      .catch(e => showError(String(e)));
+    });
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function () {
+      _activeTrigger = refreshBtn;
+      resetModal('Refreshing Form Data (last 5 matches per team, cross-competition)…');
+      disableButtons();
+      const uniqTid = refreshBtn.dataset.uniqTid;
+      const season  = refreshBtn.dataset.season;
+      fetch('/api/form_refresh', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({uniq_tid: uniqTid, season_id: season}),
+      })
+      .then(r => r.json())
+      .then(data => { if (data.error) { showError(data.error); return; } _activeJobId = data.job_id; poll(data.job_id, 0); })
+      .catch(e => showError(String(e)));
+    });
+  }
+
+  if (managerBtn) {
+    managerBtn.addEventListener('click', function () {
+      _activeTrigger = managerBtn;
+      resetModal('Refreshing Coach Data (formation + profile per team)…');
+      disableButtons();
+      const uniqTid = managerBtn.dataset.uniqTid;
+      const season  = managerBtn.dataset.season;
+      fetch('/api/manager_refresh', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({uniq_tid: uniqTid, season_id: season,
+                              include_manager_formation: true,
+                              include_manager_profile: true}),
+      })
+      .then(r => r.json())
+      .then(data => { if (data.error) { showError(data.error); return; } _activeJobId = data.job_id; poll(data.job_id, 0); })
+      .catch(e => showError(String(e)));
+    });
+  }
+
+  function poll(jobId, offset) {
+    fetch(`/api/scrape/${jobId}?offset=${offset}`)
+      .then(r => r.json())
+      .then(data => {
+        if (_pollStopped) return;
+        if (data.error) { showError(data.error); return; }
+
+        const visible = (data.lines || []).filter(l => {
+          if (l.startsWith('PROGRESS:') || l.startsWith('PHASE2_PROGRESS:')) return false;
+          if (l.includes('JSON + heatmap saved') || l.includes('JSON saved (no heatmap)')) {
+            _playersScraped++;
+          }
+          return true;
+        });
+        if (visible.length) {
+          logEl.value += visible.join('\n') + '\n';
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // ── Paused: the scrape is waiting for a group/conference selection ──
+        if (data.paused && data.awaiting_groups) {
+          if (_pausedSince === null) _pausedSince = Date.now();
+          if (!_pickerShown && window.GroupPicker) {
+            _pickerShown = true;
+            modalTitle.textContent = 'Choose which group(s) to scrape';
+            GroupPicker.attachToJob({
+              container: groupPickerEl,
+              jobId:     jobId,
+              groups:    data.awaiting_groups,
+              onResume:  function (names) {
+                _pausedMs   += Date.now() - _pausedSince;
+                _pausedSince = null;
+                modalTitle.textContent = names
+                  ? 'Scraping ' + names.length + ' group(s)…'
+                  : 'Scraping all groups…';
+              },
+              onCancel:  function () {
+                _pausedMs   += Date.now() - _pausedSince;
+                _pausedSince = null;
+              },
+            });
+          }
+          setTimeout(() => poll(jobId, data.total), 1500);
+          return;
+        }
+        if (_pausedSince !== null) {
+          _pausedMs   += Date.now() - _pausedSince;
+          _pausedSince = null;
+        }
+        if (_pickerShown && groupPickerEl && groupPickerEl.style.display !== 'none') {
+          groupPickerEl.style.display = 'none';
+          groupPickerEl.innerHTML = '';
+        }
+
+        const pct = data.progress || 0;
+        bar.style.width = pct + '%';
+        pctNum.textContent = pct + '%';
+
+        const p2Done  = data.phase2_clubs_done  || 0;
+        const p2Total = data.phase2_clubs_total || 0;
+        _clubsDone = p2Done;
+        const elapsedSec = elapsedSeconds();
+
+        if (elapsedSec > 0) {
+          let etaText = fmtSec(elapsedSec) + ' elapsed';
+          if (p2Done > 0 && p2Total > 0 && !data.done) {
+            const etaSec = Math.round((elapsedSec / p2Done) * (p2Total - p2Done));
+            etaText += ' / ~' + fmtSec(etaSec) + ' left';
+          }
+          etaStat.textContent = etaText;
+          etaStat.style.display = '';
+        }
+
+        if (p2Total > 0) {
+          const remaining = p2Total - p2Done;
+          let speedStr = '—';
+          if (p2Done > 0 && elapsedSec > 0) {
+            speedStr = (p2Done / elapsedSec * 60).toFixed(1) + ' teams/min';
+          }
+          clubsStat.textContent =
+            p2Done + ' / ' + p2Total + ' teams done · ' +
+            remaining + ' remaining · ' + speedStr;
+          clubsStat.style.display = '';
+        }
+
+        if (data.done) {
+          bar.style.width = '100%';
+          pctNum.textContent = '100%';
+          stopBtn.style.display = 'none';
+          forceKillBtn.style.display = 'none';
+          closeBtn.disabled = false;
+          enableButtons();
+
+          const isError = !!data.error;
+          if (isError) {
+            doneMsg.style.color = 'var(--red, #e74c3c)';
+            doneMsg.textContent = '✗ Failed — see log above.';
+          } else {
+            doneMsg.style.color = 'var(--green, #27ae60)';
+            doneMsg.textContent = '✓ Done. Reload the page to see updated data.';
+          }
+          doneMsg.style.display = 'block';
+          _persistLog(true, isError);
+          _showDownloadBtn();
+        } else {
+          _persistLog(false, false);
+          setTimeout(() => poll(jobId, data.total), 1500);
+        }
+      })
+      .catch(e => showError(String(e)));
+  }
+
+  function showError(msg) {
+    logEl.value += '\nERROR: ' + msg + '\n';
+    doneMsg.style.color = 'var(--red, #e74c3c)';
+    doneMsg.textContent = '✗ ' + msg;
+    doneMsg.style.display = 'block';
+    stopBtn.style.display = 'none';
+    forceKillBtn.style.display = 'none';
+    closeBtn.disabled = false;
+    enableButtons();
+    _persistLog(true, true);
+    _showDownloadBtn();
+  }
+
+  forceKillBtn.addEventListener('click', function () {
+    const msg = 'FORCE KILL will immediately terminate all browser processes. Any player currently being scraped will be lost.' + _summarySuffix() + '\n\nProceed?';
+    if (!confirm(msg)) return;
+    _pollStopped = true;
+    forceKillBtn.disabled = true;
+    forceKillBtn.textContent = 'Killing…';
+    stopBtn.style.display = 'none';
+    logEl.value += '\n[Force Kill] Terminating all browser processes…\n';
+    logEl.scrollTop = logEl.scrollHeight;
+    fetch('/api/scrape/cancel_all', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        const ts = new Date().toLocaleTimeString();
+        logEl.value += `[${ts}] [Force Kill] Done — ${d.jobs_cancelled} job(s) cancelled, ${d.browsers_killed || 0} browser process(es) killed.\n`;
+        logEl.value += `[${ts}] [Force Kill] Players scraped before kill: ${_playersScraped}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+        forceKillBtn.style.display = 'none';
+        closeBtn.disabled = false;
+        enableButtons();
+        doneMsg.style.color = 'var(--amber, #f0a500)';
+        doneMsg.textContent = '⚡ Force-killed. Browsers terminated. ' + _playersScraped + ' players were scraped.';
+        doneMsg.style.display = 'block';
+        _persistLog(true, true);
+        _showDownloadBtn();
+      })
+      .catch(() => { forceKillBtn.textContent = '⚡ Force Kill'; forceKillBtn.disabled = false; });
+  });
+
+  stopBtn.addEventListener('click', function () {
+    if (!_activeJobId) return;
+    const msg = 'Stop scrape gracefully? The current team will finish before halting.' + _summarySuffix() + '\n\nProceed?';
+    if (!confirm(msg)) return;
+    stopBtn.disabled = true;
+    stopBtn.textContent = 'Stopping…';
+    const ts = new Date().toLocaleTimeString();
+    logEl.value += `\n[${ts}] [Stop] Cancellation requested — finishing current team then halting…\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+    fetch(`/api/scrape/${_activeJobId}/cancel`, { method: 'POST' });
+  });
+
+  closeBtn.addEventListener('click', function () {
+    modal.style.display = 'none';
+  });
+})();
+</script>
+<script>
+/* ── Group / conference scope editor ── */
+(function () {
+  const scopeBtn = document.getElementById('scope-btn');
+  if (!scopeBtn) return;                    // single-group competition
+
+  const modal      = document.getElementById('scope-modal');
+  const closeBtn   = document.getElementById('scope-close');
+  const pickerEl   = document.getElementById('scope-picker');
+  const saveBtn    = document.getElementById('scope-save');
+  const clearBtn   = document.getElementById('scope-clear');
+  const refreshBtn = document.getElementById('scope-refresh');
+  const msgEl      = document.getElementById('scope-msg');
+
+  const uniqTid  = scopeBtn.dataset.uniqTid;
+  const seasonId = scopeBtn.dataset.season;
+
+  function readJson(id, fallback) {
+    try { return JSON.parse(document.getElementById(id).textContent) || fallback; }
+    catch (_) { return fallback; }
+  }
+
+  let groups   = readJson('comp-groups-data', []);
+  let selected = readJson('comp-scope-data', []);
+  let picker   = null;
+
+  function say(text, ok) {
+    msgEl.textContent = text;
+    msgEl.style.color = ok === false ? 'var(--red,#e74c3c)'
+                      : ok === true  ? 'var(--green,#27ae60)'
+                      : 'var(--text3)';
+    msgEl.style.display = 'block';
+  }
+
+  function render() {
+    picker = GroupPicker.mount(pickerEl, groups, {
+      title: groups.length + ' group(s) in this competition',
+      selected: selected,
+    });
+  }
+
+  function busy(on) {
+    [saveBtn, clearBtn, refreshBtn].forEach(b => { b.disabled = on; });
+  }
+
+  scopeBtn.addEventListener('click', function () {
+    msgEl.style.display = 'none';
+    render();
+    modal.style.display = 'flex';
+  });
+
+  closeBtn.addEventListener('click', function () { modal.style.display = 'none'; });
+
+  saveBtn.addEventListener('click', function () {
+    const names = picker.selected();
+    if (!names.length) { say('Select at least one group, or use "Scrape everything".', false); return; }
+    busy(true);
+    fetch('/api/group_filter', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({uniq_tid: uniqTid, season_id: seasonId, group_names: names}),
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { say('Error: ' + d.error, false); busy(false); return; }
+        say('Saved — ' + names.length + ' group(s), ' + (d.team_count || 0)
+            + ' team(s). Reloading…', true);
+        setTimeout(() => window.location.reload(), 700);
+      })
+      .catch(e => { say(String(e), false); busy(false); });
+  });
+
+  clearBtn.addEventListener('click', function () {
+    if (!confirm('Remove the scope so the whole competition gets scraped?')) return;
+    busy(true);
+    fetch('/api/group_filter', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({uniq_tid: uniqTid, season_id: seasonId, clear: true}),
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { say('Error: ' + d.error, false); busy(false); return; }
+        say('Scope removed. Reloading…', true);
+        setTimeout(() => window.location.reload(), 700);
+      })
+      .catch(e => { say(String(e), false); busy(false); });
+  });
+
+  refreshBtn.addEventListener('click', function () {
+    busy(true);
+    say('Opening a browser and re-reading the standings — this takes about a minute…');
+    fetch('/api/refresh_groups', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({uniq_tid: uniqTid, season_id: seasonId}),
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { say('Error: ' + d.error, false); busy(false); return; }
+        (function pollGroups() {
+          fetch('/api/refresh_groups/' + d.job_id)
+            .then(r => r.json())
+            .then(s => {
+              if (!s.done) { setTimeout(pollGroups, 2000); return; }
+              busy(false);
+              if (s.error) { say('Failed: ' + (s.lines || []).slice(-1)[0], false); return; }
+              // Keep whatever is still ticked, drop anything that vanished.
+              selected = picker.selected();
+              groups   = s.groups || groups;
+              const names = new Set(groups.map(g => g.phase_name));
+              selected = selected.filter(n => names.has(n));
+              render();
+              say('Group list refreshed — ' + groups.length + ' group(s).', true);
+            })
+            .catch(e => { say(String(e), false); busy(false); });
+        })();
+      })
+      .catch(e => { say(String(e), false); busy(false); });
+  });
+})();
+</script>
+{% endif %}
 <script>
 function showStandingsView(mode) {
   const allView    = document.getElementById('standings-all-view');

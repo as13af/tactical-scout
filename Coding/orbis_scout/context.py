@@ -107,6 +107,13 @@ search_players        = _loader.search_players
 search_free_agents    = getattr(_loader, 'search_free_agents',
                                 lambda *a, **k: {'players': [], 'total': 0, 'page': 1,
                                                  'per_page': 50, 'total_pages': 0})
+# Season enumeration (Mongo loader only; file-system loader has no seasons concept).
+get_competition_seasons = getattr(_loader, 'get_competition_seasons', lambda *a, **k: [])
+# Cross-competition player lookup (Mongo loader only) — one player_id can hold a
+# doc per (tournament_id, season_id), e.g. a league record and a national-cup one.
+get_player_competitions = getattr(_loader, 'get_player_competitions', lambda *a, **k: [])
+# Club comparison pool for the club percentile panel (both loaders implement it).
+get_competition_club_stats = getattr(_loader, 'get_competition_club_stats', lambda *a, **k: [])
 get_all_players_flat  = _loader.get_all_players_flat
 get_all_clubs_flat    = _loader.get_all_clubs_flat
 get_heatmap_path      = _loader.get_heatmap_path
@@ -138,7 +145,10 @@ import time as _time
 _home_stats_cache = {'data': None, 'ts': 0}
 _HOME_STATS_TTL   = 300  # 5 minutes
 
-_player_id_cache: dict = {}  # player_id -> profile_path
+# (player_id, tournament_id) -> profile_path. The tournament is part of the key
+# because one player_id can have a profile in several competitions; without it
+# the first match found wins forever and shadows the others.
+_player_id_cache: dict = {}
 
 # == Match-stats layer + background-job registry ============================
 import threading as _threading

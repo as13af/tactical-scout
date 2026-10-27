@@ -8,7 +8,9 @@ import context as ctx
 from context import (
     _logger,
     OUTPUT_DIR, MATCH_OUTPUT_DIR, _WEBAPP_DIR,
-    get_all_competitions, get_competition, get_club, get_club_players,
+    get_all_competitions, get_competition, get_competition_seasons,
+    get_player_competitions,
+    get_club, get_club_players,
     get_player, search_players, search_free_agents,
     get_all_players_flat, get_all_clubs_flat,
     get_heatmap_path, get_home_stats,
@@ -98,12 +100,14 @@ def index():
 
 @bp.route('/competition/<country>/<competition>')
 def competition(country, competition):
-    data = get_competition(OUTPUT_DIR, country, competition)
+    season = request.args.get('season') or None
+    data = get_competition(OUTPUT_DIR, country, competition, season_id=season)
     from tactical_match_engine.services.json_loader import get_league_intensity
     cvs_score = round(get_league_intensity(country.replace('_', ' '), competition.replace('_', ' ')) * 100, 1)
     comp_type = data.get('competition_type', 'league')
     return render_template('competition.html', data=data, country=country, competition=competition,
-                           cvs_score=cvs_score, comp_type=comp_type)
+                           cvs_score=cvs_score, comp_type=comp_type,
+                           season=data.get('season_id'))
 
 
 @bp.route('/competition/<country>/<competition>/playing-styles')
@@ -121,7 +125,8 @@ def playing_styles(country, competition):
 @bp.route('/competition/<country>/<competition>/<club>')
 def club(country, competition, club):
     club = club.replace('-', '_')
-    data    = get_club(OUTPUT_DIR, country, competition, club)
+    season  = request.args.get('season') or None
+    data    = get_club(OUTPUT_DIR, country, competition, club, season_id=season)
     if not data:
         # Links built from a display name ("Dagenham_&_Redbridge") miss the folder
         # slug, which the scraper builds with safe_name(): non-word chars → "_",
@@ -131,9 +136,15 @@ def club(country, competition, club):
             qs = request.query_string.decode()
             return redirect(f'/competition/{country}/{competition}/{canonical}'
                             + (f'?{qs}' if qs else ''))
-    players = get_club_players(OUTPUT_DIR, country, competition, club)
+    players = get_club_players(OUTPUT_DIR, country, competition, club, season_id=season)
+    # Seasons available for this league (for the season-aware links/switcher context).
+    seasons = get_competition_seasons(OUTPUT_DIR, country, competition)
+    active_season = season or data.get('season_id') or (seasons[0]['season_id'] if seasons else None)
+    season_name = next((s['season_name'] for s in seasons if s['season_id'] == active_season),
+                       active_season)
     return render_template('club.html', data=data, players=players,
-                           country=country, competition=competition, club=club)
+                           country=country, competition=competition, club=club,
+                           season=active_season, season_name=season_name, seasons=seasons)
 
 
 # ── Team contribution breakdown ───────────────────────────────────────────────
@@ -237,7 +248,11 @@ def build_team_contribution(player_stats, team_stats):
 @bp.route('/player/<country>/<competition>/<club>/<player_file>')
 def player(country, competition, club, player_file):
     club = club.replace('-', '_')
-    data         = get_player(OUTPUT_DIR, country, competition, club, player_file)
+    season       = request.args.get('season') or None
+    data         = get_player(OUTPUT_DIR, country, competition, club, player_file, season_id=season)
+    # The player's own season (from its doc/filename) drives the club lookup and
+    # links below — no ?season= must not silently mean "latest season".
+    season       = season or (str(data.get('season_id')) if data.get('season_id') else None)
     heatmap_path = get_heatmap_path(OUTPUT_DIR, country, competition, club, player_file)
     from tactical_match_engine.services.json_loader import get_league_intensity
     cvs_score = round(get_league_intensity(country.replace('_', ' '), competition.replace('_', ' ')) * 100, 1)
@@ -249,7 +264,11 @@ def player(country, competition, club, player_file):
     match_count  = 0
     if player_id:
         try:
-            _appearances = get_player_match_history(int(player_id), MATCH_OUTPUT_DIR)
+            # Scope to this competition — the same player_id can hold records in
+            # several competitions and their appearances must not be pooled.
+            _appearances = get_player_match_history(
+                int(player_id), MATCH_OUTPUT_DIR,
+                tournament_id=data.get('tournament_id'))
             match_count  = len(_appearances)
             if match_count > 0:
                 match_per90 = compute_per90(_appearances)
@@ -258,17 +277,34 @@ def player(country, competition, club, player_file):
     # Team contribution breakdown (player season total ÷ team season total)
     contribution = None
     try:
-        club_data  = get_club(OUTPUT_DIR, country, competition, club)
+        club_data  = get_club(OUTPUT_DIR, country, competition, club, season_id=season)
         team_stats = (club_data or {}).get('season_statistics', {}).get('statistics', {})
         contribution = build_team_contribution(
             data.get('statistics', {}).get('statistics', {}), team_stats)
     except Exception:
         contribution = None
+    # Resolve a human-readable season label for the departed/current badge.
+    active_season = season or data.get('season_id')
+    seasons = get_competition_seasons(OUTPUT_DIR, country, competition)
+    season_name = next((s['season_name'] for s in seasons if s['season_id'] == str(active_season)),
+                       active_season)
+    # Other competitions/seasons holding a record for this same player_id.
+    player_competitions = get_player_competitions(player_id) if player_id else []
     return render_template('player.html', data=data, heatmap=heatmap_path,
                            country=country, competition=competition, club=club,
                            cvs_score=cvs_score, player_path=player_path,
                            match_per90=match_per90, match_count=match_count,
-                           contribution=contribution)
+                           contribution=contribution,
+                           player_competitions=player_competitions,
+                           season=active_season, season_name=season_name)
+
+
+@bp.route('/heatmap/<path:filepath>')
+def heatmap_image(filepath):
+    full = os.path.join(OUTPUT_DIR, filepath)
+    if os.path.exists(full):
+        return send_file(full, mimetype='image/png')
+    return '', 404
 
 
 @bp.route('/players')

@@ -30,6 +30,14 @@ from services.scatter import (
 bp = Blueprint('compatibility', __name__)
 
 
+def _latest_season_filter(country, competition):
+    """Mongo filter for a league's latest season. Mongo keeps several seasons of
+    a league side by side, so an unscoped query pools them and counts every
+    player and club once per season."""
+    sid = ctx._loader._resolve_season(OUTPUT_DIR, country, competition, None)
+    return {'season_id': sid} if sid else {}
+
+
 @bp.route('/compatibility')
 def compatibility():
     return render_template('compatibility.html')
@@ -123,7 +131,8 @@ def api_compatibility_avg():
                     {'_country': country, '_competition': competition}, limit=1) == 0:
                 return jsonify({'error': 'competition directory not found'}), 404
             for doc in ctx._loader._db().players.find(
-                    {'_country': country, '_competition': competition}):
+                    {'_country': country, '_competition': competition,
+                     **_latest_season_filter(country, competition)}):
                 if doc.get('_club') == club_slug and doc.get('_file') == target_file:
                     continue
                 try:
@@ -281,7 +290,8 @@ def api_league_suitability():
             player_count = 0
             if ctx._USING_MONGO:
                 for _pd in ctx._loader._db().players.find(
-                        {'_country': c_name, '_competition': comp_name},
+                        {'_country': c_name, '_competition': comp_name,
+                         **_latest_season_filter(c_name, comp_name)},
                         {'positions': 1, 'position': 1}):
                     _pos = [str(p).upper() for p in (_pd.get('positions') or [_pd.get('position', '')])]
                     if get_position_line(_pos) == cand_line:
@@ -422,7 +432,8 @@ def api_club_suitability():
             club_entries = [
                 (d.get('_club', ''), d.get('team_name') or str(d.get('_club', '')).replace('_', ' '))
                 for d in ctx._loader._db().clubs.find(
-                    {'_country': tc, '_competition': tcomp}, {'_club': 1, 'team_name': 1})
+                    {'_country': tc, '_competition': tcomp,
+                     **_latest_season_filter(tc, tcomp)}, {'_club': 1, 'team_name': 1})
             ]
         else:
             club_entries = []
