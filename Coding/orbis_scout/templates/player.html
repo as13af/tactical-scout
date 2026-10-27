@@ -509,7 +509,7 @@
       <span style="display:inline-block; font-size:9px; font-weight:700; letter-spacing:.06em; background:#0F0F0F; color:#FFFFFF; border-radius:4px; padding:2px 6px; text-transform:uppercase;">{{ match_count }} match{% if match_count > 1 %}es{% endif %}</span>
     </div>
     {% if data.get('player_id') %}
-    <a href="/player_matches/{{ data.player_id }}" class="btn btn-ghost" style="font-size:12px; padding:5px 12px;">
+    <a href="/player_matches/{{ data.player_id }}?tournament={{ data.get('tournament_id', '') }}&season={{ data.get('season_id', '') }}" class="btn btn-ghost" style="font-size:12px; padding:5px 12px;">
       📋 Full Match History →
     </a>
     {% endif %}

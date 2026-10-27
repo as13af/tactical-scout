@@ -20,6 +20,10 @@ import os
 from pathlib import Path
 from typing import Any
 
+# Match data is each team's last-5 form set: the player page and per-90 use at
+# most this many of a player's most recent matches.
+LAST_N_MATCHES = 5
+
 
 # ── Stat metadata ─────────────────────────────────────────────────────────────
 
@@ -176,6 +180,7 @@ def get_player_match_history(
     match_output_dir: str | None = None,
     tournament_id: int | str | None = None,
     season_id: int | str | None = None,
+    limit: int | None = None,
 ) -> list[dict]:
     """
     Return a list of per-match records for *player_id* from MongoDB, oldest first.
@@ -185,6 +190,11 @@ def get_player_match_history(
     competitions — a league and a national-team cup, say — otherwise has all of
     them concatenated into a single history, which skews compute_per90().
     Omitting both keeps the original unfiltered behaviour.
+
+    *limit* keeps only the most recent N matches (still returned oldest first).
+    Matches are stored as each team's last-5 form set, so a player also turns up
+    in opponents' sets and in every new push; the cap keeps the history at the
+    player's own latest LAST_N_MATCHES however many matches are stored.
     """
     try:
         from mongo_loader import _db
@@ -208,8 +218,12 @@ def get_player_match_history(
                 query["season_id"] = int(season_id)
             except (TypeError, ValueError):
                 query["season_id"] = season_id
-        docs = list(db.matches.find(query).sort("match_date", 1))
-        
+        if limit:
+            docs = list(db.matches.find(query).sort("match_date", -1).limit(int(limit)))
+            docs.reverse()
+        else:
+            docs = list(db.matches.find(query).sort("match_date", 1))
+
         appearances: list[dict] = []
         for m in docs:
             # Find which side the player was on

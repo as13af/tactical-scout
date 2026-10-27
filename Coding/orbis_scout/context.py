@@ -156,7 +156,7 @@ import uuid as _uuid
 from match_loader import (
     get_all_matches, get_match,
     get_player_match_history, compute_per90,
-    MATCH_STATS_META, _DERIVED_STATS,
+    MATCH_STATS_META, _DERIVED_STATS, LAST_N_MATCHES,
 )
 
 MATCH_OUTPUT_DIR = _resolve_dir('TACTICAL_MATCH_OUTPUT_DIR', '..', 'match_output')

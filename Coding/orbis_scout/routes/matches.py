@@ -12,7 +12,7 @@ from context import (
     get_player, search_players, get_all_players_flat, get_all_clubs_flat,
     get_heatmap_path, get_home_stats, get_player_competitions,
     store_get, is_import_token, token_id, build_engine_candidate,
-    get_all_matches, get_match, get_player_match_history, compute_per90,
+    get_all_matches, get_match, get_player_match_history, compute_per90, LAST_N_MATCHES,
     MATCH_STATS_META, _DERIVED_STATS,
     _home_stats_cache, _HOME_STATS_TTL, _player_id_cache,
 )
@@ -93,8 +93,10 @@ def player_matches(player_id: int):
     # Optional competition scope. Without it a player who appears in more than
     # one competition gets all of them pooled into a single per-90.
     tournament_id = request.args.get('tournament') or None
+    season_id     = request.args.get('season') or None
     appearances = get_player_match_history(player_id, MATCH_OUTPUT_DIR,
-                                           tournament_id=tournament_id)
+                                           tournament_id=tournament_id,
+                                           season_id=season_id, limit=LAST_N_MATCHES)
     per90_data  = compute_per90(appearances)
 
     # Try to find the player's name + overall profile link

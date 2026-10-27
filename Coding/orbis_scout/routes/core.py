@@ -15,7 +15,7 @@ from context import (
     get_all_players_flat, get_all_clubs_flat,
     get_heatmap_path, get_home_stats,
     store_get, is_import_token, token_id, build_engine_candidate,
-    get_all_matches, get_match, get_player_match_history, compute_per90,
+    get_all_matches, get_match, get_player_match_history, compute_per90, LAST_N_MATCHES,
     MATCH_STATS_META, _DERIVED_STATS,
     _home_stats_cache, _HOME_STATS_TTL, _player_id_cache,
     _scrape_jobs, _scrape_jobs_lock,
@@ -264,11 +264,13 @@ def player(country, competition, club, player_file):
     match_count  = 0
     if player_id:
         try:
-            # Scope to this competition — the same player_id can hold records in
-            # several competitions and their appearances must not be pooled.
+            # Scope to this competition and season — the same player_id can hold
+            # records in several, and their appearances must not be pooled — and
+            # to the player's latest LAST_N_MATCHES.
             _appearances = get_player_match_history(
                 int(player_id), MATCH_OUTPUT_DIR,
-                tournament_id=data.get('tournament_id'))
+                tournament_id=data.get('tournament_id'),
+                season_id=data.get('season_id'), limit=LAST_N_MATCHES)
             match_count  = len(_appearances)
             if match_count > 0:
                 match_per90 = compute_per90(_appearances)
